@@ -1,25 +1,25 @@
 {
 	"schema_version": 1,
 	"quilt_loader": {
-		"group": "com.example",
-		"id": "example_mod",
+		"group": "io.github.antikyth",
+		"id": "searchable",
 		"version": "${version}",
 		"metadata": {
-			"name": "Mod Name",
-			"description": "A short description of your mod.",
+			"name": "Searchable",
+			"description": "Adds a search bar to the languages screen.",
 			"contributors": {
-				"Your name here": "Owner"
+				"Antikyth": "Owner"
 			},
 			"contact": {
-				"homepage": "https://example.com/",
-				"issues": "https://github.com/QuiltMC/quilt-template-mod/issues",
-				"sources": "https://github.com/QuiltMC/quilt-template-mod"
+				"homepage": "https://github.com/Antikyth/searchable",
+				"issues": "https://github.com/Antikyth/searchable/issues",
+				"sources": "https://github.com/Antikyth/searchable"
 			},
-			"icon": "assets/example_mod/icon.png"
+			"icon": "assets/searchable/icon.png"
 		},
 		"intermediate_mappings": "net.fabricmc:intermediary",
 		"entrypoints": {
-			"init": "com.example.example_mod.ExampleMod"
+			"init": "io.github.antikyth.searchable.Searchable"
 		},
 		"depends": [
 			{
@@ -36,5 +36,5 @@
 			}
 		]
 	},
-	"mixin": "example_mod.mixins.json"
+	"mixin": "searchable.mixins.json"
 }

@@ -17,8 +17,7 @@ indent_style = tab
 indent_style = tab
 
 [*.json]
-indent_style = space
-indent_size = 2
+indent_style = tab
 
 [quilt.mod.json]
 indent_style = tab

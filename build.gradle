@@ -72,6 +72,10 @@ java {
 	// withJavadocJar()
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/${base.archivesName.get()}.accesswidener")
+}
+
 // If you plan to use a different file for the license, don't forget to change the file name here!
 jar {
 	from('LICENSE') {

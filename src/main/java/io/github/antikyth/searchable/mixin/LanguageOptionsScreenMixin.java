@@ -1,5 +1,7 @@
 package io.github.antikyth.searchable.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import io.github.antikyth.searchable.Searchable;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
@@ -8,15 +10,20 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LanguageOptionsScreen.class)
 public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen {
 	@Unique
 	private TextFieldWidget searchBox;
+
+	@Shadow
+	private LanguageOptionsScreen.LanguageSelectionListWidget languageSelectionList;
 
 	// Mixin will ignore this - required because of extending `GameOptionsScreen`
 	public LanguageOptionsScreenMixin(Screen parent, GameOptions gameOptions, Text title) {
@@ -66,6 +73,12 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen {
 		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
 	}
 
-	// TODO: modify keyPressed
-
+	// Only select a language when a toggle key is pressed if the language selection list is focused.
+	@ModifyExpressionValue(method = "keyPressed", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/CommonInputs;isToggle(I)Z"
+	))
+	private boolean onlySelectLanguageIfFocused(boolean original) {
+		return original && this.languageSelectionList.equals(this.getFocused());
+	}
 }

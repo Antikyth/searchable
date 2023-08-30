@@ -6,7 +6,7 @@
 		"version": "${version}",
 		"metadata": {
 			"name": "Searchable",
-			"description": "Adds a search bar to the languages screen.",
+			"description": "Adds a search bar to the languages and controls options screens.",
 			"contributors": {
 				"Antikyth": "Owner"
 			},
@@ -37,5 +37,6 @@
 			}
 		]
 	},
-	"mixin": "searchable.mixins.json"
+	"mixin": "searchable.mixins.json",
+	"access_widener": "searchable.accesswidener"
 }

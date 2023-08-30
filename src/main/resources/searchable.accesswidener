@@ -1,3 +1,24 @@
 accessWidener v2 named
 
+#######################################
+# Classes                             #
+#######################################
+
+# LanguageOptionsScreen.LanguageSelectionList
 accessible class net/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget
+
+# EntryListWidget.Entry
+accessible class net/minecraft/client/gui/widget/EntryListWidget$Entry
+
+
+#######################################
+# Fields                              #
+#######################################
+
+# LanguageOptionsScreen.LanguageSelectionList.LanguageEntry.languageDefinition
+accessible field net/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry languageDefinition Lnet/minecraft/text/Text;
+# LanguageOptionsScreen.LanguageSelectionList.LanguageEntry.languageCode
+accessible field net/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry languageCode Ljava/lang/String;
+
+# LanguageOptionsScreen.languageManager
+accessible field net/minecraft/client/gui/screen/option/LanguageOptionsScreen languageManager Lnet/minecraft/client/resource/language/LanguageManager;

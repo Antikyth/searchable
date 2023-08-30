@@ -26,15 +26,34 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen {
 	// Add the search box to the UI
 	@Inject(method = "init", at = @At("HEAD"))
 	public void onInit(CallbackInfo ci) {
+		Searchable.LOGGER.debug("adding search box to language options screen...");
+
 		// Search box coordinates and size copied from the world selection screen.
-		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 208, 20, Text.translatable("option.language.search"));
+		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 208, 20, this.searchBox, Text.translatable("option.language.search"));
 		this.addSelectableChild(this.searchBox);
+
+		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select
+		// screen's search box.
+		this.setInitialFocus(this.searchBox);
 	}
 
 	/******************************************************************************************************************\
 	 * The language selection list is moved down in the `LanguageSelectionListMixin`, as its coords are hardcoded in    *
 	 * its constructor.                                                                                                 *
 	 \******************************************************************************************************************/
+
+	// Move the title text up 8 pixels to make room for the search box.
+	@ModifyArg(method = "render", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredShadowedText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V",
+		ordinal = 0
+	), index = 3)
+	public int adjustTitleTextYCoord(int y) {
+		Searchable.LOGGER.debug("moving language selection screen title up by 8px...");
+
+		// The world selection screen has its title 8 pixels higher to make room for its search box.
+		return y - 8;
+	}
 
 	// Render the search box (after the language selection list has been rendered, so the search box isn't hidden by the
 	// background)

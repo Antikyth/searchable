@@ -26,9 +26,15 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen {
 	// Add the search box to the UI
 	@Inject(method = "init", at = @At("HEAD"))
 	public void onInit(CallbackInfo ci) {
-		this.searchBox = new TextFieldWidget(this.textRenderer, 0, 0, 208, 20, Text.translatable("option.languageSearch"));
+		// Search box coordinates and size copied from the world selection screen.
+		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 208, 20, Text.translatable("option.language.search"));
 		this.addSelectableChild(this.searchBox);
 	}
+
+	/******************************************************************************************************************\
+	 * The language selection list is moved down in the `LanguageSelectionListMixin`, as its coords are hardcoded in    *
+	 * its constructor.                                                                                                 *
+	 \******************************************************************************************************************/
 
 	// Render the search box (after the language selection list has been rendered, so the search box isn't hidden by the
 	// background)
@@ -41,7 +47,6 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen {
 		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
 	}
 
-	// TODO: move languages list down
-
 	// TODO: modify keyPressed
+
 }

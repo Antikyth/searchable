@@ -1,4 +1,4 @@
-package io.github.antikyth.searchable.mixin;
+package io.github.antikyth.searchable.mixin.keybind;
 
 import io.github.antikyth.searchable.Searchable;
 import net.minecraft.client.gui.widget.option.KeyBindListWidget;

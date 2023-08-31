@@ -1,4 +1,4 @@
-package io.github.antikyth.searchable.mixin;
+package io.github.antikyth.searchable.mixin.language;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import io.github.antikyth.searchable.Searchable;
@@ -52,7 +52,7 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 		Searchable.LOGGER.debug("adding search box to language options screen...");
 
 		// Search box coordinates and size copied from the world selection screen.
-		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 208, 20, this.searchBox, Text.translatable("option.language.search"));
+		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, Text.translatable("option.language.search"));
 		// Filter the language selection list when the query is changed.
 		this.searchBox.setChangedListener(query -> ((ILanguageSelectionListWidgetMixin) this.languageSelectionList).filter(query, this.languageManager.getAllLanguages()));
 

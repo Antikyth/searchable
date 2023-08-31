@@ -1,4 +1,4 @@
-package io.github.antikyth.searchable.mixin;
+package io.github.antikyth.searchable.mixin.keybind;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
@@ -25,7 +25,7 @@ public class KeyBindScreenMixin extends GameOptionsScreen {
 
 	@Inject(method = "init", at = @At("HEAD"))
 	public void onInit(CallbackInfo ci) {
-		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 208, 20, this.searchBox, Text.translatable("controls.keybinds.search"));
+		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, Text.translatable("controls.keybinds.search"));
 
 		this.addSelectableChild(this.searchBox);
 		this.setInitialFocus(this.searchBox);

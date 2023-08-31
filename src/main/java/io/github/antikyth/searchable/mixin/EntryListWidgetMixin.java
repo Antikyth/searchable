@@ -14,30 +14,30 @@ import java.util.List;
 
 @Mixin(EntryListWidget.class)
 public abstract class EntryListWidgetMixin<E extends EntryListWidget.Entry<E>> extends AbstractParentElement {
-    @Shadow
-    @Override
-    public abstract List<? extends Element> children();
+	@Shadow
+	@Override
+	public abstract List<? extends Element> children();
 
-    @Shadow
-    @Nullable
-    public abstract E getSelectedOrNull();
+	@Shadow
+	@Nullable
+	public abstract E getSelectedOrNull();
 
-    @Shadow
-    public abstract void setSelected(@Nullable E entry);
+	@Shadow
+	public abstract void setSelected(@Nullable E entry);
 
-    @Shadow
-    protected abstract void clearEntries();
+	@Shadow
+	public abstract void clearEntries();
 
-    @Shadow
-    protected abstract int addEntry(E entry);
+	@Shadow
+	public abstract int addEntry(E entry);
 
-    @Shadow
-    protected abstract void centerScrollOn(E entry);
+	@Shadow
+	protected abstract void centerScrollOn(E entry);
 
-    @Shadow
-    public abstract void setScrollAmount(double amount);
+	@Shadow
+	public abstract void setScrollAmount(double amount);
 
-    @Inject(method = "setSelected", at = @At("HEAD"))
-    protected void onSetSelected(@Nullable E entry, CallbackInfo ci) {
-    }
+	@Inject(method = "setSelected", at = @At("HEAD"))
+	protected void onSetSelected(@Nullable E entry, CallbackInfo ci) {
+	}
 }

@@ -15,10 +15,23 @@ accessible class net/minecraft/client/gui/widget/EntryListWidget$Entry
 # Fields                              #
 #######################################
 
-# LanguageOptionsScreen.LanguageSelectionList.LanguageEntry.languageDefinition
+# Text LanguageOptionsScreen.LanguageSelectionList.LanguageEntry.languageDefinition
 accessible field net/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry languageDefinition Lnet/minecraft/text/Text;
-# LanguageOptionsScreen.LanguageSelectionList.LanguageEntry.languageCode
+# String LanguageOptionsScreen.LanguageSelectionList.LanguageEntry.languageCode
 accessible field net/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry languageCode Ljava/lang/String;
 
-# LanguageOptionsScreen.languageManager
+# LanguageManager LanguageOptionsScreen.languageManager
 accessible field net/minecraft/client/gui/screen/option/LanguageOptionsScreen languageManager Lnet/minecraft/client/resource/language/LanguageManager;
+
+
+#######################################
+# Methods                             #
+#######################################
+
+# void EntryListWidget.clearEntries()
+accessible method net/minecraft/client/gui/widget/EntryListWidget clearEntries ()V
+# int EntryListWidget.addEntry(EntryListWidget.Entry)
+accessible method net/minecraft/client/gui/widget/EntryListWidget addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I
+
+# void MultiplayerScreen.updateButtonActivationStates()
+accessible method net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen updateButtonActivationStates ()V

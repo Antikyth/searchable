@@ -6,10 +6,12 @@
   "mixins": [],
   "client": [
     "EntryListWidgetMixin",
-    "KeyBindListWidgetMixin",
-    "KeyBindScreenMixin",
-    "LanguageOptionsScreenMixin",
-    "LanguageSelectionListWidgetMixin"
+    "keybind.KeyBindListWidgetMixin",
+    "keybind.KeyBindScreenMixin",
+    "language.LanguageOptionsScreenMixin",
+    "language.LanguageSelectionListWidgetMixin",
+    "multiplayer.MultiplayerScreenMixin",
+    "multiplayer.MultiplayerServerListWidgetMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -21,7 +21,7 @@
 		"intermediate_mappings": "net.fabricmc:intermediary",
 		"entrypoints": {
 			"pre_launch": "io.github.antikyth.searchable.Bootstrap",
-			"init": "io.github.antikyth.searchable.Searchable"
+			"client_init": "io.github.antikyth.searchable.Searchable"
 		},
 		"depends": [
 			{
@@ -39,5 +39,8 @@
 		]
 	},
 	"mixin": "searchable.mixins.json",
-	"access_widener": "searchable.accesswidener"
+	"access_widener": "searchable.accesswidener",
+	"minecraft": {
+		"environment": "client"
+	}
 }

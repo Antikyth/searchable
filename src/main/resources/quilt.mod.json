@@ -7,6 +7,7 @@
 		"metadata": {
 			"name": "Searchable",
 			"description": "Adds search bars to the language selection, server selection, and keybinds screens.",
+			"license": "MPL-2.0",
 			"contributors": {
 				"Antikyth": "Owner"
 			},

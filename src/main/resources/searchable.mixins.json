@@ -11,7 +11,8 @@
     "language.LanguageOptionsScreenMixin",
     "language.LanguageSelectionListWidgetMixin",
     "multiplayer.MultiplayerScreenMixin",
-    "multiplayer.MultiplayerServerListWidgetMixin"
+    "multiplayer.MultiplayerServerListWidgetMixin",
+    "singleplayer.WorldListWidgetMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -15,6 +15,9 @@ accessible class net/minecraft/client/gui/widget/EntryListWidget$Entry
 # Fields                              #
 #######################################
 
+# WorldSaveSummary WorldListWidget.Entry.level
+accessible field net/minecraft/client/gui/screen/world/WorldListWidget$Entry level Lnet/minecraft/world/storage/WorldSaveSummary;
+
 # Text LanguageOptionsScreen.LanguageSelectionList.LanguageEntry.languageDefinition
 accessible field net/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry languageDefinition Lnet/minecraft/text/Text;
 # String LanguageOptionsScreen.LanguageSelectionList.LanguageEntry.languageCode

@@ -105,6 +105,12 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 		});
 
 		this.screen.updateButtonActivationStates();
+
+		if (this.getSelectedOrNull() != null) {
+			this.centerScrollOn(this.getSelectedOrNull());
+		} else {
+			this.setScrollAmount(0.0);
+		}
 	}
 
 	// Filter the server entries added back when `updateEntries()` is called.

@@ -6,7 +6,7 @@
 		"version": "${version}",
 		"metadata": {
 			"name": "Searchable",
-			"description": "Adds a search bar to the languages and controls options screens.",
+			"description": "Adds search bars to the language selection, server selection, and keybinds screens.",
 			"contributors": {
 				"Antikyth": "Owner"
 			},

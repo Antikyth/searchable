@@ -38,3 +38,6 @@ accessible method net/minecraft/client/gui/widget/EntryListWidget addEntry (Lnet
 
 # void MultiplayerScreen.updateButtonActivationStates()
 accessible method net/minecraft/client/gui/screen/multiplayer/MultiplayerScreen updateButtonActivationStates ()V
+
+# constructor KeyBindListWidget.KeyBindEntry.<init>
+accessible method net/minecraft/client/gui/widget/option/KeyBindListWidget$KeyBindEntry <init> (Lnet/minecraft/client/gui/widget/option/KeyBindListWidget;Lnet/minecraft/client/option/KeyBind;Lnet/minecraft/text/Text;)V

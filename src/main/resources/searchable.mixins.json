@@ -6,6 +6,8 @@
   "mixins": [],
   "client": [
     "EntryListWidgetMixin",
+    "KeyBindListWidgetMixin",
+    "KeyBindScreenMixin",
     "LanguageOptionsScreenMixin",
     "LanguageSelectionListWidgetMixin"
   ],

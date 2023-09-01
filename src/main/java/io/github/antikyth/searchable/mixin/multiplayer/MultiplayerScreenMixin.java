@@ -51,7 +51,7 @@ public class MultiplayerScreenMixin extends Screen {
 		Searchable.LOGGER.debug("adding search box to multiplayer servers screen...");
 
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, Text.translatable("selectServer.search"));
-		this.searchBox.setChangedListener(query -> ((IMultiplayerServerListWidgetMixin) this.serverListWidget).setQuery(query));
+		this.searchBox.setChangedListener(query -> ((IMultiplayerServerListWidgetMixin) this.serverListWidget).searchable$setQuery(query));
 
 		this.addSelectableChild(this.searchBox);
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select

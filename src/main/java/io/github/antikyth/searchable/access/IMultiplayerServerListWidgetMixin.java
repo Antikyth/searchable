@@ -7,7 +7,7 @@
 package io.github.antikyth.searchable.access;
 
 public interface IMultiplayerServerListWidgetMixin {
-	String getQuery();
+	String searchable$getQuery();
 
-	void setQuery(String query);
+	void searchable$setQuery(String query);
 }

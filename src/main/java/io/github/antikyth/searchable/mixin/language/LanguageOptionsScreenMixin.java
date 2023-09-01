@@ -37,7 +37,7 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 
 	@Unique
 	@Override
-	public TextFieldWidget getSearchBox() {
+	public TextFieldWidget searchable$getSearchBox() {
 		return searchBox;
 	}
 
@@ -60,7 +60,7 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 		// Search box coordinates and size copied from the world selection screen.
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, Text.translatable("option.language.search"));
 		// Filter the language selection list when the query is changed.
-		this.searchBox.setChangedListener(query -> ((ILanguageSelectionListWidgetMixin) this.languageSelectionList).filter(query, this.languageManager.getAllLanguages()));
+		this.searchBox.setChangedListener(query -> ((ILanguageSelectionListWidgetMixin) this.languageSelectionList).searchable$filter(query, this.languageManager.getAllLanguages()));
 
 		this.addSelectableChild(this.searchBox);
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select
@@ -115,6 +115,6 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 			ordinal = 0
 	))
 	private LanguageEntry setSelectedLanguageEvenIfHidden(LanguageEntry original) {
-		return ((ILanguageSelectionListWidgetMixin) this.languageSelectionList).getSelectedLanguage();
+		return ((ILanguageSelectionListWidgetMixin) this.languageSelectionList).searchable$getSelectedLanguage();
 	}
 }

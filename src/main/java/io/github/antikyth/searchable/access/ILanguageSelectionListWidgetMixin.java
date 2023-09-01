@@ -12,7 +12,7 @@ import net.minecraft.client.resource.language.LanguageDefinition;
 import java.util.Map;
 
 public interface ILanguageSelectionListWidgetMixin {
-	void filter(String query, Map<String, LanguageDefinition> languages);
+	void searchable$filter(String query, Map<String, LanguageDefinition> languages);
 
-	LanguageEntry getSelectedLanguage();
+	LanguageEntry searchable$getSelectedLanguage();
 }

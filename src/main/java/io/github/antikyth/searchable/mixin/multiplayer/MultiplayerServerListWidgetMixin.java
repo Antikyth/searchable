@@ -42,13 +42,13 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 
 	@Unique
 	@Override
-	public String getQuery() {
+	public String searchable$getQuery() {
 		return this.query;
 	}
 
 	@Unique
 	@Override
-	public void setQuery(String query) {
+	public void searchable$setQuery(String query) {
 		if (!query.equals(this.query)) {
 			this.filter(query);
 		}
@@ -125,7 +125,7 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	))
 	private static boolean filterServerEntry(MultiplayerServerListWidget instance, EntryListWidget.Entry<MultiplayerServerListWidget.Entry> entry) {
-		return serverMatchesQuery(((IMultiplayerServerListWidgetMixin) instance).getQuery(), (ServerEntry) entry);
+		return serverMatchesQuery(((IMultiplayerServerListWidgetMixin) instance).searchable$getQuery(), (ServerEntry) entry);
 	}
 
 	// Filter the LAN server entries added back when `updateEntries()` is called.
@@ -134,7 +134,7 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	))
 	private static boolean filterLanServerEntry(MultiplayerServerListWidget instance, EntryListWidget.Entry<MultiplayerServerListWidget.Entry> entry) {
-		return lanServerMatchesQuery(((IMultiplayerServerListWidgetMixin) instance).getQuery(), (LanServerEntry) entry);
+		return lanServerMatchesQuery(((IMultiplayerServerListWidgetMixin) instance).searchable$getQuery(), (LanServerEntry) entry);
 	}
 
 	@Unique

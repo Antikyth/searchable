@@ -44,7 +44,7 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	@Unique
 	@Nullable
 	@Override
-	public LanguageEntry getSelectedLanguage() {
+	public LanguageEntry searchable$getSelectedLanguage() {
 		return selectedLanguage;
 	}
 
@@ -70,8 +70,8 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	// Filter the language selection list at the end of the constructor.
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConstructor(LanguageOptionsScreen languageOptionsScreen, MinecraftClient client, CallbackInfo ci) {
-		String query = ((ILanguageOptionsScreenMixin) languageOptionsScreen).getSearchBox().getText();
-		this.filter(query, languageOptionsScreen.languageManager.getAllLanguages());
+		String query = ((ILanguageOptionsScreenMixin) languageOptionsScreen).searchable$getSearchBox().getText();
+		this.searchable$filter(query, languageOptionsScreen.languageManager.getAllLanguages());
 	}
 
 	// Use `EntryListWidget.nextFocusPath` instead of `AlwaysSelectedEntryListWidget`'s so that we can hide the selected
@@ -98,12 +98,12 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	/**
 	 * Filters the language selection list by the given query.
 	 *
-	 * @param query
 	 * @param languages The language source (i.e. `languageManager.getAllLanguages()`)
 	 */
 	@Override
 	@Unique
-	public void filter(String query, Map<String, LanguageDefinition> languages) {
+	@SuppressWarnings("unchecked")
+	public void searchable$filter(String query, Map<String, LanguageDefinition> languages) {
 		String lowercaseQuery = query.toLowerCase(Locale.ROOT);
 
 		// If the query has changed...
@@ -141,10 +141,6 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 
 	/**
 	 * Whether the given language matches the given query.
-	 *
-	 * @param lowercaseQuery
-	 * @param language
-	 * @return
 	 */
 	@Unique
 	private boolean languageMatches(String lowercaseQuery, LanguageDefinition language) {

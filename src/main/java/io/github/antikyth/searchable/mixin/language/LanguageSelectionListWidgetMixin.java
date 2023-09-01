@@ -7,6 +7,7 @@
 package io.github.antikyth.searchable.mixin.language;
 
 import io.github.antikyth.searchable.Searchable;
+import io.github.antikyth.searchable.access.ILanguageEntryMixin;
 import io.github.antikyth.searchable.access.ILanguageOptionsScreenMixin;
 import io.github.antikyth.searchable.access.ILanguageSelectionListWidgetMixin;
 import io.github.antikyth.searchable.mixin.EntryListWidgetMixin;
@@ -115,14 +116,14 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 			languages.forEach((code, definition) -> {
 				// Add each entry matching the query back
 				if (this.languageMatches(lowercaseQuery, definition)) {
-					@SuppressWarnings("unchecked")
-					var entry = (E) ((LanguageSelectionListWidget) (Object) this).new LanguageEntry(code, definition);
+					var entry = ((LanguageSelectionListWidget) (Object) this).new LanguageEntry(code, definition);
+					((ILanguageEntryMixin) entry).searchable$highlightQuery(query);
 
-					this.addEntry(entry);
+					this.addEntry((E) entry);
 
 					// If it's the previously selected language, select it again.
 					if (selectedLanguage != null && code.equals(selectedLanguage.languageCode)) {
-						this.setSelected(entry);
+						this.setSelected((E) entry);
 					}
 				}
 			});

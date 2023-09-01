@@ -21,9 +21,10 @@ accessible class net/minecraft/client/gui/widget/EntryListWidget$Entry
 # WorldSaveSummary WorldListWidget.Entry.level
 accessible field net/minecraft/client/gui/screen/world/WorldListWidget$Entry level Lnet/minecraft/world/storage/WorldSaveSummary;
 
-# Text LanguageOptionsScreen.LanguageSelectionList.LanguageEntry.languageDefinition
+# Text LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry.languageDefinition
 accessible field net/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry languageDefinition Lnet/minecraft/text/Text;
-# String LanguageOptionsScreen.LanguageSelectionList.LanguageEntry.languageCode
+mutable field net/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry languageDefinition Lnet/minecraft/text/Text;
+# String LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry.languageCode
 accessible field net/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry languageCode Ljava/lang/String;
 
 # LanguageManager LanguageOptionsScreen.languageManager

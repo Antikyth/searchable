@@ -6,7 +6,7 @@
 		"version": "${version}",
 		"metadata": {
 			"name": "Searchable",
-			"description": "Adds search bars to the language selection, server selection, and keybinds screens.",
+			"description": "Improves singleplayer world searching and adds search boxes for servers, languages, and keybinds.",
 			"license": "MPL-2.0",
 			"contributors": {
 				"Antikyth": "Owner"

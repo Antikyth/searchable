@@ -1,4 +1,4 @@
-package io.github.antikyth.searchable;
+package io.github.antikyth.searchable.util;
 
 import net.minecraft.text.MutableText;
 import net.minecraft.text.StringVisitable;

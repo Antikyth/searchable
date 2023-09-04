@@ -7,6 +7,7 @@
 package io.github.antikyth.searchable.mixin.singleplayer;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
@@ -42,7 +43,7 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 			target = "net/minecraft/client/gui/screen/world/WorldListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	), index = 0)
 	private EntryListWidget.Entry<WorldListWidget.AbstractWorldEntry> onAddEntry(EntryListWidget.Entry<WorldListWidget.AbstractWorldEntry> entry) {
-		if (entry instanceof WorldListWidget.Entry worldEntry) {
+		if (Searchable.config.reselectLastSelection && entry instanceof WorldListWidget.Entry worldEntry) {
 			((SetQueryAccessor) (Object) worldEntry).searchable$setQuery(this.query);
 
 			if (worldEntry.level == this.lastSelection) {
@@ -56,6 +57,8 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 	// Match world details in search results as well as the display name and name.
 	@ModifyReturnValue(method = "worldNameMatches", at = @At("RETURN"))
 	private boolean matchWorldDetails(boolean matches, String query, WorldSaveSummary summary) {
+		if (!Searchable.config.selectWorld.matchWorldDetails) return matches;
+
 		var stripped = Formatting.strip(summary.getDetails().getString());
 		if (stripped == null) return matches;
 
@@ -74,7 +77,7 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 	// Keep track of the last (non-null) selected world.
 	@Inject(method = "setSelected(Lnet/minecraft/client/gui/screen/world/WorldListWidget$AbstractWorldEntry;)V", at = @At("TAIL"))
 	public void onSetSelected(WorldListWidget.AbstractWorldEntry abstractWorldEntry, CallbackInfo ci) {
-		if (abstractWorldEntry instanceof WorldListWidget.Entry entry) {
+		if (Searchable.config.reselectLastSelection && abstractWorldEntry instanceof WorldListWidget.Entry entry) {
 			this.lastSelection = entry.level;
 		}
 	}

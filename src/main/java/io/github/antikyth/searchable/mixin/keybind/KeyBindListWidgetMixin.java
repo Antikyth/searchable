@@ -7,8 +7,8 @@
 package io.github.antikyth.searchable.mixin.keybind;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.Util;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.util.Util;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.option.KeyBindsScreen;
 import net.minecraft.client.gui.widget.ElementListWidget;
@@ -16,6 +16,7 @@ import net.minecraft.client.gui.widget.option.KeyBindListWidget;
 import net.minecraft.client.option.KeyBind;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,7 +37,7 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 	@Unique
 	@Override
 	public void searchable$setQuery(String query) {
-		if (!query.equals(this.query)) {
+		if (enabled() && query != null && !query.equals(this.query)) {
 			this.filter(query);
 			this.setScrollAmount(0.0);
 
@@ -53,6 +54,8 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 			target = "net/minecraft/client/gui/widget/ElementListWidget.<init> (Lnet/minecraft/client/MinecraftClient;IIIII)V"
 	), index = 3)
 	private static int adjustTopCoord(int top) {
+		if (!enabled()) return top;
+
 		Searchable.LOGGER.debug("moving keybinds list down by 28px...");
 
 		// 12 pixels lower to match the normal header height (32px), then 16 lower to make space for the search box.
@@ -61,11 +64,15 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 
 	@Inject(method = "<init>", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void onConstructor(KeyBindsScreen parent, MinecraftClient client, CallbackInfo ci, KeyBind[] keyBinds) {
+		if (!enabled()) return;
+
 		this.keyBinds = keyBinds;
 	}
 
 	@Inject(method = "update", at = @At("TAIL"))
 	public void onUpdate(CallbackInfo ci) {
+		if (!enabled()) return;
+
 		filter(this.query);
 	}
 
@@ -84,12 +91,15 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 
 				// Add all keys in category.
 				this.addEntry(((KeyBindListWidget) (Object) this).new KeyBindEntry(keyBind, Text.translatable(keyBind.getTranslationKey())));
-			} else if (matches(query, category)) {
+			} else if (Searchable.config.keybinds.matchCategory && matches(query, category)) {
 				// New whole category match.
 				categoryMatch = category;
 
-				// Add category. Safe cast: input is Text, so output will be Text.
-				this.addEntry(((KeyBindListWidget) (Object) this).new CategoryEntry((Text) Util.textWithHighlight(query, Text.translatable(category))));
+				var categoryTranslation = Text.translatable(category);
+				var categoryText = Searchable.config.highlightMatches ? (Text) Util.textWithHighlight(query, categoryTranslation) : categoryTranslation;
+
+				// Add category.
+				this.addEntry(((KeyBindListWidget) (Object) this).new CategoryEntry(categoryText));
 				// Add key.
 				this.addEntry(((KeyBindListWidget) (Object) this).new KeyBindEntry(keyBind, Text.translatable(keyBind.getTranslationKey())));
 			} else {
@@ -121,14 +131,22 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 
 	@Unique
 	private static boolean keyBindMatches(String query, KeyBind keyBind) {
-		return matches(query, keyBind.getTranslationKey()) || matches(query, keyBind.getKeyTranslationKey());
+		var bindNameMatches = matches(query, keyBind.getTranslationKey());
+		var boundKeyMatches = Searchable.config.keybinds.matchBoundKey && matches(query, keyBind.getKeyTranslationKey());
+
+		return bindNameMatches || boundKeyMatches;
 	}
 
 	@Unique
 	private static boolean matches(String query, String translationKey) {
 		String lowercaseQuery = query.toLowerCase(Locale.ROOT);
-		String target = I18n.translate(translationKey);
+		String target = Formatting.strip(I18n.translate(translationKey));
 
 		return target != null && !target.isEmpty() && target.toLowerCase(Locale.ROOT).contains(lowercaseQuery);
+	}
+
+	@Unique
+	private static boolean enabled() {
+		return Searchable.config.keybinds.enable;
 	}
 }

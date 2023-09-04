@@ -10,6 +10,12 @@ base {
 version = "$project.version+${libs.versions.minecraft.get()}"
 group = project.maven_group
 
+// Exclude Fabric API and Loader so that mods depending on them can be used in the dev environment.
+project.configurations.configureEach {
+	exclude(group: "net.fabricmc", module: "fabric-loader")
+	exclude(group: "net.fabricmc.fabric-api")
+}
+
 repositories {
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because
@@ -24,6 +30,11 @@ repositories {
 	maven {
 		name = "Terraformers"
 		url = "https://maven.terraformersmc.com/releases/"
+	}
+
+	maven {
+		name = "shedaniel"
+		url = "https://maven.shedaniel.me/"
 	}
 }
 
@@ -52,7 +63,10 @@ dependencies {
 	include "com.github.LlamaLad7:MixinExtras:0.1.1"
 
 	// Mod Menu
-	// modRuntimeOnly "com.terraformersmc:modmenu:7.2.1"
+	modApi "com.terraformersmc:modmenu:7.2.1"
+
+	// Cloth Config
+	modApi "me.shedaniel.cloth:cloth-config-fabric:11.1.106"
 }
 
 processResources {

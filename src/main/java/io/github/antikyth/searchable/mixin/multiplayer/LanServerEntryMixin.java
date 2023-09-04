@@ -3,8 +3,9 @@ package io.github.antikyth.searchable.mixin.multiplayer;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import io.github.antikyth.searchable.Util;
+import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.util.Util;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -46,10 +47,13 @@ public class LanServerEntryMixin implements SetQueryAccessor {
 
 	@Override
 	public void searchable$setQuery(String query) {
-		if (query != null && !query.equals(this.query)) {
+		if (enabled() && query != null && !query.equals(this.query)) {
 			// Safe casts: input is Text, so output will be Text.
 			this.titleWithHighlight = (Text) Util.textWithHighlight(query, this.title);
-			this.motdWithHighlight = (Text) Util.textWithHighlight(query, this.motdText);
+
+			if (Searchable.config.selectServer.matchMotd) {
+				this.motdWithHighlight = (Text) Util.textWithHighlight(query, this.motdText);
+			}
 
 			this.query = query;
 		}
@@ -57,15 +61,19 @@ public class LanServerEntryMixin implements SetQueryAccessor {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	protected void onConstructor(MultiplayerScreen screen, LanServerInfo server, CallbackInfo ci) {
+		if (!enabled()) return;
+
 		// Used in case a mixin uses a different title, so we can support that.
 		this.title = TITLE;
 		this.titleWithHighlight = this.title;
 
-		// Used to check for changes to the MOTD.
-		this.motd = this.server.getMotd();
-		// Used to update the highlight.
-		this.motdText = Text.literal(this.motd);
-		this.motdWithHighlight = this.motdText;
+		if (Searchable.config.selectServer.matchMotd) {
+			// Used to check for changes to the MOTD.
+			this.motd = this.server.getMotd();
+			// Used to update the highlight.
+			this.motdText = Text.literal(this.motd);
+			this.motdWithHighlight = this.motdText;
+		}
 	}
 
 	@ModifyArg(method = "render", at = @At(
@@ -74,7 +82,7 @@ public class LanServerEntryMixin implements SetQueryAccessor {
 			ordinal = 0
 	), index = 1)
 	private Text drawTitleWithHighlight(Text title) {
-		if (title == null) return null;
+		if (!enabled() || title == null) return title;
 
 		// If the title has been changed (by another mixin), update the highlight first.
 		if (!title.equals(this.title)) {
@@ -91,7 +99,9 @@ public class LanServerEntryMixin implements SetQueryAccessor {
 			ordinal = 0
 	))
 	private int drawMotdWithHighlight(GuiGraphics graphics, TextRenderer textRenderer, String motd, int x, int y, int color, boolean shadowed, Operation<Integer> original) {
-		if (motd == null) return original.call(graphics, textRenderer, null, x, y, color, shadowed);
+		if (!enabled() || !Searchable.config.selectServer.matchMotd || motd == null) {
+			return original.call(graphics, textRenderer, motd, x, y, color, shadowed);
+		}
 
 		// If the MOTD has been changed, update the highlight first.
 		if (!motd.equals(this.motd)) {
@@ -102,5 +112,10 @@ public class LanServerEntryMixin implements SetQueryAccessor {
 		}
 
 		return graphics.drawText(textRenderer, this.motdWithHighlight, x, y, color, shadowed);
+	}
+
+	@Unique
+	private static boolean enabled() {
+		return Searchable.config.selectServer.enable && Searchable.config.highlightMatches;
 	}
 }

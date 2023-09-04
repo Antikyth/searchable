@@ -40,14 +40,14 @@ public class MultiplayerScreenMixin extends Screen {
 			target = "net/minecraft/text/Text.translatable (Ljava/lang/String;)Lnet/minecraft/text/MutableText;",
 			ordinal = 0
 	), index = 0)
-	private static String correctServerSelectTitle(String title) {
-		// TODO: config option to enable or disable
-		var option = true;
-		return option ? "selectServer.title" : title;
+	private static String changeSelectServerTitle(String title) {
+		return Searchable.config.selectServer.changeSelectServerTitle ? "selectServer.title" : title;
 	}
 
 	@Inject(method = "init", at = @At("HEAD"))
 	private void onInit(CallbackInfo ci) {
+		if (!enabled()) return;
+
 		Searchable.LOGGER.debug("adding search box to multiplayer servers screen...");
 
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, Text.translatable("selectServer.search"));
@@ -78,6 +78,8 @@ public class MultiplayerScreenMixin extends Screen {
 
 	@Unique
 	private int adjustServerListTopCoord(int top) {
+		if (!enabled()) return top;
+
 		Searchable.LOGGER.debug("moving multiplayer servers screen server list down by 16px...");
 
 		return top + 16;
@@ -90,6 +92,8 @@ public class MultiplayerScreenMixin extends Screen {
 			ordinal = 0
 	), index = 3)
 	public int adjustTitleTextYCoord(int y) {
+		if (!enabled()) return y;
+
 		Searchable.LOGGER.debug("moving multiplayer servers screen title up by 12px...");
 
 		return y - 12;
@@ -101,6 +105,13 @@ public class MultiplayerScreenMixin extends Screen {
 			shift = At.Shift.AFTER
 	))
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+		if (!enabled()) return;
+
 		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
+	}
+
+	@Unique
+	private static boolean enabled() {
+		return Searchable.config.selectServer.enable;
 	}
 }

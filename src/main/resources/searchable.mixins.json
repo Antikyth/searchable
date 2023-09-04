@@ -8,7 +8,7 @@
 		"EntryListWidgetMixin",
 		"keybind.KeyBindEntryMixin",
 		"keybind.KeyBindListWidgetMixin",
-		"keybind.KeyBindScreenMixin",
+		"keybind.KeyBindsScreenMixin",
 		"language.LanguageEntryMixin",
 		"language.LanguageOptionsScreenMixin",
 		"language.LanguageSelectionListWidgetMixin",

@@ -55,6 +55,8 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 	// Add the search box to the UI
 	@Inject(method = "init", at = @At("HEAD"))
 	public void onInit(CallbackInfo ci) {
+		if (!enabled()) return;
+
 		Searchable.LOGGER.debug("adding search box to language options screen...");
 
 		// Search box coordinates and size copied from the world selection screen.
@@ -80,6 +82,8 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 			ordinal = 0
 	), index = 3)
 	public int adjustTitleTextYCoord(int y) {
+		if (!enabled()) return y;
+
 		Searchable.LOGGER.debug("moving language selection screen title up by 8px...");
 
 		// The world selection screen has its title 8 pixels higher to make room for its search box.
@@ -94,6 +98,8 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 			shift = At.Shift.AFTER
 	))
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+		if (!enabled()) return;
+
 		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
 	}
 
@@ -103,6 +109,8 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 			target = "Lnet/minecraft/client/gui/CommonInputs;isToggle(I)Z"
 	))
 	private boolean onlySelectLanguageIfFocused(boolean original) {
+		if (!enabled()) return original;
+
 		// Only if the language selection list is focused...
 		return original && this.languageSelectionList.equals(this.getFocused());
 	}
@@ -115,6 +123,13 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 			ordinal = 0
 	))
 	private LanguageEntry setSelectedLanguageEvenIfHidden(LanguageEntry original) {
+		if (!enabled()) return original;
+
 		return ((LanguageSelectionListWidgetAccessor) this.languageSelectionList).searchable$getSelectedLanguage();
+	}
+
+	@Unique
+	private static boolean enabled() {
+		return Searchable.config.language.enable;
 	}
 }

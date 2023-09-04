@@ -12,8 +12,6 @@ import io.github.antikyth.searchable.accessor.language.LanguageOptionsScreenAcce
 import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
 import io.github.antikyth.searchable.mixin.EntryListWidgetMixin;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.ElementPath;
-import net.minecraft.client.gui.navigation.GuiNavigationEvent;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen.LanguageSelectionListWidget;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry;
@@ -61,6 +59,8 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 			target = "Lnet/minecraft/client/gui/widget/AlwaysSelectedEntryListWidget;<init>(Lnet/minecraft/client/MinecraftClient;IIIII)V"
 	), index = 3)
 	private static int adjustTopCoord(int top) {
+		if (!enabled()) return top;
+
 		Searchable.LOGGER.debug("moving language selection list down by 16px...");
 
 		// The world selection screen has the top of its selection list 16 pixels lower to make space for its search
@@ -71,25 +71,29 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	// Filter the language selection list at the end of the constructor.
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConstructor(LanguageOptionsScreen languageOptionsScreen, MinecraftClient client, CallbackInfo ci) {
+		if (!enabled()) return;
+
 		String query = ((LanguageOptionsScreenAccessor) languageOptionsScreen).searchable$getSearchBox().getText();
 		this.searchable$filter(query, languageOptionsScreen.languageManager.getAllLanguages());
 	}
 
-	// Use `EntryListWidget.nextFocusPath` instead of `AlwaysSelectedEntryListWidget`'s so that we can hide the selected
-	// entry when needed.
-	//
-	// Yes, this is overwriting the method. It's because this isn't the behavior we want, nor any potential
-	// modifications made to it by other mixins (which I doubt anyone does).
-	@Nullable
-	public ElementPath nextFocusPath(GuiNavigationEvent event) {
-		return ((EntryListWidget<?>) (Object) this).nextFocusPath(event);
-	}
+//	// Use `EntryListWidget.nextFocusPath` instead of `AlwaysSelectedEntryListWidget`'s so that we can hide the selected
+//	// entry when needed.
+//	//
+//	// Yes, this is overwriting the method. It's because this isn't the behavior we want, nor any potential
+//	// modifications made to it by other mixins (which I doubt anyone does).
+//	@Nullable
+//	public ElementPath nextFocusPath(GuiNavigationEvent event) {
+//		return ((EntryListWidget<?>) (Object) this).nextFocusPath(event);
+//	}
 
 	// Keep track of the latest selected language entry so it can be re-selected if a query hides it and it is then
 	// later shown again.
 	@Override
 	protected void onSetSelected(@Nullable E entry, CallbackInfo ci) {
-		if (entry != null && !entry.equals(selectedLanguage)) {
+		if (!enabled()) return;
+
+		if (Searchable.config.reselectLastSelection && entry != null && !entry.equals(selectedLanguage)) {
 			Searchable.LOGGER.debug("updating selected language...");
 
 			selectedLanguage = (LanguageEntry) entry;
@@ -122,7 +126,7 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 					this.addEntry((E) entry);
 
 					// If it's the previously selected language, select it again.
-					if (selectedLanguage != null && code.equals(selectedLanguage.languageCode)) {
+					if (Searchable.config.reselectLastSelection && selectedLanguage != null && code.equals(selectedLanguage.languageCode)) {
 						this.setSelected((E) entry);
 					}
 				}
@@ -148,5 +152,10 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 		var string = Formatting.strip(language.getDisplayText().getString());
 
 		return string != null && !string.isEmpty() && string.toLowerCase(Locale.ROOT).contains(lowercaseQuery);
+	}
+
+	@Unique
+	private static boolean enabled() {
+		return Searchable.config.language.enable;
 	}
 }

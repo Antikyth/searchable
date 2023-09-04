@@ -6,6 +6,7 @@
 
 package io.github.antikyth.searchable.mixin.keybind;
 
+import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
@@ -23,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(KeyBindsScreen.class)
-public class KeyBindScreenMixin extends GameOptionsScreen {
+public class KeyBindsScreenMixin extends GameOptionsScreen {
 	@Shadow
 	private KeyBindListWidget keyBindList;
 
@@ -31,12 +32,14 @@ public class KeyBindScreenMixin extends GameOptionsScreen {
 	public TextFieldWidget searchBox;
 
 	// Mixin will ignore this - required because of extending `GameOptionsScreen`
-	public KeyBindScreenMixin(Screen parent, GameOptions gameOptions, Text title) {
+	public KeyBindsScreenMixin(Screen parent, GameOptions gameOptions, Text title) {
 		super(parent, gameOptions, title);
 	}
 
 	@Inject(method = "init", at = @At("HEAD"))
 	public void onInit(CallbackInfo ci) {
+		if (!Searchable.config.keybinds.enable) return;
+
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, Text.translatable("controls.keybinds.search"));
 		this.searchBox.setChangedListener(query -> ((SetQueryAccessor) this.keyBindList).searchable$setQuery(query));
 
@@ -50,6 +53,8 @@ public class KeyBindScreenMixin extends GameOptionsScreen {
 			shift = At.Shift.AFTER
 	))
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+		if (!Searchable.config.keybinds.enable) return;
+
 		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
 	}
 }

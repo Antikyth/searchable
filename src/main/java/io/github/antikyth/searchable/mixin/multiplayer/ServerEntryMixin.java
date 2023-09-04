@@ -2,8 +2,9 @@ package io.github.antikyth.searchable.mixin.multiplayer;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import io.github.antikyth.searchable.Util;
+import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.util.Util;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -44,10 +45,13 @@ public class ServerEntryMixin implements SetQueryAccessor {
 	@Unique
 	@Override
 	public void searchable$setQuery(String query) {
-		if (query != null && !query.equals(this.query)) {
+		if (enabled() && query != null && !query.equals(this.query)) {
 			// Safe cast: input is Text, so output will be Text.
 			this.serverNameWithHighlight = (Text) Util.textWithHighlight(query, this.serverNameText);
-			this.serverLabelWithHighlight = Util.textWithHighlight(query, this.serverLabel);
+
+			if (Searchable.config.selectServer.matchMotd) {
+				this.serverLabelWithHighlight = Util.textWithHighlight(query, this.serverLabel);
+			}
 
 			this.query = query;
 		}
@@ -55,15 +59,19 @@ public class ServerEntryMixin implements SetQueryAccessor {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	protected void onConstructor(MultiplayerServerListWidget multiplayerServerListWidget, MultiplayerScreen screen, ServerInfo server, CallbackInfo ci) {
+		if (!enabled()) return;
+
 		// Used to check for changes to the name.
 		this.serverName = this.server.name;
 		// Used to update the highlight.
 		this.serverNameText = Text.literal(this.serverName);
 		this.serverNameWithHighlight = this.serverNameText;
 
-		// Used to check for changes to the label and to update the highlight.
-		this.serverLabel = this.server.label;
-		this.serverLabelWithHighlight = this.serverLabel;
+		if (Searchable.config.selectServer.matchMotd) {
+			// Used to check for changes to the label and to update the highlight.
+			this.serverLabel = this.server.label;
+			this.serverLabelWithHighlight = this.serverLabel;
+		}
 	}
 
 	/**
@@ -75,7 +83,9 @@ public class ServerEntryMixin implements SetQueryAccessor {
 			ordinal = 0
 	))
 	private int drawServerNameWithHighlight(GuiGraphics graphics, TextRenderer textRenderer, String serverName, int x, int y, int color, boolean shadowed, Operation<Integer> original) {
-		if (serverName == null) return original.call(graphics, textRenderer, null, x, y, color, shadowed);
+		if (!enabled() || serverName == null) {
+			return original.call(graphics, textRenderer, serverName, x, y, color, shadowed);
+		}
 
 		// If the server name has been changed, update the highlight first.
 		if (!serverName.equals(this.serverName)) {
@@ -98,7 +108,7 @@ public class ServerEntryMixin implements SetQueryAccessor {
 			ordinal = 0
 	))
 	private StringVisitable drawServerLabelWithHighlight(StringVisitable label) {
-		if (label == null) return null;
+		if (!enabled() || !Searchable.config.selectServer.matchMotd || label == null) return label;
 
 		// If the server label has been changed, update the highlight first.
 		if (!label.equals(this.serverLabel)) {
@@ -107,5 +117,10 @@ public class ServerEntryMixin implements SetQueryAccessor {
 		}
 
 		return this.serverLabelWithHighlight;
+	}
+
+	@Unique
+	private static boolean enabled() {
+		return Searchable.config.selectServer.enable && Searchable.config.highlightMatches;
 	}
 }

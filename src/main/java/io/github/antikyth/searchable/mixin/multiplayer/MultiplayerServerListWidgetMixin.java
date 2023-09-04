@@ -7,6 +7,7 @@
 package io.github.antikyth.searchable.mixin.multiplayer;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.multiplayer.MultiplayerServerListWidgetAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -50,11 +51,10 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 	@Unique
 	@Override
 	public void searchable$setQuery(String query) {
-		if (!query.equals(this.query)) {
+		if (enabled() && query != null && !query.equals(this.query)) {
 			this.filter(query);
+			this.query = query;
 		}
-
-		this.query = query;
 	}
 
 	@Final
@@ -79,7 +79,9 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 
 	@Inject(method = "setSelected(Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget$Entry;)V", at = @At("TAIL"))
 	public void onSetSelected(@Nullable MultiplayerServerListWidget.Entry entry, CallbackInfo ci) {
-		if (entry != null) {
+		if (!enabled()) return;
+
+		if (Searchable.config.reselectLastSelection && entry != null) {
 			lastSelection = entry;
 		}
 	}
@@ -89,6 +91,8 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 	@Unique
 	@SuppressWarnings("unchecked")
 	private void filter(String query) {
+		var reselect = Searchable.config.reselectLastSelection;
+
 		this.clearEntries();
 
 		this.servers.forEach(entry -> {
@@ -97,7 +101,7 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 				((SetQueryAccessor) entry).searchable$setQuery(query);
 				this.addEntry((E) entry);
 
-				if (entry == lastSelection) {
+				if (reselect && entry == lastSelection) {
 					this.setSelected((E) entry);
 				}
 			}
@@ -109,7 +113,7 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 				((SetQueryAccessor) entry).searchable$setQuery(query);
 				this.addEntry((E) entry);
 
-				if (entry == lastSelection) {
+				if (reselect && entry == lastSelection) {
 					this.setSelected((E) entry);
 				}
 			}
@@ -130,6 +134,8 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	))
 	private static boolean filterServerEntry(MultiplayerServerListWidget instance, EntryListWidget.Entry<MultiplayerServerListWidget.Entry> entry) {
+		if (!enabled()) return true;
+
 		return serverMatchesQuery(((MultiplayerServerListWidgetAccessor) instance).searchable$getQuery(), (ServerEntry) entry);
 	}
 
@@ -139,6 +145,8 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	))
 	private static boolean filterLanServerEntry(MultiplayerServerListWidget instance, EntryListWidget.Entry<MultiplayerServerListWidget.Entry> entry) {
+		if (!enabled()) return true;
+
 		return lanServerMatchesQuery(((MultiplayerServerListWidgetAccessor) instance).searchable$getQuery(), (LanServerEntry) entry);
 	}
 
@@ -165,8 +173,13 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 		String lowercaseQuery = query.toLowerCase(Locale.ROOT);
 
 		boolean titleMatches = title != null && !title.isEmpty() && title.toLowerCase(Locale.ROOT).contains(lowercaseQuery);
-		boolean motdMatches = motd != null && !motd.isEmpty() && motd.toLowerCase(Locale.ROOT).contains(lowercaseQuery);
+		boolean motdMatches = Searchable.config.selectServer.matchMotd && motd != null && !motd.isEmpty() && motd.toLowerCase(Locale.ROOT).contains(lowercaseQuery);
 
 		return titleMatches || motdMatches;
+	}
+
+	@Unique
+	private static boolean enabled() {
+		return Searchable.config.selectServer.enable;
 	}
 }

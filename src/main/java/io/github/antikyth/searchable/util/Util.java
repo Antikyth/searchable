@@ -123,9 +123,6 @@ public class Util {
 		return Text.literal(text).setStyle(style);
 	}
 
-	// Note: this is designed after Sponge's implementation here:
-	//
-
 	/**
 	 * Parses legacy text formatted using legacy formatting codes using {@code §} into {@link Text}.
 	 * <p>

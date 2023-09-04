@@ -7,7 +7,7 @@
 package io.github.antikyth.searchable.mixin.multiplayer;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.access.IMultiplayerServerListWidgetMixin;
+import io.github.antikyth.searchable.access.multiplayer.IMultiplayerServerListWidgetMixin;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;

@@ -7,7 +7,8 @@
 package io.github.antikyth.searchable.mixin.multiplayer;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import io.github.antikyth.searchable.access.IMultiplayerServerListWidgetMixin;
+import io.github.antikyth.searchable.access.ISetQuery;
+import io.github.antikyth.searchable.access.multiplayer.IMultiplayerServerListWidgetMixin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -92,6 +93,8 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 
 		this.servers.forEach(entry -> {
 			if (serverMatchesQuery(query, entry)) {
+				// Update highlight.
+				((ISetQuery) entry).searchable$setQuery(query);
 				this.addEntry((E) entry);
 
 				if (entry == lastSelection) {
@@ -102,6 +105,8 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 		this.addEntry((E) this.scanningEntry);
 		this.lanServers.forEach(entry -> {
 			if (lanServerMatchesQuery(query, entry)) {
+				// Update highlight.
+				((ISetQuery) entry).searchable$setQuery(query);
 				this.addEntry((E) entry);
 
 				if (entry == lastSelection) {

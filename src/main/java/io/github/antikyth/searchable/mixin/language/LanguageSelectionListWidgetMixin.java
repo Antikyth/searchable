@@ -7,9 +7,9 @@
 package io.github.antikyth.searchable.mixin.language;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.access.ILanguageEntryMixin;
-import io.github.antikyth.searchable.access.ILanguageOptionsScreenMixin;
-import io.github.antikyth.searchable.access.ILanguageSelectionListWidgetMixin;
+import io.github.antikyth.searchable.access.language.ILanguageEntryMixin;
+import io.github.antikyth.searchable.access.language.ILanguageOptionsScreenMixin;
+import io.github.antikyth.searchable.access.language.ILanguageSelectionListWidgetMixin;
 import io.github.antikyth.searchable.mixin.EntryListWidgetMixin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.ElementPath;

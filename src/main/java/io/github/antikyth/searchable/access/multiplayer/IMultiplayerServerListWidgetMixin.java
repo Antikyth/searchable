@@ -4,10 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.access;
+package io.github.antikyth.searchable.access.multiplayer;
 
-public interface IMultiplayerServerListWidgetMixin {
+import io.github.antikyth.searchable.access.ISetQuery;
+
+public interface IMultiplayerServerListWidgetMixin extends ISetQuery {
 	String searchable$getQuery();
-
-	void searchable$setQuery(String query);
 }

@@ -8,8 +8,8 @@ package io.github.antikyth.searchable.mixin.language;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.access.ILanguageOptionsScreenMixin;
-import io.github.antikyth.searchable.access.ILanguageSelectionListWidgetMixin;
+import io.github.antikyth.searchable.access.language.ILanguageOptionsScreenMixin;
+import io.github.antikyth.searchable.access.language.ILanguageSelectionListWidgetMixin;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;

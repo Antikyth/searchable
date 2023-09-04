@@ -7,7 +7,8 @@
 package io.github.antikyth.searchable.mixin.keybind;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.access.IKeyBindListWidgetMixin;
+import io.github.antikyth.searchable.Util;
+import io.github.antikyth.searchable.access.ISetQuery;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.option.KeyBindsScreen;
 import net.minecraft.client.gui.widget.ElementListWidget;
@@ -26,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.Locale;
 
 @Mixin(KeyBindListWidget.class)
-public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.Entry> implements IKeyBindListWidgetMixin {
+public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.Entry> implements ISetQuery {
 	@Unique
 	private KeyBind[] keyBinds;
 	@Unique
@@ -34,13 +35,13 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 
 	@Unique
 	@Override
-	public void setQuery(String query) {
+	public void searchable$setQuery(String query) {
 		if (!query.equals(this.query)) {
 			this.filter(query);
 			this.setScrollAmount(0.0);
-		}
 
-		this.query = query;
+			this.query = query;
+		}
 	}
 
 	public KeyBindListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
@@ -87,8 +88,8 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 				// New whole category match.
 				categoryMatch = category;
 
-				// Add category.
-				this.addEntry(((KeyBindListWidget) (Object) this).new CategoryEntry(Text.translatable(category)));
+				// Add category. Safe cast: input is Text, so output will be Text.
+				this.addEntry(((KeyBindListWidget) (Object) this).new CategoryEntry((Text) Util.textWithHighlight(query, Text.translatable(category))));
 				// Add key.
 				this.addEntry(((KeyBindListWidget) (Object) this).new KeyBindEntry(keyBind, Text.translatable(keyBind.getTranslationKey())));
 			} else {
@@ -108,8 +109,11 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 						this.addEntry(((KeyBindListWidget) (Object) this).new CategoryEntry(Text.translatable(category)));
 					}
 
-					// Add key.
-					this.addEntry(((KeyBindListWidget) (Object) this).new KeyBindEntry(keyBind, Text.translatable(keyBind.getTranslationKey())));
+					var keyEntry = ((KeyBindListWidget) (Object) this).new KeyBindEntry(keyBind, Text.translatable(keyBind.getTranslationKey()));
+					// Highlight the query within the key entry.
+					((ISetQuery) keyEntry).searchable$setQuery(query);
+					// Add key entry.
+					this.addEntry(keyEntry);
 				}
 			}
 		}

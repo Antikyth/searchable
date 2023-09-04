@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.access;
+package io.github.antikyth.searchable.access.language;
 
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry;
 import net.minecraft.client.resource.language.LanguageDefinition;

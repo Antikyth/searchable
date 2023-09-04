@@ -8,7 +8,7 @@ package io.github.antikyth.searchable.mixin.keybind;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.Util;
-import io.github.antikyth.searchable.access.ISetQuery;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.option.KeyBindsScreen;
 import net.minecraft.client.gui.widget.ElementListWidget;
@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.Locale;
 
 @Mixin(KeyBindListWidget.class)
-public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.Entry> implements ISetQuery {
+public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.Entry> implements SetQueryAccessor {
 	@Unique
 	private KeyBind[] keyBinds;
 	@Unique
@@ -111,7 +111,7 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 
 					var keyEntry = ((KeyBindListWidget) (Object) this).new KeyBindEntry(keyBind, Text.translatable(keyBind.getTranslationKey()));
 					// Highlight the query within the key entry.
-					((ISetQuery) keyEntry).searchable$setQuery(query);
+					((SetQueryAccessor) keyEntry).searchable$setQuery(query);
 					// Add key entry.
 					this.addEntry(keyEntry);
 				}

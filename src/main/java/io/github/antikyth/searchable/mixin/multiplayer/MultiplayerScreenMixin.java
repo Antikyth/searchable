@@ -7,7 +7,7 @@
 package io.github.antikyth.searchable.mixin.multiplayer;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.access.multiplayer.IMultiplayerServerListWidgetMixin;
+import io.github.antikyth.searchable.accessor.multiplayer.MultiplayerServerListWidgetAccessor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -51,7 +51,7 @@ public class MultiplayerScreenMixin extends Screen {
 		Searchable.LOGGER.debug("adding search box to multiplayer servers screen...");
 
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, Text.translatable("selectServer.search"));
-		this.searchBox.setChangedListener(query -> ((IMultiplayerServerListWidgetMixin) this.serverListWidget).searchable$setQuery(query));
+		this.searchBox.setChangedListener(query -> ((MultiplayerServerListWidgetAccessor) this.serverListWidget).searchable$setQuery(query));
 
 		this.addSelectableChild(this.searchBox);
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select

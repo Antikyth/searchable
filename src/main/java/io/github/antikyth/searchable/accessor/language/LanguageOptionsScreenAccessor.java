@@ -4,10 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.access.language;
+package io.github.antikyth.searchable.accessor.language;
 
 import net.minecraft.client.gui.widget.TextFieldWidget;
 
-public interface ILanguageOptionsScreenMixin {
+public interface LanguageOptionsScreenAccessor {
 	TextFieldWidget searchable$getSearchBox();
 }

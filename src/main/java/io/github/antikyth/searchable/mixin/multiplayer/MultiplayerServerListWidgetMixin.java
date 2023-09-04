@@ -7,8 +7,8 @@
 package io.github.antikyth.searchable.mixin.multiplayer;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import io.github.antikyth.searchable.access.ISetQuery;
-import io.github.antikyth.searchable.access.multiplayer.IMultiplayerServerListWidgetMixin;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.accessor.multiplayer.MultiplayerServerListWidgetAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Mixin(MultiplayerServerListWidget.class)
-public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends AlwaysSelectedEntryListWidget<E> implements IMultiplayerServerListWidgetMixin {
+public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends AlwaysSelectedEntryListWidget<E> implements MultiplayerServerListWidgetAccessor {
 	@Unique
 	private String query = "";
 
@@ -94,7 +94,7 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 		this.servers.forEach(entry -> {
 			if (serverMatchesQuery(query, entry)) {
 				// Update highlight.
-				((ISetQuery) entry).searchable$setQuery(query);
+				((SetQueryAccessor) entry).searchable$setQuery(query);
 				this.addEntry((E) entry);
 
 				if (entry == lastSelection) {
@@ -106,7 +106,7 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 		this.lanServers.forEach(entry -> {
 			if (lanServerMatchesQuery(query, entry)) {
 				// Update highlight.
-				((ISetQuery) entry).searchable$setQuery(query);
+				((SetQueryAccessor) entry).searchable$setQuery(query);
 				this.addEntry((E) entry);
 
 				if (entry == lastSelection) {
@@ -130,7 +130,7 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	))
 	private static boolean filterServerEntry(MultiplayerServerListWidget instance, EntryListWidget.Entry<MultiplayerServerListWidget.Entry> entry) {
-		return serverMatchesQuery(((IMultiplayerServerListWidgetMixin) instance).searchable$getQuery(), (ServerEntry) entry);
+		return serverMatchesQuery(((MultiplayerServerListWidgetAccessor) instance).searchable$getQuery(), (ServerEntry) entry);
 	}
 
 	// Filter the LAN server entries added back when `updateEntries()` is called.
@@ -139,7 +139,7 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	))
 	private static boolean filterLanServerEntry(MultiplayerServerListWidget instance, EntryListWidget.Entry<MultiplayerServerListWidget.Entry> entry) {
-		return lanServerMatchesQuery(((IMultiplayerServerListWidgetMixin) instance).searchable$getQuery(), (LanServerEntry) entry);
+		return lanServerMatchesQuery(((MultiplayerServerListWidgetAccessor) instance).searchable$getQuery(), (LanServerEntry) entry);
 	}
 
 	@Unique

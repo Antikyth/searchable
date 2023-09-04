@@ -8,8 +8,8 @@ package io.github.antikyth.searchable.mixin.language;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.access.language.ILanguageOptionsScreenMixin;
-import io.github.antikyth.searchable.access.language.ILanguageSelectionListWidgetMixin;
+import io.github.antikyth.searchable.accessor.language.LanguageOptionsScreenAccessor;
+import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LanguageOptionsScreen.class)
-public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen implements ILanguageOptionsScreenMixin {
+public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen implements LanguageOptionsScreenAccessor {
 	@Unique
 	public TextFieldWidget searchBox;
 
@@ -60,7 +60,7 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 		// Search box coordinates and size copied from the world selection screen.
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, Text.translatable("option.language.search"));
 		// Filter the language selection list when the query is changed.
-		this.searchBox.setChangedListener(query -> ((ILanguageSelectionListWidgetMixin) this.languageSelectionList).searchable$filter(query, this.languageManager.getAllLanguages()));
+		this.searchBox.setChangedListener(query -> ((LanguageSelectionListWidgetAccessor) this.languageSelectionList).searchable$filter(query, this.languageManager.getAllLanguages()));
 
 		this.addSelectableChild(this.searchBox);
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select
@@ -115,6 +115,6 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 			ordinal = 0
 	))
 	private LanguageEntry setSelectedLanguageEvenIfHidden(LanguageEntry original) {
-		return ((ILanguageSelectionListWidgetMixin) this.languageSelectionList).searchable$getSelectedLanguage();
+		return ((LanguageSelectionListWidgetAccessor) this.languageSelectionList).searchable$getSelectedLanguage();
 	}
 }

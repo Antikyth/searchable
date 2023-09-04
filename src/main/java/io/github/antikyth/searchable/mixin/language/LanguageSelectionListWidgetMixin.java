@@ -7,9 +7,9 @@
 package io.github.antikyth.searchable.mixin.language;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.access.language.ILanguageEntryMixin;
-import io.github.antikyth.searchable.access.language.ILanguageOptionsScreenMixin;
-import io.github.antikyth.searchable.access.language.ILanguageSelectionListWidgetMixin;
+import io.github.antikyth.searchable.accessor.language.LanguageEntryAccessor;
+import io.github.antikyth.searchable.accessor.language.LanguageOptionsScreenAccessor;
+import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
 import io.github.antikyth.searchable.mixin.EntryListWidgetMixin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.ElementPath;
@@ -34,7 +34,7 @@ import java.util.Map;
 
 @ClientOnly
 @Mixin(LanguageOptionsScreen.LanguageSelectionListWidget.class)
-public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget.Entry<E>> extends EntryListWidgetMixin<E> implements ILanguageSelectionListWidgetMixin {
+public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget.Entry<E>> extends EntryListWidgetMixin<E> implements LanguageSelectionListWidgetAccessor {
 	/**
 	 * The last selected language entry. Used so that if the entry is hidden and later shown, it can be re-selected.
 	 */
@@ -71,7 +71,7 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	// Filter the language selection list at the end of the constructor.
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConstructor(LanguageOptionsScreen languageOptionsScreen, MinecraftClient client, CallbackInfo ci) {
-		String query = ((ILanguageOptionsScreenMixin) languageOptionsScreen).searchable$getSearchBox().getText();
+		String query = ((LanguageOptionsScreenAccessor) languageOptionsScreen).searchable$getSearchBox().getText();
 		this.searchable$filter(query, languageOptionsScreen.languageManager.getAllLanguages());
 	}
 
@@ -117,7 +117,7 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 				// Add each entry matching the query back
 				if (this.languageMatches(lowercaseQuery, definition)) {
 					var entry = ((LanguageSelectionListWidget) (Object) this).new LanguageEntry(code, definition);
-					((ILanguageEntryMixin) entry).searchable$highlightQuery(query);
+					((LanguageEntryAccessor) entry).searchable$highlightQuery(query);
 
 					this.addEntry((E) entry);
 

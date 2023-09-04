@@ -1,7 +1,7 @@
 package io.github.antikyth.searchable.mixin.keybind;
 
 import io.github.antikyth.searchable.Util;
-import io.github.antikyth.searchable.access.ISetQuery;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import net.minecraft.client.gui.widget.option.KeyBindListWidget;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(KeyBindListWidget.KeyBindEntry.class)
-public abstract class KeyBindEntryMixin extends KeyBindListWidget.Entry implements ISetQuery {
+public abstract class KeyBindEntryMixin extends KeyBindListWidget.Entry implements SetQueryAccessor {
 	@Final
 	@Shadow
 	private Text keyName;

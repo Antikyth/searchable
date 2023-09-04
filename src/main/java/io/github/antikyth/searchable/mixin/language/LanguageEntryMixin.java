@@ -1,7 +1,7 @@
 package io.github.antikyth.searchable.mixin.language;
 
 import io.github.antikyth.searchable.Util;
-import io.github.antikyth.searchable.access.language.ILanguageEntryMixin;
+import io.github.antikyth.searchable.accessor.language.LanguageEntryAccessor;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.resource.language.LanguageDefinition;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry.class)
-public abstract class LanguageEntryMixin extends AlwaysSelectedEntryListWidget.Entry<LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry> implements ILanguageEntryMixin {
+public abstract class LanguageEntryMixin extends AlwaysSelectedEntryListWidget.Entry<LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry> implements LanguageEntryAccessor {
 	@Shadow
 	public Text languageDefinition;
 

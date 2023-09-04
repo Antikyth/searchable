@@ -1,7 +1,7 @@
 package io.github.antikyth.searchable.mixin.multiplayer;
 
 import io.github.antikyth.searchable.Util;
-import io.github.antikyth.searchable.access.ISetQuery;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MultiplayerServerListWidget.ServerEntry.class)
-public class ServerEntryMixin implements ISetQuery {
+public class ServerEntryMixin implements SetQueryAccessor {
 	@Final
 	@Shadow
 	private ServerInfo server;

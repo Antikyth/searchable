@@ -1,6 +1,8 @@
 package io.github.antikyth.searchable.mixin.multiplayer;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.github.antikyth.searchable.Util;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import net.minecraft.client.font.TextRenderer;
@@ -16,7 +18,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MultiplayerServerListWidget.LanServerEntry.class)
@@ -73,8 +74,10 @@ public class LanServerEntry implements SetQueryAccessor {
 			ordinal = 0
 	), index = 1)
 	private Text drawTitleWithHighlight(Text title) {
+		if (title == null) return null;
+
 		// If the title has been changed (by another mixin), update the highlight first.
-		if (title != null && !this.title.equals(title)) {
+		if (!this.title.equals(title)) {
 			this.title = title;
 			this.titleWithHighlight = (Text) Util.textWithHighlight(this.query, this.title);
 		}
@@ -82,13 +85,13 @@ public class LanServerEntry implements SetQueryAccessor {
 		return this.titleWithHighlight;
 	}
 
-	@Redirect(method = "render", at = @At(
+	@WrapOperation(method = "render", at = @At(
 			value = "INVOKE",
 			target = "net/minecraft/client/gui/GuiGraphics.drawText (Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;IIIZ)I",
 			ordinal = 0
 	))
-	private int drawMotdWithHighlight(GuiGraphics graphics, TextRenderer textRenderer, String motd, int x, int y, int color, boolean shadowed) {
-		if (motd == null) return graphics.drawText(textRenderer, (String) null, x, y, color, shadowed);
+	private int drawMotdWithHighlight(GuiGraphics graphics, TextRenderer textRenderer, String motd, int x, int y, int color, boolean shadowed, Operation<Integer> original) {
+		if (motd == null) return original.call(graphics, textRenderer, null, x, y, color, shadowed);
 
 		// If the MOTD has been changed, update the highlight first.
 		if (!this.motd.equals(motd)) {

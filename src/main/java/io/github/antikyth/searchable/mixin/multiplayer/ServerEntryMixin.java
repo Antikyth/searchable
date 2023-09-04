@@ -1,5 +1,7 @@
 package io.github.antikyth.searchable.mixin.multiplayer;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.github.antikyth.searchable.Util;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import net.minecraft.client.font.TextRenderer;
@@ -16,7 +18,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MultiplayerServerListWidget.ServerEntry.class)
@@ -36,11 +37,18 @@ public class ServerEntryMixin implements SetQueryAccessor {
 	private Text serverNameWithHighlight;
 
 	@Unique
+	private StringVisitable serverLabel;
+	@Unique
+	private StringVisitable serverLabelWithHighlight;
+
+	@Unique
 	@Override
 	public void searchable$setQuery(String query) {
 		if (query != null && !this.query.equals(query)) {
 			// Safe cast: input is Text, so output will be Text.
 			this.serverNameWithHighlight = (Text) Util.textWithHighlight(query, this.serverNameText);
+			this.serverLabelWithHighlight = Util.textWithHighlight(query, this.serverLabel);
+
 			this.query = query;
 		}
 	}
@@ -52,20 +60,22 @@ public class ServerEntryMixin implements SetQueryAccessor {
 		// Used to update the highlight.
 		this.serverNameText = Text.literal(this.serverName);
 		this.serverNameWithHighlight = this.serverNameText;
+
+		// Used to check for changes to the label and to update the highlight.
+		this.serverLabel = this.server.label;
+		this.serverLabelWithHighlight = this.serverLabel;
 	}
 
 	/**
 	 * Draw the server title text with the highlighted query match, if any.
-	 * <p>
-	 * Redirect is necessary as the `drawText` method used takes a `String` instead of `Text`.
 	 */
-	@Redirect(method = "render", at = @At(
+	@WrapOperation(method = "render", at = @At(
 			value = "INVOKE",
 			target = "net/minecraft/client/gui/GuiGraphics.drawText (Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;IIIZ)I",
 			ordinal = 0
 	))
-	private int drawServerNameWithHighlight(GuiGraphics graphics, TextRenderer textRenderer, String serverName, int x, int y, int color, boolean shadowed) {
-		if (serverName == null) return graphics.drawText(textRenderer, (String) null, x, y, color, shadowed);
+	private int drawServerNameWithHighlight(GuiGraphics graphics, TextRenderer textRenderer, String serverName, int x, int y, int color, boolean shadowed, Operation<Integer> original) {
+		if (serverName == null) return original.call(graphics, textRenderer, null, x, y, color, shadowed);
 
 		// If the server name has been changed, update the highlight first.
 		if (!this.serverName.equals(serverName)) {
@@ -81,12 +91,6 @@ public class ServerEntryMixin implements SetQueryAccessor {
 	/**
 	 * Highlight the label used in the {@link MultiplayerServerListWidget.ServerEntry#render render} method with the
 	 * query match, if any.
-	 * <p>
-	 * This is run every render, re-creating the highlight every single time, cloning the text every single time. As far
-	 * as I can tell, there is no reliable way around that: we don't know when the server's label is updated.
-	 * {@link Text} doesn't seem to implement {@link Object#equals} other than reference equality. Even if we checked if
-	 * the string had changed, (a) I don't think that would be worse than re-calculating this highlight, as it also
-	 * clones the text, (b) it wouldn't take into account changes in formatting.
 	 */
 	@ModifyArg(method = "render", at = @At(
 			value = "INVOKE",
@@ -94,6 +98,14 @@ public class ServerEntryMixin implements SetQueryAccessor {
 			ordinal = 0
 	))
 	private StringVisitable drawServerLabelWithHighlight(StringVisitable label) {
-		return Util.textWithHighlight(this.query, label);
+		if (this.serverLabel == null) return null;
+
+		// If the server label has been changed, update the highlight first.
+		if (!this.serverLabel.equals(label)) {
+			this.serverLabel = label;
+			this.serverLabelWithHighlight = Util.textWithHighlight(this.query, this.serverLabel);
+		}
+
+		return this.serverLabelWithHighlight;
 	}
 }

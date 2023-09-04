@@ -8,6 +8,7 @@ package io.github.antikyth.searchable.mixin.multiplayer;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.multiplayer.MultiplayerServerListWidgetAccessor;
+import io.github.antikyth.searchable.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -25,6 +26,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MultiplayerScreen.class)
 public class MultiplayerScreenMixin extends Screen {
 	@Unique
+	private static final Text SEARCH_BOX_NARRATION_MESSAGE = Text.translatable("selectServer.search");
+	@Unique
+	private static final Text SEARCH_BOX_HINT = Util.hint(Text.translatable("selectServer.search.hint"));
+
+	@Unique
+	private static final String ALT_TITLE_TRANSLATION_KEY = "selectServer.title";
+
+	@Unique
 	public TextFieldWidget searchBox;
 
 	@Shadow
@@ -41,7 +50,7 @@ public class MultiplayerScreenMixin extends Screen {
 			ordinal = 0
 	), index = 0)
 	private static String changeSelectServerTitle(String title) {
-		return Searchable.config.selectServer.changeSelectServerTitle ? "selectServer.title" : title;
+		return Searchable.config.selectServer.changeSelectServerTitle ? ALT_TITLE_TRANSLATION_KEY : title;
 	}
 
 	@Inject(method = "init", at = @At("HEAD"))
@@ -50,7 +59,8 @@ public class MultiplayerScreenMixin extends Screen {
 
 		Searchable.LOGGER.debug("adding search box to multiplayer servers screen...");
 
-		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, Text.translatable("selectServer.search"));
+		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
+		this.searchBox.setHint(SEARCH_BOX_HINT);
 		this.searchBox.setChangedListener(query -> ((MultiplayerServerListWidgetAccessor) this.serverListWidget).searchable$setQuery(query));
 
 		this.addSelectableChild(this.searchBox);

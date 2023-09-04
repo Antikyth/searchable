@@ -23,6 +23,13 @@ public class Util {
 	}
 
 	/**
+	 * Formats the given {@code hint} as {@link Formatting#DARK_GRAY}.
+	 */
+	public static MutableText hint(MutableText hint) {
+		return hint.formatted(Formatting.DARK_GRAY);
+	}
+
+	/**
 	 * Returns the text with a highlight if the {@code query} is found within the {@code text}, or the original
 	 * {@code text} otherwise.
 	 */

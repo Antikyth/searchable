@@ -1,8 +1,12 @@
 {
 	"modmenu.summaryTranslation.searchable": "Makes more GUIs searchable.",
 	"controls.keybinds.search": "search for key binds",
-	"selectServer.search": "search for servers",
+	"controls.keybinds.search.hint": "Search...",
 	"option.language.search": "search for languages",
+	"option.language.search.hint": "Search...",
+	"selectServer.search": "search for servers",
+	"selectServer.search.hint": "Search...",
+	"selectWorld.search.hint": "Search...",
 	"text.autoconfig.searchable.title": "Searchable Options",
 	"text.autoconfig.searchable.option.reselectLastSelection": "Keep Selection Selected",
 	"text.autoconfig.searchable.option.reselectLastSelection.@Tooltip": "Whether the latest selected option should remain selected after being hidden and later unhidden due to search query changes.",

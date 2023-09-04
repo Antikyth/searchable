@@ -16,6 +16,7 @@
 		"multiplayer.MultiplayerScreenMixin",
 		"multiplayer.MultiplayerServerListWidgetMixin",
 		"multiplayer.ServerEntryMixin",
+		"singleplayer.SelectWorldScreenMixin",
 		"singleplayer.WorldListWidget$EntryMixin",
 		"singleplayer.WorldListWidgetMixin"
 	],

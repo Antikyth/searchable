@@ -6,10 +6,13 @@
 
 package io.github.antikyth.searchable.mixin.singleplayer;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.util.Formatting;
 import net.minecraft.world.storage.WorldSaveSummary;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,9 +22,13 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.Locale;
 
 @Mixin(WorldListWidget.class)
 public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldListWidget.AbstractWorldEntry> {
+	@Unique
+	private String query = "";
+
 	@Unique
 	private WorldSaveSummary lastSelection;
 
@@ -34,17 +41,33 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 			value = "INVOKE",
 			target = "net/minecraft/client/gui/screen/world/WorldListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	), index = 0)
-	private EntryListWidget.Entry<WorldListWidget.AbstractWorldEntry> setSelectionIfEntryMatches(EntryListWidget.Entry<WorldListWidget.AbstractWorldEntry> entry) {
-		if (entry instanceof WorldListWidget.Entry worldEntry && worldEntry.level == this.lastSelection) {
-			this.setSelected((WorldListWidget.AbstractWorldEntry) entry);
+	private EntryListWidget.Entry<WorldListWidget.AbstractWorldEntry> onAddEntry(EntryListWidget.Entry<WorldListWidget.AbstractWorldEntry> entry) {
+		if (entry instanceof WorldListWidget.Entry worldEntry) {
+			((SetQueryAccessor) (Object) worldEntry).searchable$setQuery(this.query);
+
+			if (worldEntry.level == this.lastSelection) {
+				this.setSelected((WorldListWidget.AbstractWorldEntry) entry);
+			}
 		}
 
 		return entry;
 	}
 
+	// Match world details in search results as well as the display name and name.
+	@ModifyReturnValue(method = "worldNameMatches", at = @At("RETURN"))
+	private boolean matchWorldDetails(boolean matches, String query, WorldSaveSummary summary) {
+		var stripped = Formatting.strip(summary.getDetails().getString());
+		if (stripped == null) return matches;
+
+		var details = stripped.toLowerCase(Locale.ROOT);
+
+		return matches || details.contains(query);
+	}
+
 	// Fix a vanilla bug: use `setSelected(null)`'s side effects to disable the world selection buttons.
 	@Inject(method = "filter(Ljava/lang/String;Ljava/util/List;)V", at = @At("HEAD"))
 	private void onFilter(String query, List<WorldSaveSummary> levels, CallbackInfo ci) {
+		this.query = query;
 		this.setSelected(null);
 	}
 

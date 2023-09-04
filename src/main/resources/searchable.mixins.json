@@ -12,10 +12,11 @@
 		"language.LanguageEntryMixin",
 		"language.LanguageOptionsScreenMixin",
 		"language.LanguageSelectionListWidgetMixin",
-		"multiplayer.LanServerEntry",
+		"multiplayer.LanServerEntryMixin",
 		"multiplayer.MultiplayerScreenMixin",
 		"multiplayer.MultiplayerServerListWidgetMixin",
 		"multiplayer.ServerEntryMixin",
+		"singleplayer.WorldListWidget$EntryMixin",
 		"singleplayer.WorldListWidgetMixin"
 	],
 	"injectors": {

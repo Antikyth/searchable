@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MultiplayerServerListWidget.LanServerEntry.class)
-public class LanServerEntry implements SetQueryAccessor {
+public class LanServerEntryMixin implements SetQueryAccessor {
 	@Final
 	@Shadow
 	protected LanServerInfo server;
@@ -46,7 +46,7 @@ public class LanServerEntry implements SetQueryAccessor {
 
 	@Override
 	public void searchable$setQuery(String query) {
-		if (query != null && !this.query.equals(query)) {
+		if (query != null && !query.equals(this.query)) {
 			// Safe casts: input is Text, so output will be Text.
 			this.titleWithHighlight = (Text) Util.textWithHighlight(query, this.title);
 			this.motdWithHighlight = (Text) Util.textWithHighlight(query, this.motdText);
@@ -77,7 +77,7 @@ public class LanServerEntry implements SetQueryAccessor {
 		if (title == null) return null;
 
 		// If the title has been changed (by another mixin), update the highlight first.
-		if (!this.title.equals(title)) {
+		if (!title.equals(this.title)) {
 			this.title = title;
 			this.titleWithHighlight = (Text) Util.textWithHighlight(this.query, this.title);
 		}
@@ -94,7 +94,7 @@ public class LanServerEntry implements SetQueryAccessor {
 		if (motd == null) return original.call(graphics, textRenderer, null, x, y, color, shadowed);
 
 		// If the MOTD has been changed, update the highlight first.
-		if (!this.motd.equals(motd)) {
+		if (!motd.equals(this.motd)) {
 			this.motd = motd;
 			this.motdText = Text.literal(this.motd);
 

@@ -18,12 +18,16 @@ public class Util {
 	 */
 	private static final int FORMATTING_CODE_LENGTH = 2;
 
+	private static Style highlight(Style style) {
+		return style.withFormatting(Formatting.UNDERLINE, Formatting.WHITE);
+	}
+
 	/**
 	 * Returns the text with a highlight if the {@code query} is found within the {@code text}, or the original
 	 * {@code text} otherwise.
 	 */
 	public static StringVisitable textWithHighlight(String query, StringVisitable visitable) {
-		if (query == null || query.isEmpty()) return visitable;
+		if (query == null || query.isEmpty() || visitable == null) return visitable;
 
 		var stripped = Formatting.strip(visitable.getString());
 		if (stripped == null) return visitable;
@@ -105,14 +109,11 @@ public class Util {
 	}
 
 	private static MutableText highlighted(String text, Style style) {
-		return Text.literal(text).setStyle(style).formatted(Formatting.WHITE, Formatting.UNDERLINE);
+		return Text.literal(text).setStyle(highlight(style));
 	}
 
 	private static MutableText literal(String text, Style style) {
-		var ret = Text.literal(text).formatted(Formatting.RESET);
-		ret.setStyle(ret.getStyle().withParent(style));
-
-		return ret;
+		return Text.literal(text).setStyle(style);
 	}
 
 	// Note: this is designed after Sponge's implementation here:
@@ -151,6 +152,7 @@ public class Util {
 			List<Text> texts = new ArrayList<>();
 
 			do {
+				// If there is text between the previous formatting code and the next one, add it.
 				if (nextCodeIndex > index) {
 					String string = legacy.substring(index, nextCodeIndex);
 					texts.add(Text.literal(string).setStyle(style));

@@ -44,7 +44,7 @@ public class ServerEntryMixin implements SetQueryAccessor {
 	@Unique
 	@Override
 	public void searchable$setQuery(String query) {
-		if (query != null && !this.query.equals(query)) {
+		if (query != null && !query.equals(this.query)) {
 			// Safe cast: input is Text, so output will be Text.
 			this.serverNameWithHighlight = (Text) Util.textWithHighlight(query, this.serverNameText);
 			this.serverLabelWithHighlight = Util.textWithHighlight(query, this.serverLabel);
@@ -78,7 +78,7 @@ public class ServerEntryMixin implements SetQueryAccessor {
 		if (serverName == null) return original.call(graphics, textRenderer, null, x, y, color, shadowed);
 
 		// If the server name has been changed, update the highlight first.
-		if (!this.serverName.equals(serverName)) {
+		if (!serverName.equals(this.serverName)) {
 			this.serverName = serverName;
 			this.serverNameText = Text.literal(this.serverName);
 
@@ -98,10 +98,10 @@ public class ServerEntryMixin implements SetQueryAccessor {
 			ordinal = 0
 	))
 	private StringVisitable drawServerLabelWithHighlight(StringVisitable label) {
-		if (this.serverLabel == null) return null;
+		if (label == null) return null;
 
 		// If the server label has been changed, update the highlight first.
-		if (!this.serverLabel.equals(label)) {
+		if (!label.equals(this.serverLabel)) {
 			this.serverLabel = label;
 			this.serverLabelWithHighlight = Util.textWithHighlight(this.query, this.serverLabel);
 		}

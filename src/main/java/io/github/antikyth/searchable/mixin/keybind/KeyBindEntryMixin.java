@@ -27,7 +27,7 @@ public abstract class KeyBindEntryMixin extends KeyBindListWidget.Entry implemen
 	@Unique
 	@Override
 	public void searchable$setQuery(String query) {
-		if (query != null && !this.query.equals(query)) {
+		if (query != null && !query.equals(this.query)) {
 			this.query = query;
 			this.update();
 		}

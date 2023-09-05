@@ -7,6 +7,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.option.KeyBindsScreen;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen;
+import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 
 @Config(name = Searchable.MOD_ID)
@@ -34,17 +35,23 @@ public class SearchableConfig implements ConfigData {
 	@ConfigEntry.Gui.CollapsibleObject
 	public LanguageScreenOptions language = new LanguageScreenOptions();
 	/**
+	 * Options relating to modifying the {@link MultiplayerScreen}.
+	 */
+	@ConfigEntry.Gui.Tooltip
+	@ConfigEntry.Gui.CollapsibleObject
+	public ServerSelectScreenOptions selectServer = new ServerSelectScreenOptions();
+	/**
 	 * Options relating to modifying the {@link SelectWorldScreen}.
 	 */
 	@ConfigEntry.Gui.Tooltip
 	@ConfigEntry.Gui.CollapsibleObject
 	public WorldSelectScreenOptions selectWorld = new WorldSelectScreenOptions();
 	/**
-	 * Options relating to modifying the {@link MultiplayerScreen}.
+	 * Options relating to modifying the {@link EditGameRulesScreen}.
 	 */
 	@ConfigEntry.Gui.Tooltip
 	@ConfigEntry.Gui.CollapsibleObject
-	public ServerSelectScreenOptions selectServer = new ServerSelectScreenOptions();
+	public EditGameRulesScreenOptions editGamerule = new EditGameRulesScreenOptions();
 
 	public static class KeyBindScreenOptions {
 		public boolean enable = true;
@@ -71,5 +78,14 @@ public class SearchableConfig implements ConfigData {
 	public static class WorldSelectScreenOptions {
 		@ConfigEntry.Gui.Tooltip
 		public boolean matchWorldDetails = false;
+	}
+
+	public static class EditGameRulesScreenOptions {
+		public boolean enable = true;
+
+		@ConfigEntry.Gui.Tooltip
+		public boolean matchCategory = true;
+		@ConfigEntry.Gui.Tooltip
+		public boolean matchDescription = false;
 	}
 }

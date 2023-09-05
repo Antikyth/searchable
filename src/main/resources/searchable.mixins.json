@@ -18,7 +18,13 @@
 		"multiplayer.ServerEntryMixin",
 		"singleplayer.SelectWorldScreenMixin",
 		"singleplayer.WorldListWidget$EntryMixin",
-		"singleplayer.WorldListWidgetMixin"
+		"singleplayer.WorldListWidgetMixin",
+		"singleplayer.gamerule.AbstractRuleWidgetMixin",
+		"singleplayer.gamerule.BooleanRuleWidgetMixin",
+		"singleplayer.gamerule.EditGameRulesScreenMixin",
+		"singleplayer.gamerule.IntRuleWidgetMixin",
+		"singleplayer.gamerule.NamedRuleWidgetMixin",
+		"singleplayer.gamerule.RuleListWidgetMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

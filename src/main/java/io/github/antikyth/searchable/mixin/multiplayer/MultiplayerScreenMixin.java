@@ -7,7 +7,7 @@
 package io.github.antikyth.searchable.mixin.multiplayer;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.accessor.multiplayer.MultiplayerServerListWidgetAccessor;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
@@ -50,7 +50,13 @@ public class MultiplayerScreenMixin extends Screen {
 			ordinal = 0
 	), index = 0)
 	private static String changeSelectServerTitle(String title) {
-		return Searchable.config.selectServer.changeSelectServerTitle ? ALT_TITLE_TRANSLATION_KEY : title;
+		if (Searchable.config.selectServer.changeSelectServerTitle) {
+			Searchable.LOGGER.debug("changing server selection screen title translation key to {}", ALT_TITLE_TRANSLATION_KEY);
+
+			return ALT_TITLE_TRANSLATION_KEY;
+		} else {
+			return title;
+		}
 	}
 
 	@Inject(method = "init", at = @At("HEAD"))
@@ -61,7 +67,7 @@ public class MultiplayerScreenMixin extends Screen {
 
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
-		this.searchBox.setChangedListener(query -> ((MultiplayerServerListWidgetAccessor) this.serverListWidget).searchable$setQuery(query));
+		this.searchBox.setChangedListener(query -> ((SetQueryAccessor) this.serverListWidget).searchable$setQuery(query));
 
 		this.addSelectableChild(this.searchBox);
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select

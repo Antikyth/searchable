@@ -44,7 +44,7 @@ public class KeyBindsScreenMixin extends GameOptionsScreen {
 
 	@Inject(method = "init", at = @At("HEAD"))
 	public void onInit(CallbackInfo ci) {
-		if (!Searchable.config.keybinds.enable) return;
+		if (!enabled()) return;
 
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
@@ -60,8 +60,13 @@ public class KeyBindsScreenMixin extends GameOptionsScreen {
 			shift = At.Shift.AFTER
 	))
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-		if (!Searchable.config.keybinds.enable) return;
+		if (!enabled()) return;
 
 		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
+	}
+
+	@Unique
+	private static boolean enabled() {
+		return Searchable.config.keybinds.enable;
 	}
 }

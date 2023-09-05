@@ -8,7 +8,7 @@ package io.github.antikyth.searchable.mixin.language;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.accessor.language.LanguageOptionsScreenAccessor;
+import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
 import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
 import io.github.antikyth.searchable.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LanguageOptionsScreen.class)
-public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen implements LanguageOptionsScreenAccessor {
+public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen implements GetSearchBoxAccessor {
 	@Unique
 	private static final Text SEARCH_BOX_NARRATION_MESSAGE = Text.translatable("option.language.search");
 	@Unique

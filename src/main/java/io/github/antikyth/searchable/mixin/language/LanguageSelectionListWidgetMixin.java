@@ -7,8 +7,8 @@
 package io.github.antikyth.searchable.mixin.language;
 
 import io.github.antikyth.searchable.Searchable;
+import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
 import io.github.antikyth.searchable.accessor.language.LanguageEntryAccessor;
-import io.github.antikyth.searchable.accessor.language.LanguageOptionsScreenAccessor;
 import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
 import io.github.antikyth.searchable.mixin.EntryListWidgetMixin;
 import net.minecraft.client.MinecraftClient;
@@ -73,7 +73,7 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	public void onConstructor(LanguageOptionsScreen languageOptionsScreen, MinecraftClient client, CallbackInfo ci) {
 		if (!enabled()) return;
 
-		String query = ((LanguageOptionsScreenAccessor) languageOptionsScreen).searchable$getSearchBox().getText();
+		String query = ((GetSearchBoxAccessor) languageOptionsScreen).searchable$getSearchBox().getText();
 		this.searchable$filter(query, languageOptionsScreen.languageManager.getAllLanguages());
 	}
 

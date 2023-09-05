@@ -36,6 +36,10 @@ accessible field net/minecraft/client/gui/screen/option/LanguageOptionsScreen la
 # ButtonWidget KeyBindListWidget.KeyBindEntry.bindButton
 accessible field net/minecraft/client/gui/widget/option/KeyBindListWidget$KeyBindEntry bindButton Lnet/minecraft/client/gui/widget/ButtonWidget;
 
+# List<OrderedText> EditGameRulesScreen.NamedRuleWidget.name
+accessible field net/minecraft/client/gui/screen/world/EditGameRulesScreen$NamedRuleWidget name Ljava/util/List;
+mutable field net/minecraft/client/gui/screen/world/EditGameRulesScreen$NamedRuleWidget name Ljava/util/List;
+
 
 #######################################
 # Methods                             #

@@ -24,6 +24,7 @@
 		"singleplayer.gamerule.EditGameRulesScreenMixin",
 		"singleplayer.gamerule.IntRuleWidgetMixin",
 		"singleplayer.gamerule.NamedRuleWidgetMixin",
+		"singleplayer.gamerule.RuleCategoryWidgetMixin",
 		"singleplayer.gamerule.RuleListWidgetMixin"
 	],
 	"injectors": {

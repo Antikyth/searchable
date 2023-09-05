@@ -83,9 +83,13 @@ public class SearchableConfig implements ConfigData {
 	public static class EditGameRulesScreenOptions {
 		public boolean enable = true;
 
+		public boolean showTechnicalName = false;
+
 		@ConfigEntry.Gui.Tooltip
 		public boolean matchCategory = true;
 		@ConfigEntry.Gui.Tooltip
 		public boolean matchDescription = false;
+		@ConfigEntry.Gui.Tooltip
+		public boolean matchTechnicalName = true;
 	}
 }

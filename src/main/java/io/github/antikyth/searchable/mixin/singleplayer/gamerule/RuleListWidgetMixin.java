@@ -83,13 +83,28 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 		if (!this.filterCategory(this.query.toLowerCase(Locale.ROOT), entry)) ci.cancel();
 	}
 
-	// Set the rule name.
+	// Set the query on the category.
+	@ModifyArg(method = "method_27637", at = @At(
+			value = "INVOKE",
+			target = "net/minecraft/client/gui/screen/world/EditGameRulesScreen$RuleListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I",
+			ordinal = 0
+	), index = 0)
+	private EntryListWidget.Entry<EditGameRulesScreen.AbstractRuleWidget> onAddCategoryWidget(EntryListWidget.Entry<EditGameRulesScreen.AbstractRuleWidget> entry) {
+		if (entry instanceof EditGameRulesScreen.AbstractRuleWidget ruleWidget) {
+			((SetQueryAccessor) ruleWidget).searchable$setQuery(this.query);
+		}
+
+		return entry;
+	}
+
+	// Set the query and technical name.
 	@Inject(method = "method_27638", at = @At("HEAD"))
 	private void onAddRuleWidget(Map.Entry<GameRules.Key<?>, EditGameRulesScreen.AbstractRuleWidget> entry, CallbackInfo ci) {
 		GameRules.Key<?> key = entry.getKey();
 		EditGameRulesScreen.AbstractRuleWidget widget = entry.getValue();
 
-		((AbstractRuleWidgetAccessor) widget).searchable$setRuleName(key.getName());
+		((AbstractRuleWidgetAccessor) widget).searchable$setTechnicalName(key.getName());
+		((SetQueryAccessor) widget).searchable$setQuery(this.query);
 	}
 
 	@WrapWithCondition(method = "method_27638", at = @At(

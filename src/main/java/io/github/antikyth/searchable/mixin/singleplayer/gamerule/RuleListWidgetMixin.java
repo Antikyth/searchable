@@ -5,6 +5,7 @@ import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.singleplayer.gamerule.AbstractRuleWidgetAccessor;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.widget.ElementListWidget;
@@ -20,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.Locale;
 import java.util.Map;
 
 @Mixin(EditGameRulesScreen.RuleListWidget.class)
@@ -80,7 +80,7 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 		if (!enabled()) return;
 
 		// If the category and nothing in it match, cancel adding it.
-		if (!this.filterCategory(this.query.toLowerCase(Locale.ROOT), entry)) ci.cancel();
+		if (!this.filterCategory(this.query, entry)) ci.cancel();
 	}
 
 	// Set the query on the category.
@@ -115,13 +115,12 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 	private boolean onFilterRules(EditGameRulesScreen.RuleListWidget instance, EntryListWidget.Entry<EditGameRulesScreen.AbstractRuleWidget> entry) {
 		if (!enabled()) return true;
 
-		return entry instanceof EditGameRulesScreen.NamedRuleWidget namedRule && this.filterRule(this.query.toLowerCase(Locale.ROOT), namedRule);
+		return entry instanceof EditGameRulesScreen.NamedRuleWidget namedRule && this.filterRule(this.query, namedRule);
 	}
 
 	@Unique
 	private boolean filterCategory(String query, Map.Entry<GameRules.Category, Map<GameRules.Key<?>, EditGameRulesScreen.AbstractRuleWidget>> entry) {
-		this.currentCategoryMatches = Searchable.config.editGamerule.matchCategory
-				&& I18n.translate(entry.getKey().getCategory()).toLowerCase(Locale.ROOT).contains(query);
+		this.currentCategoryMatches = Searchable.config.editGamerule.matchCategory && MatchUtil.hasMatches(I18n.translate(entry.getKey().getCategory()), query);
 
 		if (this.currentCategoryMatches) {
 			return true;

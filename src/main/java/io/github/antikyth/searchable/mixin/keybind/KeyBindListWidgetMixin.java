@@ -8,7 +8,7 @@ package io.github.antikyth.searchable.mixin.keybind;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
-import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.option.KeyBindsScreen;
 import net.minecraft.client.gui.widget.ElementListWidget;
@@ -16,7 +16,6 @@ import net.minecraft.client.gui.widget.option.KeyBindListWidget;
 import net.minecraft.client.option.KeyBind;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,8 +23,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Locale;
 
 @Mixin(KeyBindListWidget.class)
 public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.Entry> implements SetQueryAccessor {
@@ -96,7 +93,7 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 				categoryMatch = category;
 
 				var categoryTranslation = Text.translatable(category);
-				var categoryText = Searchable.config.highlightMatches ? (Text) Util.textWithHighlight(query, categoryTranslation) : categoryTranslation;
+				var categoryText = Searchable.config.highlightMatches ? (Text) MatchUtil.getHighlightedText(categoryTranslation, query) : categoryTranslation;
 
 				// Add category.
 				this.addEntry(((KeyBindListWidget) (Object) this).new CategoryEntry(categoryText));
@@ -139,10 +136,7 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 
 	@Unique
 	private static boolean matches(String query, String translationKey) {
-		String lowercaseQuery = query.toLowerCase(Locale.ROOT);
-		String target = Formatting.strip(I18n.translate(translationKey));
-
-		return target != null && !target.isEmpty() && target.toLowerCase(Locale.ROOT).contains(lowercaseQuery);
+		return MatchUtil.hasMatches(I18n.translate(translationKey), query);
 	}
 
 	@Unique

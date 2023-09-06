@@ -2,7 +2,7 @@ package io.github.antikyth.searchable.mixin.keybind;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
-import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.gui.widget.option.KeyBindListWidget;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
@@ -44,7 +44,7 @@ public abstract class KeyBindEntryMixin extends KeyBindListWidget.Entry implemen
 		if (!enabled() || !Searchable.config.keybinds.matchBoundKey) return message;
 
 		// safe cast: input is Text, output will be Text
-		return (Text) Util.textWithHighlight(this.query, message);
+		return (Text) MatchUtil.getHighlightedText(message, this.query);
 	}
 
 	// Update the highlight for the binding name.
@@ -53,7 +53,7 @@ public abstract class KeyBindEntryMixin extends KeyBindListWidget.Entry implemen
 		if (!enabled()) return;
 
 		// safe cast: input is Text, output will be Text
-		this.bindNameWithHighlight = (Text) Util.textWithHighlight(this.query, this.keyName);
+		this.bindNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.keyName, this.query);
 	}
 
 	// Render the highlighted binding name instead of `keyName`.

@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
-import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -47,10 +47,10 @@ public class ServerEntryMixin implements SetQueryAccessor {
 	public void searchable$setQuery(String query) {
 		if (enabled() && query != null && !query.equals(this.query)) {
 			// Safe cast: input is Text, so output will be Text.
-			this.serverNameWithHighlight = (Text) Util.textWithHighlight(query, this.serverNameText);
+			this.serverNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.serverNameText, query);
 
 			if (Searchable.config.selectServer.matchMotd) {
-				this.serverLabelWithHighlight = Util.textWithHighlight(query, this.serverLabel);
+				this.serverLabelWithHighlight = MatchUtil.getHighlightedText(this.serverLabel, query);
 			}
 
 			this.query = query;
@@ -92,7 +92,7 @@ public class ServerEntryMixin implements SetQueryAccessor {
 			this.serverName = serverName;
 			this.serverNameText = Text.literal(this.serverName);
 
-			this.serverNameWithHighlight = (Text) Util.textWithHighlight(this.query, this.serverNameText);
+			this.serverNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.serverNameText, this.query);
 		}
 
 		return graphics.drawText(textRenderer, this.serverNameWithHighlight, x, y, color, shadowed);
@@ -113,7 +113,7 @@ public class ServerEntryMixin implements SetQueryAccessor {
 		// If the server label has been changed, update the highlight first.
 		if (!label.equals(this.serverLabel)) {
 			this.serverLabel = label;
-			this.serverLabelWithHighlight = Util.textWithHighlight(this.query, this.serverLabel);
+			this.serverLabelWithHighlight = MatchUtil.getHighlightedText(this.serverLabel, this.query);
 		}
 
 		return this.serverLabelWithHighlight;

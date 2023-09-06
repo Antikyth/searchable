@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
-import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -49,10 +49,10 @@ public class LanServerEntryMixin implements SetQueryAccessor {
 	public void searchable$setQuery(String query) {
 		if (enabled() && query != null && !query.equals(this.query)) {
 			// Safe casts: input is Text, so output will be Text.
-			this.titleWithHighlight = (Text) Util.textWithHighlight(query, this.title);
+			this.titleWithHighlight = (Text) MatchUtil.getHighlightedText(this.title, query);
 
 			if (Searchable.config.selectServer.matchMotd) {
-				this.motdWithHighlight = (Text) Util.textWithHighlight(query, this.motdText);
+				this.motdWithHighlight = (Text) MatchUtil.getHighlightedText(this.motdText, query);
 			}
 
 			this.query = query;
@@ -87,7 +87,7 @@ public class LanServerEntryMixin implements SetQueryAccessor {
 		// If the title has been changed (by another mixin), update the highlight first.
 		if (!title.equals(this.title)) {
 			this.title = title;
-			this.titleWithHighlight = (Text) Util.textWithHighlight(this.query, this.title);
+			this.titleWithHighlight = (Text) MatchUtil.getHighlightedText(this.title, this.query);
 		}
 
 		return this.titleWithHighlight;
@@ -108,7 +108,7 @@ public class LanServerEntryMixin implements SetQueryAccessor {
 			this.motd = motd;
 			this.motdText = Text.literal(this.motd);
 
-			this.motdWithHighlight = (Text) Util.textWithHighlight(this.query, this.motdText);
+			this.motdWithHighlight = (Text) MatchUtil.getHighlightedText(this.motdText, this.query);
 		}
 
 		return graphics.drawText(textRenderer, this.motdWithHighlight, x, y, color, shadowed);

@@ -1,7 +1,6 @@
 package io.github.antikyth.searchable.util;
 
 import net.minecraft.text.MutableText;
-import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.component.TextComponent;
@@ -9,8 +8,6 @@ import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 
 public class Util {
 	/**
@@ -18,109 +15,11 @@ public class Util {
 	 */
 	private static final int FORMATTING_CODE_LENGTH = 2;
 
-	private static Style highlight(Style style) {
-		return style.withFormatting(Formatting.UNDERLINE, Formatting.WHITE);
-	}
-
 	/**
 	 * Formats the given {@code hint} as {@link Formatting#DARK_GRAY}.
 	 */
 	public static MutableText hint(MutableText hint) {
 		return hint.formatted(Formatting.DARK_GRAY);
-	}
-
-	/**
-	 * Returns the text with a highlight if the {@code query} is found within the {@code text}, or the original
-	 * {@code text} otherwise.
-	 */
-	public static StringVisitable textWithHighlight(String query, StringVisitable visitable) {
-		if (query == null || query.isEmpty() || visitable == null) return visitable;
-
-		var stripped = Formatting.strip(visitable.getString());
-		if (stripped == null) return visitable;
-
-		// Index of the beginning of the query match.
-		int startIndex = stripped.toLowerCase(Locale.ROOT).indexOf(query.toLowerCase(Locale.ROOT));
-		int endIndex = startIndex + query.length();
-
-		if (startIndex < 0) {
-			// If there was no match, return the text.
-			return visitable;
-		} else {
-			List<Text> texts = new ArrayList<>();
-			// Non-final variables cannot be used within the lambda below, and since to change an int you have to
-			// re-assign it, we have to wrap it in a `new Object()`.
-			var counter = new Object() {
-				int index = 0;
-			};
-			visitable.visit((outerStyle, outerString) -> parseLegacyText(outerString).visit((style, string) -> {
-				// start, relative to this string
-				var start = startIndex - counter.index;
-				// end, relative to this string
-				var end = endIndex - counter.index;
-
-				if (start <= 0 && end > 0) {
-					// query match starts immediately
-
-					if (end < string.length()) {
-						// query ends within this string
-
-						// query text
-						var highlight = highlighted(string.substring(0, end), style);
-						texts.add(highlight);
-						// text after query
-						var right = literal(string.substring(end), Style.EMPTY.withParent(style));
-						texts.add(right);
-					} else {
-						var highlight = highlighted(string, style);
-						texts.add(highlight);
-					}
-				} else if (start > 0 && start < string.length()) {
-					// query starts within this string
-
-					// text up until query
-					var left = literal(string.substring(0, start), style);
-					texts.add(left);
-
-					if (end < string.length()) {
-						// query ends within this string
-
-						// query text
-						var highlight = highlighted(string.substring(start, end), style);
-						texts.add(highlight);
-						// text after query
-						var right = literal(string.substring(end), style);
-						texts.add(right);
-					} else {
-						// query ends after this string
-
-						// query text
-						var highlight = highlighted(string.substring(start), style);
-						texts.add(highlight);
-					}
-				} else {
-					// query does not match within this string
-
-					// non-query text
-					texts.add(literal(string, style));
-				}
-
-				counter.index += string.length();
-
-				return Optional.empty();
-			}, outerStyle), Style.EMPTY);
-
-			Style style = visitable instanceof Text text ? text.getStyle() : Style.EMPTY;
-			return new MutableText(TextComponent.EMPTY, texts, style);
-		}
-	}
-
-	private static MutableText highlighted(String text, Style style) {
-		return Text.literal(text).setStyle(highlight(style));
-	}
-
-	private static MutableText literal(String text, Style style) {
-		return Text.literal(text).setStyle(style);
 	}
 
 	/**

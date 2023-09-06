@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
-import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
@@ -50,11 +50,11 @@ public class WorldListWidget$EntryMixin implements SetQueryAccessor {
 	@Override
 	public void searchable$setQuery(String query) {
 		if (enabled() && query != null && !query.equals(this.query)) {
-			this.worldDisplayNameWithHighlight = (Text) Util.textWithHighlight(query, this.worldDisplayNameText);
-			this.worldNameWithHighlight = (Text) Util.textWithHighlight(query, this.worldNameText);
+			this.worldDisplayNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.worldDisplayNameText, query);
+			this.worldNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.worldNameText, query);
 
 			if (Searchable.config.selectWorld.matchWorldDetails) {
-				this.worldDetailsWithHighlight = (Text) Util.textWithHighlight(query, this.worldDetails);
+				this.worldDetailsWithHighlight = (Text) MatchUtil.getHighlightedText(this.worldDetails, query);
 			}
 
 			this.query = query;
@@ -99,7 +99,7 @@ public class WorldListWidget$EntryMixin implements SetQueryAccessor {
 			this.worldDisplayName = worldDisplayName;
 			this.worldDisplayNameText = Text.literal(this.worldDisplayName);
 
-			this.worldDisplayNameWithHighlight = (Text) Util.textWithHighlight(this.query, this.worldDisplayNameText);
+			this.worldDisplayNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.worldDisplayNameText, this.query);
 		}
 
 		return graphics.drawText(textRenderer, this.worldDisplayNameWithHighlight, x, y, color, shadowed);
@@ -120,7 +120,10 @@ public class WorldListWidget$EntryMixin implements SetQueryAccessor {
 			this.worldName = worldName;
 			this.worldNameText = Text.literal(this.worldName);
 
-			this.worldNameWithHighlight = (Text) Util.textWithHighlight(this.query, this.worldNameText);
+			// Get the matches from `this.level.getName()`, as while `worldName` is updated to add the date, it is not
+			// checked in searches.
+			var matches = MatchUtil.getMatches(this.level.getName(), this.query);
+			this.worldNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.worldNameText, matches);
 		}
 
 		return graphics.drawText(textRenderer, this.worldNameWithHighlight, x, y, color, shadowed);
@@ -139,7 +142,7 @@ public class WorldListWidget$EntryMixin implements SetQueryAccessor {
 		if (!worldDetails.equals(this.worldDetails)) {
 			this.worldDetails = worldDetails;
 
-			this.worldDetailsWithHighlight = (Text) Util.textWithHighlight(this.query, this.worldDetails);
+			this.worldDetailsWithHighlight = (Text) MatchUtil.getHighlightedText(this.worldDetails, this.query);
 		}
 
 		return this.worldDetailsWithHighlight;

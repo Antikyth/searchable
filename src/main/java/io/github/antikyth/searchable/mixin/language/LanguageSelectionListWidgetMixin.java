@@ -11,13 +11,13 @@ import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
 import io.github.antikyth.searchable.accessor.language.LanguageEntryAccessor;
 import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
 import io.github.antikyth.searchable.mixin.EntryListWidgetMixin;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen.LanguageSelectionListWidget;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.resource.language.LanguageDefinition;
-import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 import org.quiltmc.loader.api.minecraft.ClientOnly;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +27,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Locale;
 import java.util.Map;
 
 @ClientOnly
@@ -59,7 +58,7 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 			target = "Lnet/minecraft/client/gui/widget/AlwaysSelectedEntryListWidget;<init>(Lnet/minecraft/client/MinecraftClient;IIIII)V"
 	), index = 3)
 	private static int adjustTopCoord(int top) {
-		if (!enabled()) return top;
+		if (disabled()) return top;
 
 		Searchable.LOGGER.debug("moving language selection list down by 16px...");
 
@@ -71,27 +70,17 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	// Filter the language selection list at the end of the constructor.
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConstructor(LanguageOptionsScreen languageOptionsScreen, MinecraftClient client, CallbackInfo ci) {
-		if (!enabled()) return;
+		if (disabled()) return;
 
 		String query = ((GetSearchBoxAccessor) languageOptionsScreen).searchable$getSearchBox().getText();
 		this.searchable$filter(query, languageOptionsScreen.languageManager.getAllLanguages());
 	}
 
-//	// Use `EntryListWidget.nextFocusPath` instead of `AlwaysSelectedEntryListWidget`'s so that we can hide the selected
-//	// entry when needed.
-//	//
-//	// Yes, this is overwriting the method. It's because this isn't the behavior we want, nor any potential
-//	// modifications made to it by other mixins (which I doubt anyone does).
-//	@Nullable
-//	public ElementPath nextFocusPath(GuiNavigationEvent event) {
-//		return ((EntryListWidget<?>) (Object) this).nextFocusPath(event);
-//	}
-
-	// Keep track of the latest selected language entry so it can be re-selected if a query hides it and it is then
+	// Keep track of the latest selected language entry, so it can be re-selected if a query hides it and it is then
 	// later shown again.
 	@Override
 	protected void onSetSelected(@Nullable E entry, CallbackInfo ci) {
-		if (!enabled()) return;
+		if (disabled()) return;
 
 		if (Searchable.config.reselectLastSelection && entry != null && !entry.equals(selectedLanguage)) {
 			Searchable.LOGGER.debug("updating selected language...");
@@ -109,17 +98,15 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	@Unique
 	@SuppressWarnings("unchecked")
 	public void searchable$filter(String query, Map<String, LanguageDefinition> languages) {
-		String lowercaseQuery = query.toLowerCase(Locale.ROOT);
-
 		// If the query has changed...
-		if (!lowercaseQuery.equals(this.query)) {
-			Searchable.LOGGER.debug("filtering language selection list by query \"" + lowercaseQuery + "\"...");
+		if (query != null && !query.equals(this.query)) {
+			Searchable.LOGGER.debug("filtering language selection list by query \"" + query + "\"...");
 
 			this.clearEntries();
 
 			languages.forEach((code, definition) -> {
 				// Add each entry matching the query back
-				if (this.languageMatches(lowercaseQuery, definition)) {
+				if (this.languageMatches(query, definition)) {
 					var entry = ((LanguageSelectionListWidget) (Object) this).new LanguageEntry(code, definition);
 					((LanguageEntryAccessor) entry).searchable$highlightQuery(query);
 
@@ -139,23 +126,21 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 			} else {
 				this.setScrollAmount(0.0);
 			}
-		}
 
-		this.query = lowercaseQuery;
+			this.query = query;
+		}
 	}
 
 	/**
 	 * Whether the given language matches the given query.
 	 */
 	@Unique
-	private boolean languageMatches(String lowercaseQuery, LanguageDefinition language) {
-		var string = Formatting.strip(language.getDisplayText().getString());
-
-		return string != null && !string.isEmpty() && string.toLowerCase(Locale.ROOT).contains(lowercaseQuery);
+	private boolean languageMatches(String query, LanguageDefinition language) {
+		return MatchUtil.hasMatches(language.getDisplayText(), query);
 	}
 
 	@Unique
-	private static boolean enabled() {
-		return Searchable.config.language.enable;
+	private static boolean disabled() {
+		return !Searchable.config.language.enable;
 	}
 }

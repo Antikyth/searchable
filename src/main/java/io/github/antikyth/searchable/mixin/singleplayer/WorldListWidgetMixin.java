@@ -9,11 +9,11 @@ package io.github.antikyth.searchable.mixin.singleplayer;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.util.Formatting;
 import net.minecraft.world.storage.WorldSaveSummary;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,7 +23,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
-import java.util.Locale;
 
 @Mixin(WorldListWidget.class)
 public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldListWidget.AbstractWorldEntry> {
@@ -59,12 +58,7 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 	private boolean matchWorldDetails(boolean matches, String query, WorldSaveSummary summary) {
 		if (!Searchable.config.selectWorld.matchWorldDetails) return matches;
 
-		var stripped = Formatting.strip(summary.getDetails().getString());
-		if (stripped == null) return matches;
-
-		var details = stripped.toLowerCase(Locale.ROOT);
-
-		return matches || details.contains(query);
+		return matches || MatchUtil.hasMatches(summary.getDetails(), query);
 	}
 
 	// Fix a vanilla bug: use `setSelected(null)`'s side effects to disable the world selection buttons.

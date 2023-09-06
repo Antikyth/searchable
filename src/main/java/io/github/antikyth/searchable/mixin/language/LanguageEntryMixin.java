@@ -2,7 +2,7 @@ package io.github.antikyth.searchable.mixin.language;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.language.LanguageEntryAccessor;
-import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.resource.language.LanguageDefinition;
@@ -25,7 +25,7 @@ public abstract class LanguageEntryMixin extends AlwaysSelectedEntryListWidget.E
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void onConstructor(LanguageOptionsScreen.LanguageSelectionListWidget languageSelectionListWidget, String languageCode, LanguageDefinition languageDefinition, CallbackInfo ci) {
-		if (!enabled()) return;
+		if (disabled()) return;
 
 		this.textWithHighlight = this.languageDefinition;
 	}
@@ -36,7 +36,7 @@ public abstract class LanguageEntryMixin extends AlwaysSelectedEntryListWidget.E
 			ordinal = 0
 	), index = 1)
 	private Text renderLanguageWithHighlight(Text languageDefinition) {
-		if (!enabled()) return languageDefinition;
+		if (disabled()) return languageDefinition;
 
 		return this.textWithHighlight;
 	}
@@ -44,14 +44,14 @@ public abstract class LanguageEntryMixin extends AlwaysSelectedEntryListWidget.E
 	@Unique
 	@Override
 	public void searchable$highlightQuery(String query) {
-		if (!enabled()) return;
+		if (disabled()) return;
 
 		// Safe cast: input is Text, so output will be Text.
-		this.textWithHighlight = (Text) Util.textWithHighlight(query, this.languageDefinition);
+		this.textWithHighlight = (Text) MatchUtil.getHighlightedText(this.languageDefinition, query);
 	}
 
 	@Unique
-	private boolean enabled() {
-		return Searchable.config.language.enable && Searchable.config.highlightMatches;
+	private boolean disabled() {
+		return !Searchable.config.language.enable || !Searchable.config.highlightMatches;
 	}
 }

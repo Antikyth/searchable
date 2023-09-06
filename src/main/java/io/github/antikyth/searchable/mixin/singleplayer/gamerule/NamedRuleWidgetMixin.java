@@ -1,7 +1,7 @@
 package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.text.OrderedText;
@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
-import java.util.Locale;
 
 @Mixin(EditGameRulesScreen.NamedRuleWidget.class)
 public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
@@ -40,7 +39,7 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 		if (technicalName != null && !technicalName.equals(this.technicalName)) {
 			this.technicalName = technicalName;
 
-			this.technicalNameText = Text.literal(this.technicalName).formatted(Formatting.DARK_GRAY, Formatting.ITALIC);
+			this.technicalNameText = Text.literal(this.technicalName).formatted(Formatting.GRAY, Formatting.ITALIC);
 			this.updateHighlight(this.query);
 		}
 	}
@@ -63,11 +62,11 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 	protected void updateHighlight(String query) {
 		if (!enabled() || !Searchable.config.highlightMatches) return;
 
-		Text nameWithHighlight = (Text) Util.textWithHighlight(query, this.nameText);
+		var nameWithHighlight = MatchUtil.getHighlightedText(this.nameText, query);
 		this.name = this.instance.getTextRenderer().wrapLines(nameWithHighlight, 175);
 
 		if (this.technicalNameText != null) {
-			this.technicalNameWithHighlight = (Text) Util.textWithHighlight(query, this.technicalNameText);
+			this.technicalNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.technicalNameText, query);
 		}
 	}
 
@@ -104,10 +103,7 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 	@Unique
 	@Override
 	public boolean searchable$matches(String query) {
-		String text = Formatting.strip(this.nameText.getString());
-		assert text != null;
-
-		return text.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT)) || super.searchable$matches(query);
+		return MatchUtil.hasMatches(this.nameText, query) || super.searchable$matches(query);
 	}
 
 	@Override

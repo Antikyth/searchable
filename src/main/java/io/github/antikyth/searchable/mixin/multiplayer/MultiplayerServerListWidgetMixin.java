@@ -10,6 +10,7 @@ import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.multiplayer.MultiplayerServerListWidgetAccessor;
+import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -30,7 +31,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
-import java.util.Locale;
 
 @Mixin(MultiplayerServerListWidget.class)
 public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends AlwaysSelectedEntryListWidget<E> implements MultiplayerServerListWidgetAccessor {
@@ -170,12 +170,7 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 
 	@Unique
 	private static boolean matchesQuery(String query, @Nullable String title, @Nullable String motd) {
-		String lowercaseQuery = query.toLowerCase(Locale.ROOT);
-
-		boolean titleMatches = title != null && !title.isEmpty() && title.toLowerCase(Locale.ROOT).contains(lowercaseQuery);
-		boolean motdMatches = Searchable.config.selectServer.matchMotd && motd != null && !motd.isEmpty() && motd.toLowerCase(Locale.ROOT).contains(lowercaseQuery);
-
-		return titleMatches || motdMatches;
+		return MatchUtil.hasMatches(title, query) || MatchUtil.hasMatches(motd, query);
 	}
 
 	@Unique

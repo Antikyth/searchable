@@ -1,33 +1,28 @@
 package io.github.antikyth.searchable.mixin.language;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.accessor.language.LanguageEntryAccessor;
-import io.github.antikyth.searchable.util.MatchUtil;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.resource.language.LanguageDefinition;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry.class)
-public abstract class LanguageEntryMixin extends AlwaysSelectedEntryListWidget.Entry<LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry> implements LanguageEntryAccessor {
-	@Shadow
-	public Text languageDefinition;
-
+public abstract class LanguageEntryMixin extends AlwaysSelectedEntryListWidget.Entry<LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry> implements SetQueryAccessor {
 	@Unique
-	private Text textWithHighlight;
+	private final MatchManager matchManager = new MatchManager();
+	@Unique
+	private String query = "";
 
-	@Inject(method = "<init>", at = @At("TAIL"))
-	public void onConstructor(LanguageOptionsScreen.LanguageSelectionListWidget languageSelectionListWidget, String languageCode, LanguageDefinition languageDefinition, CallbackInfo ci) {
-		if (disabled()) return;
-
-		this.textWithHighlight = this.languageDefinition;
+	@Override
+	public void searchable$setQuery(String query) {
+		if (!disabled() && query != null) {
+			this.query = query;
+		}
 	}
 
 	@ModifyArg(method = "render", at = @At(
@@ -38,16 +33,7 @@ public abstract class LanguageEntryMixin extends AlwaysSelectedEntryListWidget.E
 	private Text renderLanguageWithHighlight(Text languageDefinition) {
 		if (disabled()) return languageDefinition;
 
-		return this.textWithHighlight;
-	}
-
-	@Unique
-	@Override
-	public void searchable$highlightQuery(String query) {
-		if (disabled()) return;
-
-		// Safe cast: input is Text, so output will be Text.
-		this.textWithHighlight = (Text) MatchUtil.getHighlightedText(this.languageDefinition, query);
+		return (Text) this.matchManager.getHighlightedText(languageDefinition, this.query);
 	}
 
 	@Unique

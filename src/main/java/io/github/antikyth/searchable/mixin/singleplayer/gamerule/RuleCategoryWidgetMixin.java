@@ -1,7 +1,7 @@
 package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.util.MatchUtil;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
@@ -27,7 +27,7 @@ public class RuleCategoryWidgetMixin extends AbstractRuleWidgetMixin {
 	protected void updateHighlight(String query) {
 		if (!enabled()) return;
 
-		this.nameWithHighlight = (Text) MatchUtil.getHighlightedText(this.nameText, query);
+		this.nameWithHighlight = (Text) MatchManager.getHighlightedText(this.nameText, query);
 	}
 
 	@Inject(method = "<init>", at = @At("TAIL"))

@@ -1,7 +1,7 @@
 package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.util.MatchUtil;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.text.OrderedText;
@@ -28,11 +28,12 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 
 	@Unique
 	private Text nameText;
-
 	@Unique
 	private Text technicalNameText;
+
 	@Unique
-	private Text technicalNameWithHighlight;
+	private final MatchManager nameMatchManager = new MatchManager();
+
 
 	@Override
 	public void searchable$setTechnicalName(String technicalName) {
@@ -45,9 +46,9 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 	}
 
 	@Inject(method = "<init>", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/font/TextRenderer.wrapLines (Lnet/minecraft/text/StringVisitable;I)Ljava/util/List;",
-			ordinal = 0
+		value = "INVOKE",
+		target = "net/minecraft/client/font/TextRenderer.wrapLines (Lnet/minecraft/text/StringVisitable;I)Ljava/util/List;",
+		ordinal = 0
 	))
 	public void onConstructor(EditGameRulesScreen instance, @Nullable List<OrderedText> description, Text name, CallbackInfo ci) {
 		if (!enabled() || !Searchable.config.highlightMatches) return;
@@ -62,21 +63,17 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 	protected void updateHighlight(String query) {
 		if (!enabled() || !Searchable.config.highlightMatches) return;
 
-		var nameWithHighlight = MatchUtil.getHighlightedText(this.nameText, query);
+		var nameWithHighlight = this.nameMatchManager.getHighlightedText(this.nameText, query);
 		this.name = this.instance.getTextRenderer().wrapLines(nameWithHighlight, 175);
-
-		if (this.technicalNameText != null) {
-			this.technicalNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.technicalNameText, query);
-		}
 	}
 
 	@ModifyArg(method = "drawName", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/GuiGraphics.drawText (Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/OrderedText;IIIZ)I",
-			ordinal = 0
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/GuiGraphics.drawText (Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/OrderedText;IIIZ)I",
+		ordinal = 0
 	), index = 3)
 	private int adjustNameYCoord(int y) {
-		if (enabled() && Searchable.config.editGamerule.showTechnicalName && this.technicalNameWithHighlight != null) {
+		if (enabled() && Searchable.config.editGamerule.showTechnicalName && this.technicalNameText != null) {
 			return y - 5;
 		} else {
 			return y;
@@ -84,26 +81,26 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 	}
 
 	@Inject(method = "drawName", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/GuiGraphics.drawText (Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/OrderedText;IIIZ)I",
-			ordinal = 0,
-			shift = At.Shift.AFTER
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/GuiGraphics.drawText (Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/OrderedText;IIIZ)I",
+		ordinal = 0,
+		shift = At.Shift.AFTER
 	))
 	private void drawTechnicalName(GuiGraphics graphics, int y, int x, CallbackInfo ci) {
 		if (!enabled()) return;
 
-		if (Searchable.config.editGamerule.showTechnicalName && this.technicalNameWithHighlight != null) {
+		if (Searchable.config.editGamerule.showTechnicalName && this.technicalNameText != null) {
 			Integer color = Formatting.WHITE.getColorValue();
 			assert color != null;
 
-			graphics.drawText(this.instance.getTextRenderer(), this.technicalNameWithHighlight, x, y + 10, color, false);
+			graphics.drawText(this.instance.getTextRenderer(), (Text) this.technicalNameMatchManager.getHighlightedText(this.technicalNameText, this.query), x, y + 10, color, false);
 		}
 	}
 
 	@Unique
 	@Override
 	public boolean searchable$matches(String query) {
-		return MatchUtil.hasMatches(this.nameText, query) || super.searchable$matches(query);
+		return this.nameMatchManager.hasMatches(this.nameText, query) || super.searchable$matches(query);
 	}
 
 	@Override

@@ -3,11 +3,14 @@
 	"minVersion": "0.8",
 	"package": "io.github.antikyth.searchable.mixin",
 	"compatibilityLevel": "JAVA_17",
-	"mixins": [],
+	"mixins": [
+		"singleplayer.WorldSaveSummaryMixin"
+	],
 	"client": [
 		"EntryListWidgetMixin",
 		"keybind.KeyBindEntryMixin",
 		"keybind.KeyBindListWidgetMixin",
+		"keybind.KeyBindMixin",
 		"keybind.KeyBindsScreenMixin",
 		"language.LanguageEntryMixin",
 		"language.LanguageOptionsScreenMixin",

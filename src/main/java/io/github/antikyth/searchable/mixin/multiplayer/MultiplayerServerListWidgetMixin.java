@@ -8,9 +8,8 @@ package io.github.antikyth.searchable.mixin.multiplayer;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.multiplayer.MultiplayerServerListWidgetAccessor;
-import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -18,9 +17,6 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget.L
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget.ServerEntry;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,29 +30,6 @@ import java.util.List;
 
 @Mixin(MultiplayerServerListWidget.class)
 public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends AlwaysSelectedEntryListWidget<E> implements MultiplayerServerListWidgetAccessor {
-	@Unique
-	private String query = "";
-
-	// Mixin will ignore this - required because of extending `AlwaysSelectedEntryListWidget`
-	public MultiplayerServerListWidgetMixin(MinecraftClient client, int width, int height, int top, int bottom, int entryHeight) {
-		super(client, width, height, top, bottom, entryHeight);
-	}
-
-	@Unique
-	@Override
-	public String searchable$getQuery() {
-		return this.query;
-	}
-
-	@Unique
-	@Override
-	public void searchable$setQuery(String query) {
-		if (enabled() && query != null && !query.equals(this.query)) {
-			this.filter(query);
-			this.query = query;
-		}
-	}
-
 	@Final
 	@Shadow
 	private MultiplayerScreen screen;
@@ -77,100 +50,94 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 	@Unique
 	private MultiplayerServerListWidget.Entry lastSelection;
 
+	@Override
+	public MultiplayerServerListWidget.Entry searchable$getLastSelection() {
+		return this.lastSelection;
+	}
+
+	@Unique
+	private String query = "";
+
+	@Unique
+	@Override
+	public String searchable$getQuery() {
+		return this.query;
+	}
+
+	@Unique
+	@Override
+	public void searchable$setQuery(String query) {
+		if (enabled() && query != null && !query.equals(this.query)) {
+			this.updateEntries();
+			this.screen.updateButtonActivationStates();
+
+			if (this.getSelectedOrNull() != null) {
+				this.centerScrollOn(this.getSelectedOrNull());
+			} else {
+				this.setScrollAmount(0.0);
+			}
+
+			this.query = query;
+		}
+	}
+
+	// Mixin will ignore this - required because of extending `AlwaysSelectedEntryListWidget`
+	public MultiplayerServerListWidgetMixin(MinecraftClient client, int width, int height, int top, int bottom, int entryHeight) {
+		super(client, width, height, top, bottom, entryHeight);
+	}
+
 	@Inject(method = "setSelected(Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget$Entry;)V", at = @At("TAIL"))
 	public void onSetSelected(@Nullable MultiplayerServerListWidget.Entry entry, CallbackInfo ci) {
 		if (!enabled()) return;
 
-		if (Searchable.config.reselectLastSelection && entry != null) {
+		if (reselectLastSelection() && entry != null) {
 			lastSelection = entry;
-		}
-	}
-
-	// Filters very similarly to `updateEntries`, but as it isn't run during initialization, it can use `setSelected` to
-	// maintain the selection when searching.
-	@Unique
-	@SuppressWarnings("unchecked")
-	private void filter(String query) {
-		var reselect = Searchable.config.reselectLastSelection;
-
-		this.clearEntries();
-
-		this.servers.forEach(entry -> {
-			if (serverMatchesQuery(query, entry)) {
-				// Update highlight.
-				((SetQueryAccessor) entry).searchable$setQuery(query);
-				this.addEntry((E) entry);
-
-				if (reselect && entry == lastSelection) {
-					this.setSelected((E) entry);
-				}
-			}
-		});
-		this.addEntry((E) this.scanningEntry);
-		this.lanServers.forEach(entry -> {
-			if (lanServerMatchesQuery(query, entry)) {
-				// Update highlight.
-				((SetQueryAccessor) entry).searchable$setQuery(query);
-				this.addEntry((E) entry);
-
-				if (reselect && entry == lastSelection) {
-					this.setSelected((E) entry);
-				}
-			}
-		});
-
-		this.screen.updateButtonActivationStates();
-
-		if (this.getSelectedOrNull() != null) {
-			this.centerScrollOn(this.getSelectedOrNull());
-		} else {
-			this.setScrollAmount(0.0);
 		}
 	}
 
 	// Filter the server entries added back when `updateEntries()` is called.
 	@WrapWithCondition(method = "method_36889", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	))
 	private static boolean filterServerEntry(MultiplayerServerListWidget instance, EntryListWidget.Entry<MultiplayerServerListWidget.Entry> entry) {
-		if (!enabled()) return true;
+		if (enabled() && entry instanceof ServerEntry serverEntry) {
+			MultiplayerServerListWidgetAccessor self = (MultiplayerServerListWidgetAccessor) instance;
 
-		return serverMatchesQuery(((MultiplayerServerListWidgetAccessor) instance).searchable$getQuery(), (ServerEntry) entry);
+			if (reselectLastSelection() && serverEntry == self.searchable$getLastSelection()) {
+				instance.setSelected(serverEntry);
+			}
+
+			String query = self.searchable$getQuery();
+			return ((MatchesAccessor) serverEntry).searchable$matches(query);
+		}
+
+		return true;
 	}
 
 	// Filter the LAN server entries added back when `updateEntries()` is called.
 	@WrapWithCondition(method = "method_36888", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	))
 	private static boolean filterLanServerEntry(MultiplayerServerListWidget instance, EntryListWidget.Entry<MultiplayerServerListWidget.Entry> entry) {
-		if (!enabled()) return true;
+		if (enabled() && entry instanceof LanServerEntry lanServerEntry) {
+			MultiplayerServerListWidgetAccessor self = (MultiplayerServerListWidgetAccessor) instance;
 
-		return lanServerMatchesQuery(((MultiplayerServerListWidgetAccessor) instance).searchable$getQuery(), (LanServerEntry) entry);
+			if (reselectLastSelection() && lanServerEntry == self.searchable$getLastSelection()) {
+				instance.setSelected(lanServerEntry);
+			}
+
+			String query = ((MultiplayerServerListWidgetAccessor) instance).searchable$getQuery();
+			return ((MatchesAccessor) lanServerEntry).searchable$matches(query);
+		}
+
+		return true;
 	}
 
 	@Unique
-	private static boolean serverMatchesQuery(String query, ServerEntry entry) {
-		String name = entry.getServer().name;
-
-		Text label = entry.getServer().label;
-		String labelString = label == null ? null : Formatting.strip(label.getString());
-
-		return matchesQuery(query, name, labelString);
-	}
-
-	@Unique
-	private static boolean lanServerMatchesQuery(String query, LanServerEntry entry) {
-		String title = I18n.translate("lanServer.title");
-		String motd = Formatting.strip(entry.getLanServerEntry().getMotd());
-
-		return matchesQuery(query, title, motd);
-	}
-
-	@Unique
-	private static boolean matchesQuery(String query, @Nullable String title, @Nullable String motd) {
-		return MatchUtil.hasMatches(title, query) || MatchUtil.hasMatches(motd, query);
+	private static boolean reselectLastSelection() {
+		return Searchable.config.reselectLastSelection;
 	}
 
 	@Unique

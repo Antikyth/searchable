@@ -3,8 +3,9 @@ package io.github.antikyth.searchable.mixin.multiplayer;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.github.antikyth.searchable.Searchable;
+import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
-import io.github.antikyth.searchable.util.MatchUtil;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -22,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MultiplayerServerListWidget.ServerEntry.class)
-public class ServerEntryMixin implements SetQueryAccessor {
+public class ServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 	@Final
 	@Shadow
 	private ServerInfo server;
@@ -30,47 +31,41 @@ public class ServerEntryMixin implements SetQueryAccessor {
 	@Unique
 	private String query = "";
 
+
 	@Unique
 	private String serverName;
 	@Unique
-	private Text serverNameText;
-	@Unique
-	private Text serverNameWithHighlight;
+	private Text serverLabel;
 
 	@Unique
-	private StringVisitable serverLabel;
+	private final MatchManager serverNameMatchManager = new MatchManager();
 	@Unique
-	private StringVisitable serverLabelWithHighlight;
+	private final MatchManager serverLabelMatchManager = new MatchManager();
 
 	@Unique
 	@Override
 	public void searchable$setQuery(String query) {
 		if (enabled() && query != null && !query.equals(this.query)) {
-			// Safe cast: input is Text, so output will be Text.
-			this.serverNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.serverNameText, query);
-
-			if (Searchable.config.selectServer.matchMotd) {
-				this.serverLabelWithHighlight = MatchUtil.getHighlightedText(this.serverLabel, query);
-			}
-
 			this.query = query;
 		}
+	}
+
+	@Override
+	public boolean searchable$matches(String query) {
+		return this.serverNameMatchManager.hasMatches(this.serverName, query)
+			|| (Searchable.config.selectServer.matchMotd && this.serverLabelMatchManager.hasMatches(this.serverLabel, query));
 	}
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	protected void onConstructor(MultiplayerServerListWidget multiplayerServerListWidget, MultiplayerScreen screen, ServerInfo server, CallbackInfo ci) {
 		if (!enabled()) return;
 
-		// Used to check for changes to the name.
+		// Used for `searchable$matches`
 		this.serverName = this.server.name;
-		// Used to update the highlight.
-		this.serverNameText = Text.literal(this.serverName);
-		this.serverNameWithHighlight = this.serverNameText;
 
+		// Used for `searchable$matches`
 		if (Searchable.config.selectServer.matchMotd) {
-			// Used to check for changes to the label and to update the highlight.
 			this.serverLabel = this.server.label;
-			this.serverLabelWithHighlight = this.serverLabel;
 		}
 	}
 
@@ -78,24 +73,20 @@ public class ServerEntryMixin implements SetQueryAccessor {
 	 * Draw the server title text with the highlighted query match, if any.
 	 */
 	@WrapOperation(method = "render", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/GuiGraphics.drawText (Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;IIIZ)I",
-			ordinal = 0
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/GuiGraphics.drawText (Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;IIIZ)I",
+		ordinal = 0
 	))
 	private int drawServerNameWithHighlight(GuiGraphics graphics, TextRenderer textRenderer, String serverName, int x, int y, int color, boolean shadowed, Operation<Integer> original) {
 		if (!enabled() || serverName == null) {
 			return original.call(graphics, textRenderer, serverName, x, y, color, shadowed);
 		}
 
-		// If the server name has been changed, update the highlight first.
 		if (!serverName.equals(this.serverName)) {
 			this.serverName = serverName;
-			this.serverNameText = Text.literal(this.serverName);
-
-			this.serverNameWithHighlight = (Text) MatchUtil.getHighlightedText(this.serverNameText, this.query);
 		}
 
-		return graphics.drawText(textRenderer, this.serverNameWithHighlight, x, y, color, shadowed);
+		return graphics.drawText(textRenderer, (Text) this.serverNameMatchManager.getHighlightedText(serverName, this.query), x, y, color, shadowed);
 	}
 
 	/**
@@ -103,20 +94,18 @@ public class ServerEntryMixin implements SetQueryAccessor {
 	 * query match, if any.
 	 */
 	@ModifyArg(method = "render", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/font/TextRenderer.wrapLines (Lnet/minecraft/text/StringVisitable;I)Ljava/util/List;",
-			ordinal = 0
+		value = "INVOKE",
+		target = "net/minecraft/client/font/TextRenderer.wrapLines (Lnet/minecraft/text/StringVisitable;I)Ljava/util/List;",
+		ordinal = 0
 	))
 	private StringVisitable drawServerLabelWithHighlight(StringVisitable label) {
 		if (!enabled() || !Searchable.config.selectServer.matchMotd || label == null) return label;
 
-		// If the server label has been changed, update the highlight first.
-		if (!label.equals(this.serverLabel)) {
-			this.serverLabel = label;
-			this.serverLabelWithHighlight = MatchUtil.getHighlightedText(this.serverLabel, this.query);
+		if (label instanceof Text serverLabel && !serverLabel.equals(this.serverLabel)) {
+			this.serverLabel = serverLabel;
 		}
 
-		return this.serverLabelWithHighlight;
+		return this.serverLabelMatchManager.getHighlightedText(label, this.query);
 	}
 
 	@Unique

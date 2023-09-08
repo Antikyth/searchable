@@ -5,7 +5,7 @@ import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.singleplayer.gamerule.AbstractRuleWidgetAccessor;
-import io.github.antikyth.searchable.util.MatchUtil;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.widget.ElementListWidget;
@@ -120,7 +120,7 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 
 	@Unique
 	private boolean filterCategory(String query, Map.Entry<GameRules.Category, Map<GameRules.Key<?>, EditGameRulesScreen.AbstractRuleWidget>> entry) {
-		this.currentCategoryMatches = Searchable.config.editGamerule.matchCategory && MatchUtil.hasMatches(I18n.translate(entry.getKey().getCategory()), query);
+		this.currentCategoryMatches = Searchable.config.editGamerule.matchCategory && MatchManager.hasMatches(I18n.translate(entry.getKey().getCategory()), query);
 
 		if (this.currentCategoryMatches) {
 			return true;

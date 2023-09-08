@@ -9,6 +9,7 @@ package io.github.antikyth.searchable.mixin.language;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
 import io.github.antikyth.searchable.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
@@ -69,7 +70,7 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		// Filter the language selection list when the query is changed.
-		this.searchBox.setChangedListener(query -> ((LanguageSelectionListWidgetAccessor) this.languageSelectionList).searchable$filter(query, this.languageManager.getAllLanguages()));
+		this.searchBox.setChangedListener(query -> ((SetQueryAccessor) this.languageSelectionList).searchable$setQuery(query));
 
 		this.addSelectableChild(this.searchBox);
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select

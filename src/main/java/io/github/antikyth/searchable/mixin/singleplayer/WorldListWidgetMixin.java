@@ -8,8 +8,8 @@ package io.github.antikyth.searchable.mixin.singleplayer;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import io.github.antikyth.searchable.Searchable;
+import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
-import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
@@ -38,11 +38,11 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 
 	// Re-select a world when it is shown again after re-filtering if no other world was selected.
 	@ModifyArg(method = "filter(Ljava/lang/String;Ljava/util/List;)V", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/world/WorldListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/world/WorldListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	), index = 0)
 	private EntryListWidget.Entry<WorldListWidget.AbstractWorldEntry> onAddEntry(EntryListWidget.Entry<WorldListWidget.AbstractWorldEntry> entry) {
-		if (Searchable.config.reselectLastSelection && entry instanceof WorldListWidget.Entry worldEntry) {
+		if (reselectLastSelection() && entry instanceof WorldListWidget.Entry worldEntry) {
 			((SetQueryAccessor) (Object) worldEntry).searchable$setQuery(this.query);
 
 			if (worldEntry.level == this.lastSelection) {
@@ -56,9 +56,9 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 	// Match world details in search results as well as the display name and name.
 	@ModifyReturnValue(method = "worldNameMatches", at = @At("RETURN"))
 	private boolean matchWorldDetails(boolean matches, String query, WorldSaveSummary summary) {
-		if (!Searchable.config.selectWorld.matchWorldDetails) return matches;
+		if (matches) return true;
 
-		return matches || MatchUtil.hasMatches(summary.getDetails(), query);
+		return matchWorldDetails() && ((MatchesAccessor) summary).searchable$matches(query);
 	}
 
 	// Fix a vanilla bug: use `setSelected(null)`'s side effects to disable the world selection buttons.
@@ -74,5 +74,15 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 		if (Searchable.config.reselectLastSelection && abstractWorldEntry instanceof WorldListWidget.Entry entry) {
 			this.lastSelection = entry.level;
 		}
+	}
+
+	@Unique
+	private static boolean reselectLastSelection() {
+		return Searchable.config.reselectLastSelection;
+	}
+
+	@Unique
+	private static boolean matchWorldDetails() {
+		return Searchable.config.selectWorld.matchWorldDetails;
 	}
 }

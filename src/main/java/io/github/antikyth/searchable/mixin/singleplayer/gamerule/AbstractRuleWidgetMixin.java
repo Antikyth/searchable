@@ -2,7 +2,7 @@ package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.singleplayer.gamerule.AbstractRuleWidgetAccessor;
-import io.github.antikyth.searchable.util.MatchUtil;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,6 +32,11 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 	protected String technicalName;
 
 	@Unique
+	protected final MatchManager descriptionStringMatchManager = new MatchManager();
+	@Unique
+	protected final MatchManager technicalNameMatchManager = new MatchManager();
+
+	@Unique
 	@Override
 	public void searchable$setTechnicalName(String technicalName) {
 		if (technicalName != null) this.technicalName = technicalName;
@@ -40,11 +45,11 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 	@Override
 	public boolean searchable$matches(String query) {
 		if (Searchable.config.editGamerule.matchTechnicalName && this.technicalName != null) {
-			if (MatchUtil.hasMatches(this.technicalName, query)) return true;
+			if (this.technicalNameMatchManager.hasMatches(this.technicalName, query)) return true;
 		}
 
 		if (Searchable.config.editGamerule.matchDescription && this.descriptionString != null) {
-			return MatchUtil.hasMatches(this.descriptionString, query);
+			return this.descriptionStringMatchManager.hasMatches(this.descriptionString, query);
 		}
 
 		return false;

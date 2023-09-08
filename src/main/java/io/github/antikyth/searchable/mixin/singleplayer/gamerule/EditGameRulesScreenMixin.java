@@ -42,7 +42,7 @@ public class EditGameRulesScreenMixin extends Screen implements GetSearchBoxAcce
 
 	@Inject(method = "init", at = @At("HEAD"))
 	protected void onInit(CallbackInfo ci) {
-		if (!enabled()) return;
+		if (disabled()) return;
 
 		Searchable.LOGGER.debug("adding search box to edit gamerules screen");
 
@@ -57,29 +57,29 @@ public class EditGameRulesScreenMixin extends Screen implements GetSearchBoxAcce
 	}
 
 	@ModifyArg(method = "render", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredShadowedText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V",
-			ordinal = 0
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredShadowedText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V",
+		ordinal = 0
 	), index = 3)
 	private int adjustTitleTextYCoord(int y) {
-		if (!enabled()) return y;
+		if (disabled()) return y;
 
 		return y - 12;
 	}
 
 	@Inject(method = "render", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/world/EditGameRulesScreen$RuleListWidget.render (Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
-			shift = At.Shift.AFTER
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/world/EditGameRulesScreen$RuleListWidget.render (Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
+		shift = At.Shift.AFTER
 	))
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-		if (!enabled()) return;
+		if (disabled()) return;
 
 		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
 	}
 
 	@Unique
-	private static boolean enabled() {
-		return Searchable.config.editGamerule.enable;
+	private static boolean disabled() {
+		return !Searchable.config.editGamerule.enable;
 	}
 }

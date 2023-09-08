@@ -6,12 +6,12 @@
 
 package io.github.antikyth.searchable.mixin.language;
 
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
-import io.github.antikyth.searchable.accessor.language.LanguageEntryAccessor;
+import io.github.antikyth.searchable.accessor.MatchesAccessor;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
 import io.github.antikyth.searchable.mixin.EntryListWidgetMixin;
-import io.github.antikyth.searchable.util.MatchUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen.LanguageSelectionListWidget;
@@ -21,23 +21,28 @@ import net.minecraft.client.resource.language.LanguageDefinition;
 import org.jetbrains.annotations.Nullable;
 import org.quiltmc.loader.api.minecraft.ClientOnly;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Map;
-
 @ClientOnly
 @Mixin(LanguageOptionsScreen.LanguageSelectionListWidget.class)
 public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget.Entry<E>> extends EntryListWidgetMixin<E> implements LanguageSelectionListWidgetAccessor {
+	@Shadow
+	protected abstract void method_48261(String languageCode, String selectedLanguageCode, LanguageDefinition definition);
+
 	/**
 	 * The last selected language entry. Used so that if the entry is hidden and later shown, it can be re-selected.
 	 */
 	@Unique
 	@Nullable
 	public LanguageEntry selectedLanguage;
+
+	@Unique
+	private LanguageOptionsScreen parent;
 
 	@Unique
 	@Nullable
@@ -52,10 +57,18 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	@Unique
 	private String query = "";
 
+	@Override
+	public void searchable$setQuery(String query) {
+		if (!disabled() && query != null && !query.equals(this.query)) {
+			this.query = query;
+			this.filter();
+		}
+	}
+
 	// Move the top of the language selection list down by 16 pixels to make space for the search box.
 	@ModifyArg(method = "<init>", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/widget/AlwaysSelectedEntryListWidget;<init>(Lnet/minecraft/client/MinecraftClient;IIIII)V"
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/widget/AlwaysSelectedEntryListWidget;<init>(Lnet/minecraft/client/MinecraftClient;IIIII)V"
 	), index = 3)
 	private static int adjustTopCoord(int top) {
 		if (disabled()) return top;
@@ -72,8 +85,7 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	public void onConstructor(LanguageOptionsScreen languageOptionsScreen, MinecraftClient client, CallbackInfo ci) {
 		if (disabled()) return;
 
-		String query = ((GetSearchBoxAccessor) languageOptionsScreen).searchable$getSearchBox().getText();
-		this.searchable$filter(query, languageOptionsScreen.languageManager.getAllLanguages());
+		this.parent = languageOptionsScreen;
 	}
 
 	// Keep track of the latest selected language entry, so it can be re-selected if a query hides it and it is then
@@ -89,55 +101,87 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 		}
 	}
 
-	/**
-	 * Filters the language selection list by the given query.
-	 *
-	 * @param languages The language source (i.e. `languageManager.getAllLanguages()`)
-	 */
-	@Override
 	@Unique
-	@SuppressWarnings("unchecked")
-	public void searchable$filter(String query, Map<String, LanguageDefinition> languages) {
-		// If the query has changed...
-		if (query != null && !query.equals(this.query)) {
-			Searchable.LOGGER.debug("filtering language selection list by query \"" + query + "\"...");
+	private void filter() {
+		this.clearEntries();
 
-			this.clearEntries();
+		String selectedLanguageCode = Searchable.config.reselectLastSelection && this.selectedLanguage != null
+			? this.selectedLanguage.languageCode : this.parent.languageManager.getLanguage();
 
-			languages.forEach((code, definition) -> {
-				// Add each entry matching the query back
-				if (this.languageMatches(query, definition)) {
-					var entry = ((LanguageSelectionListWidget) (Object) this).new LanguageEntry(code, definition);
-					((LanguageEntryAccessor) entry).searchable$highlightQuery(query);
+		this.parent.languageManager.getAllLanguages()
+			.forEach((languageCode, languageDefinition) -> this.method_48261(selectedLanguageCode, languageCode, languageDefinition));
 
-					this.addEntry((E) entry);
-
-					// If it's the previously selected language, select it again.
-					if (Searchable.config.reselectLastSelection && selectedLanguage != null && code.equals(selectedLanguage.languageCode)) {
-						this.setSelected((E) entry);
-					}
-				}
-			});
-
-			// After filtering, set the scroll to be centered on the selected entry if there is one, or otherwise at the
-			// top.
-			if (this.getSelectedOrNull() != null) {
-				this.centerScrollOn(this.getSelectedOrNull());
-			} else {
-				this.setScrollAmount(0.0);
-			}
-
-			this.query = query;
+		if (this.getSelectedOrNull() != null) {
+			this.centerScrollOn(this.getSelectedOrNull());
+		} else {
+			this.setScrollAmount(0.0);
 		}
 	}
 
-	/**
-	 * Whether the given language matches the given query.
-	 */
-	@Unique
-	private boolean languageMatches(String query, LanguageDefinition language) {
-		return MatchUtil.hasMatches(language.getDisplayText(), query);
+	@WrapWithCondition(method = "method_48261", at = @At(
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I",
+		ordinal = 0
+	))
+	private boolean filterLanguage(LanguageSelectionListWidget instance, EntryListWidget.Entry<LanguageEntry> entry) {
+		if (entry instanceof LanguageEntry languageEntry) {
+			if (((MatchesAccessor) languageEntry).searchable$matches(this.query)) {
+				((SetQueryAccessor) languageEntry).searchable$setQuery(this.query);
+
+				return true;
+			}
+
+			return false;
+		}
+
+		return true;
 	}
+
+//	@Override
+//	@Unique
+//	@SuppressWarnings("unchecked")
+//	public void searchable$filter(String query, Map<String, LanguageDefinition> languages) {
+//		// If the query has changed...
+//		if (query != null && !query.equals(this.query)) {
+//			Searchable.LOGGER.debug("filtering language selection list by query \"" + query + "\"...");
+//
+//			this.clearEntries();
+//
+//			languages.forEach((code, definition) -> {
+//				// Add each entry matching the query back
+//				if (this.languageMatches(query, definition)) {
+//					var entry = ((LanguageSelectionListWidget) (Object) this).new LanguageEntry(code, definition);
+//
+//					((SetQueryAccessor) entry).searchable$setQuery(query);
+//
+//					this.addEntry((E) entry);
+//
+//					// If it's the previously selected language, select it again.
+//					if (Searchable.config.reselectLastSelection && selectedLanguage != null && code.equals(selectedLanguage.languageCode)) {
+//						this.setSelected((E) entry);
+//					}
+//				}
+//			});
+//
+//			// After filtering, set the scroll to be centered on the selected entry if there is one, or otherwise at the
+//			// top.
+//			if (this.getSelectedOrNull() != null) {
+//				this.centerScrollOn(this.getSelectedOrNull());
+//			} else {
+//				this.setScrollAmount(0.0);
+//			}
+//
+//			this.query = query;
+//		}
+//	}
+//
+//	/**
+//	 * Whether the given language matches the given query.
+//	 */
+//	@Unique
+//	private boolean languageMatches(String query, LanguageDefinition language) {
+//		return MatchManager.hasMatches(language.getDisplayText(), query);
+//	}
 
 	@Unique
 	private static boolean disabled() {

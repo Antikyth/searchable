@@ -1,6 +1,9 @@
 package io.github.antikyth.searchable.util;
 
+import io.github.antikyth.searchable.util.function.Recursive;
+import io.github.antikyth.searchable.util.match.Match;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.component.TextComponent;
@@ -8,6 +11,8 @@ import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public class Util {
 	/**
@@ -20,6 +25,93 @@ public class Util {
 	 */
 	public static MutableText hint(MutableText hint) {
 		return hint.formatted(Formatting.DARK_GRAY);
+	}
+
+	static Style highlight(Style style) {
+		return style.withFormatting(Formatting.UNDERLINE, Formatting.WHITE);
+	}
+
+	public static StringVisitable highlightMatches(StringVisitable target, List<Match> matches) {
+		if (target == null || matches.isEmpty()) return target;
+
+		List<Text> texts = new ArrayList<>();
+		// Non-final variables are not allowed within the lambda below, so a wrapper must be made around the index, as
+		// it must be reassigned to be mutated.
+		var counter = new Object() {
+			int index = 0;
+			int currentMatch = 0;
+		};
+
+		BiConsumer<String, Style> addText = Recursive.biConsumer((string, style, self) -> {
+			// If all matches have been added already.
+			if (counter.currentMatch < 0) {
+				texts.add(literal(string, style));
+				return;
+			}
+
+			Match currentMatch = matches.get(counter.currentMatch);
+
+			var start = currentMatch.startIndex() - counter.index;
+			var end = currentMatch.endIndex() - counter.index;
+
+			if (start <= 0 && end > 0) {
+				// a match highlight is ongoing
+
+				if (end < string.length()) {
+					// match highlight ends in this string
+
+					String substring = string.substring(0, end);
+
+					texts.add(highlighted(substring, style));
+					counter.index += substring.length();
+
+					// Target the next match.
+					int nextMatch = counter.currentMatch + 1;
+					counter.currentMatch = nextMatch < matches.size() ? nextMatch : -1;
+
+					// after the match ends
+					self.accept(string.substring(end), style);
+				} else {
+					// whole string is within the match
+
+					texts.add(highlighted(string, style));
+					counter.index += string.length();
+				}
+			} else if (start > 0 && start < string.length()) {
+				// the match starts in this string
+
+				// substring up until the match
+				String substring = string.substring(0, start);
+
+				texts.add(literal(substring, style));
+				counter.index += substring.length();
+
+				// the match onwards
+				self.accept(string.substring(start), style);
+			} else {
+				// match is not contained within this string
+
+				texts.add(literal(string, style));
+				counter.index += string.length();
+			}
+		});
+
+		target.visit((legacyStyle, legacyString) -> parseLegacyText(legacyString).visit((style, string) -> {
+			addText.accept(string, style);
+
+			return Optional.empty();
+		}, legacyStyle), Style.EMPTY);
+
+		Style style = target instanceof Text text ? text.getStyle() : Style.EMPTY;
+		return new MutableText(TextComponent.EMPTY, texts, style);
+	}
+
+	static MutableText highlighted(String text, Style style) {
+		return Text.literal(text).setStyle(highlight(style));
+	}
+
+	static MutableText literal(String text, Style style) {
+		return Text.literal(text).setStyle(style);
 	}
 
 	/**

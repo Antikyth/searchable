@@ -3,14 +3,13 @@ package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
+import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.singleplayer.gamerule.AbstractRuleWidgetAccessor;
-import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.world.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -53,10 +52,10 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 	}
 
 	@Inject(method = "<init>", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/world/GameRules.accept (Lnet/minecraft/world/GameRules$Visitor;)V",
-			ordinal = 0,
-			shift = At.Shift.AFTER
+		value = "INVOKE",
+		target = "net/minecraft/world/GameRules.accept (Lnet/minecraft/world/GameRules$Visitor;)V",
+		ordinal = 0,
+		shift = At.Shift.AFTER
 	), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	public void onConstructor(EditGameRulesScreen editGameRulesScreen, GameRules gameRules, CallbackInfo ci, Map<GameRules.Category, Map<GameRules.Key<?>, EditGameRulesScreen.AbstractRuleWidget>> map) {
 		if (!enabled()) return;
@@ -66,28 +65,24 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 	}
 
 	@ModifyArg(method = "<init>", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/widget/ElementListWidget.<init> (Lnet/minecraft/client/MinecraftClient;IIIII)V"
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/widget/ElementListWidget.<init> (Lnet/minecraft/client/MinecraftClient;IIIII)V"
 	), index = 3)
 	private static int adjustTopCoord(int y) {
-		if (!enabled()) return y;
-
-		return y + 5;
+		return enabled() ? y + 5 : y;
 	}
 
 	@Inject(method = "method_27637", at = @At("HEAD"), cancellable = true)
 	private void onFilterCategories(Map.Entry<GameRules.Category, Map<GameRules.Key<?>, EditGameRulesScreen.AbstractRuleWidget>> entry, CallbackInfo ci) {
-		if (!enabled()) return;
-
 		// If the category and nothing in it match, cancel adding it.
-		if (!this.filterCategory(this.query, entry)) ci.cancel();
+		if (enabled() && !this.filterCategory(this.query, entry)) ci.cancel();
 	}
 
 	// Set the query on the category.
 	@ModifyArg(method = "method_27637", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/world/EditGameRulesScreen$RuleListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I",
-			ordinal = 0
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/world/EditGameRulesScreen$RuleListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I",
+		ordinal = 0
 	), index = 0)
 	private EntryListWidget.Entry<EditGameRulesScreen.AbstractRuleWidget> onAddCategoryWidget(EntryListWidget.Entry<EditGameRulesScreen.AbstractRuleWidget> entry) {
 		if (entry instanceof EditGameRulesScreen.AbstractRuleWidget ruleWidget) {
@@ -108,9 +103,9 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 	}
 
 	@WrapWithCondition(method = "method_27638", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/world/EditGameRulesScreen$RuleListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I",
-			ordinal = 0
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/world/EditGameRulesScreen$RuleListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I",
+		ordinal = 0
 	))
 	private boolean onFilterRules(EditGameRulesScreen.RuleListWidget instance, EntryListWidget.Entry<EditGameRulesScreen.AbstractRuleWidget> entry) {
 		if (!enabled()) return true;
@@ -120,7 +115,7 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 
 	@Unique
 	private boolean filterCategory(String query, Map.Entry<GameRules.Category, Map<GameRules.Key<?>, EditGameRulesScreen.AbstractRuleWidget>> entry) {
-		this.currentCategoryMatches = Searchable.config.editGamerule.matchCategory && MatchManager.hasMatches(I18n.translate(entry.getKey().getCategory()), query);
+		this.currentCategoryMatches = Searchable.config.editGamerule.matchCategory && ((MatchesAccessor) (Object) entry.getKey()).searchable$matches(query);
 
 		if (this.currentCategoryMatches) {
 			return true;

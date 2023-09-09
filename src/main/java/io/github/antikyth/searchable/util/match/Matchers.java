@@ -47,12 +47,17 @@ public class Matchers {
 
 	public static final Matcher REGEX = new Matcher() {
 		private String query;
-		private String target;
 		private java.util.regex.Matcher matcher;
 
+		/**
+		 * Updates the matcher for the given {@code target} and {@code query}.
+		 * @return Whether the pattern was able to compile successfully.
+		 */
 		@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 		private boolean updateMatcher(String target, String query) {
-			if (query != null && (!query.equals(this.query) || this.matcher == null)) {
+			if (query == null) return false;
+
+			if (this.matcher == null || !query.equals(this.query)) {
 				Pattern pattern;
 				try {
 					pattern = Pattern.compile(query, Pattern.CASE_INSENSITIVE);
@@ -65,10 +70,8 @@ public class Matchers {
 				this.matcher = pattern.matcher(target);
 
 				this.query = query;
-			} else if (target != null && !target.equals(this.target)) {
+			} else {
 				this.matcher.reset(target);
-
-				this.target = target;
 			}
 
 			return true;

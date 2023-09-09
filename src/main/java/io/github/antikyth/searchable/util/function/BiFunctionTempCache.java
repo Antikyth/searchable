@@ -31,12 +31,12 @@ public interface BiFunctionTempCache<T, U, R> {
 		return (t, u, function) -> {
 			var args = new Pair<>(t, u);
 
-			if (Objects.equals(args, cache.args)) {
-				return cache.result;
-			} else {
+			if (!Objects.equals(args, cache.args)) {
 				cache.args = args;
-				return cache.result = function.apply(cache.args.first, cache.args.second);
+				cache.result = function.apply(args.first, args.second);
 			}
+
+			return cache.result;
 		};
 	}
 }

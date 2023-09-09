@@ -3,6 +3,7 @@ package io.github.antikyth.searchable.util.match;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.function.BiFunctionTempCache;
+import io.github.antikyth.searchable.util.function.MatcherTriFunctionTempCache;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -12,17 +13,14 @@ import java.util.List;
 
 public class MatchManager {
 	/**
-	 * Wraps the global matcher with caches and support for {@link StringVisitable}s and
-	 * highlighting.
+	 * Wraps the {@linkplain MatchManager#matcher() global matcher} with caches and support for {@link StringVisitable}s
+	 * and highlighting.
 	 * <p>
 	 * An instance of this class keeps very temporary caches of the last result, as the same inputs tend to be used many
 	 * times all in a row when it comes to search queries and highlighting their matches.
 	 */
 	public MatchManager() {
-		this.matcher = matcher();
 	}
-
-	private Matcher matcher;
 
 	/**
 	 * Gets all the {@linkplain Match matches} for the given {@code query} within the given {@code target} text.
@@ -31,9 +29,7 @@ public class MatchManager {
 	 * @see MatchManager#getMatches(String, String)
 	 */
 	public List<Match> getMatches(StringVisitable target, String query) {
-		updateCaches();
-
-		return visitableGetMatchesCache.apply(target, query, (_target, _query) -> {
+		return visitableGetMatchesCache.apply(matcher(), target, query, (matcher, _target, _query) -> {
 			var stripped = Formatting.strip(_target.getString());
 			if (stripped == null) return null;
 
@@ -48,9 +44,7 @@ public class MatchManager {
 	 * @see MatchManager#getMatches(StringVisitable, String)
 	 */
 	public List<Match> getMatches(String target, String query) {
-		updateCaches();
-
-		return getMatchesCache.apply(target, query, matcher()::findMatches);
+		return getMatchesCache.apply(matcher(), target, query, Matcher::findMatches);
 	}
 
 	/**
@@ -59,9 +53,7 @@ public class MatchManager {
 	 * @see MatchManager#hasMatches(String, String)
 	 */
 	public boolean hasMatches(StringVisitable target, String query) {
-		updateCaches();
-
-		return visitableHasMatchesCache.apply(target, query, (_target, _query) -> {
+		return visitableHasMatchesCache.apply(matcher(), target, query, (matcher, _target, _query) -> {
 			if (_target == null) return true;
 
 			var stripped = Formatting.strip(_target.getString());
@@ -77,9 +69,7 @@ public class MatchManager {
 	 * @see MatchManager#hasMatches(StringVisitable, String)
 	 */
 	public boolean hasMatches(String target, String query) {
-		updateCaches();
-
-		return hasMatchesCache.apply(target, query, matcher()::hasMatches);
+		return hasMatchesCache.apply(matcher(), target, query, Matcher::hasMatches);
 	}
 
 	/**
@@ -94,8 +84,6 @@ public class MatchManager {
 	 * @see MatchManager#getHighlightedText(StringVisitable, List)
 	 */
 	public StringVisitable getHighlightedText(String string, String query) {
-		updateCaches();
-
 		return stringHighlightCache.apply(string, query, (_string, _query) -> this.getHighlightedText(Text.literal(_string), _query));
 	}
 
@@ -110,8 +98,6 @@ public class MatchManager {
 	 * @see MatchManager#getHighlightedText(StringVisitable, List)
 	 */
 	public StringVisitable getHighlightedText(StringVisitable text, String query) {
-		updateCaches();
-
 		return highlightCache.apply(text, query, (_text, _query) -> this.getHighlightedText(_text, this.getMatches(_text, _query)));
 	}
 
@@ -126,8 +112,6 @@ public class MatchManager {
 	 * @see MatchManager#getHighlightedText(StringVisitable, List)
 	 */
 	public StringVisitable getHighlightedText(String string, List<Match> matches) {
-		updateCaches();
-
 		return stringMatchesHighlightCache.apply(string, matches, (_string, _matches) -> this.getHighlightedText(Text.literal(_string), _matches));
 	}
 
@@ -142,40 +126,24 @@ public class MatchManager {
 	 * @see MatchManager#getHighlightedText(String, List)
 	 */
 	public StringVisitable getHighlightedText(StringVisitable text, List<Match> matches) {
-		updateCaches();
-
 		return matchesHighlightCache.apply(text, matches, Util::highlightMatches);
 	}
 
-	private void updateCaches() {
-		if (matcher() != this.matcher) {
-			this.matcher = matcher();
+	// Matching caches {{{
+	private final MatcherTriFunctionTempCache<String, String, List<Match>> getMatchesCache = MatcherTriFunctionTempCache.create();
+	private final MatcherTriFunctionTempCache<StringVisitable, String, List<Match>> visitableGetMatchesCache = MatcherTriFunctionTempCache.create();
 
-			this.getMatchesCache = BiFunctionTempCache.create();
-			this.visitableGetMatchesCache = BiFunctionTempCache.create();
+	private final MatcherTriFunctionTempCache<String, String, Boolean> hasMatchesCache = MatcherTriFunctionTempCache.create();
+	private final MatcherTriFunctionTempCache<StringVisitable, String, Boolean> visitableHasMatchesCache = MatcherTriFunctionTempCache.create();
+	// }}}
 
-			this.hasMatchesCache = BiFunctionTempCache.create();
-			this.visitableHasMatchesCache = BiFunctionTempCache.create();
+	// Highlight caches {{{
+	private final BiFunctionTempCache<StringVisitable, String, StringVisitable> highlightCache = BiFunctionTempCache.create();
+	private final BiFunctionTempCache<StringVisitable, List<Match>, StringVisitable> matchesHighlightCache = BiFunctionTempCache.create();
 
-			this.highlightCache = BiFunctionTempCache.create();
-			this.matchesHighlightCache = BiFunctionTempCache.create();
-
-			this.stringHighlightCache = BiFunctionTempCache.create();
-			this.stringMatchesHighlightCache = BiFunctionTempCache.create();
-		}
-	}
-
-	private BiFunctionTempCache<String, String, List<Match>> getMatchesCache = BiFunctionTempCache.create();
-	private BiFunctionTempCache<StringVisitable, String, List<Match>> visitableGetMatchesCache = BiFunctionTempCache.create();
-
-	private BiFunctionTempCache<String, String, Boolean> hasMatchesCache = BiFunctionTempCache.create();
-	private BiFunctionTempCache<StringVisitable, String, Boolean> visitableHasMatchesCache = BiFunctionTempCache.create();
-
-	private BiFunctionTempCache<StringVisitable, String, StringVisitable> highlightCache = BiFunctionTempCache.create();
-	private BiFunctionTempCache<StringVisitable, List<Match>, StringVisitable> matchesHighlightCache = BiFunctionTempCache.create();
-
-	private BiFunctionTempCache<String, String, StringVisitable> stringHighlightCache = BiFunctionTempCache.create();
-	private BiFunctionTempCache<String, List<Match>, StringVisitable> stringMatchesHighlightCache = BiFunctionTempCache.create();
+	private final BiFunctionTempCache<String, String, StringVisitable> stringHighlightCache = BiFunctionTempCache.create();
+	private final BiFunctionTempCache<String, List<Match>, StringVisitable> stringMatchesHighlightCache = BiFunctionTempCache.create();
+	// }}}
 
 	/**
 	 * Returns the {@link Matcher} currently in use by all {@link MatchManager}s.

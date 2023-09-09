@@ -53,12 +53,12 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 		return entry;
 	}
 
-	// Match world details in search results as well as the display name and name.
+	// Return value is modified rather than overwrite in case any other mixins want to inject for reasons other than
+	// altering the return value.
 	@ModifyReturnValue(method = "worldNameMatches", at = @At("RETURN"))
-	private boolean matchWorldDetails(boolean matches, String query, WorldSaveSummary summary) {
-		if (matches) return true;
-
-		return matchWorldDetails() && ((MatchesAccessor) summary).searchable$matches(query);
+	private boolean worldNameMatches(boolean matches, String query, WorldSaveSummary summary) {
+		// Replace the return value with our matcher implementation.
+		return ((MatchesAccessor) summary).searchable$matches(query);
 	}
 
 	// Fix a vanilla bug: use `setSelected(null)`'s side effects to disable the world selection buttons.
@@ -79,10 +79,5 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 	@Unique
 	private static boolean reselectLastSelection() {
 		return Searchable.config.reselectLastSelection;
-	}
-
-	@Unique
-	private static boolean matchWorldDetails() {
-		return Searchable.config.selectWorld.matchWorldDetails;
 	}
 }

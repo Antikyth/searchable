@@ -8,7 +8,9 @@ package io.github.antikyth.searchable.mixin.multiplayer;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
 import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -45,9 +47,9 @@ public class MultiplayerScreenMixin extends Screen {
 	}
 
 	@ModifyArg(method = "<init>", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/text/Text.translatable (Ljava/lang/String;)Lnet/minecraft/text/MutableText;",
-			ordinal = 0
+		value = "INVOKE",
+		target = "net/minecraft/text/Text.translatable (Ljava/lang/String;)Lnet/minecraft/text/MutableText;",
+		ordinal = 0
 	), index = 0)
 	private static String changeSelectServerTitle(String title) {
 		if (Searchable.config.selectServer.changeSelectServerTitle) {
@@ -67,7 +69,14 @@ public class MultiplayerScreenMixin extends Screen {
 
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
-		this.searchBox.setChangedListener(query -> ((SetQueryAccessor) this.serverListWidget).searchable$setQuery(query));
+		this.searchBox.setChangedListener(query -> {
+			boolean valid = MatchManager.matcher().validateQuery(query);
+
+			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(valid);
+
+			if (!valid) query = "";
+			((SetQueryAccessor) this.serverListWidget).searchable$setQuery(query);
+		});
 
 		this.addSelectableChild(this.searchBox);
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select
@@ -77,16 +86,16 @@ public class MultiplayerScreenMixin extends Screen {
 
 	// Move the server list down by 16px to make room for the search box.
 	@ModifyArg(method = "init", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.<init> (Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;Lnet/minecraft/client/MinecraftClient;IIIII)V"
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.<init> (Lnet/minecraft/client/gui/screen/multiplayer/MultiplayerScreen;Lnet/minecraft/client/MinecraftClient;IIIII)V"
 	), index = 4)
 	private int adjustServerListTopCoordConstructor(int top) {
 		return adjustServerListTopCoord(top);
 	}
 
 	@ModifyArg(method = "init", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.updateSize (IIII)V"
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.updateSize (IIII)V"
 	), index = 2)
 	private int adjustServerListTopCoordUpdateSize(int top) {
 		return adjustServerListTopCoord(top);
@@ -103,9 +112,9 @@ public class MultiplayerScreenMixin extends Screen {
 
 	// Move the title text up 12 pixels to make room for the search box.
 	@ModifyArg(method = "render", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredShadowedText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V",
-			ordinal = 0
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredShadowedText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V",
+		ordinal = 0
 	), index = 3)
 	public int adjustTitleTextYCoord(int y) {
 		if (!enabled()) return y;
@@ -116,9 +125,9 @@ public class MultiplayerScreenMixin extends Screen {
 	}
 
 	@Inject(method = "render", at = @At(
-			value = "INVOKE",
-			target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.render (Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
-			shift = At.Shift.AFTER
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.render (Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
+		shift = At.Shift.AFTER
 	))
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (!enabled()) return;

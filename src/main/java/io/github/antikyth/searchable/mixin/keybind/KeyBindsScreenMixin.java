@@ -8,7 +8,9 @@ package io.github.antikyth.searchable.mixin.keybind;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
 import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
@@ -35,7 +37,7 @@ public class KeyBindsScreenMixin extends GameOptionsScreen {
 	private KeyBindListWidget keyBindList;
 
 	@Unique
-	public TextFieldWidget searchBox;
+	private TextFieldWidget searchBox;
 
 	// Mixin will ignore this - required because of extending `GameOptionsScreen`
 	public KeyBindsScreenMixin(Screen parent, GameOptions gameOptions, Text title) {
@@ -48,16 +50,23 @@ public class KeyBindsScreenMixin extends GameOptionsScreen {
 
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
-		this.searchBox.setChangedListener(query -> ((SetQueryAccessor) this.keyBindList).searchable$setQuery(query));
+		this.searchBox.setChangedListener(query -> {
+			boolean valid = MatchManager.matcher().validateQuery(query);
+
+			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(valid);
+
+			if (!valid) query = "";
+			((SetQueryAccessor) this.keyBindList).searchable$setQuery(query);
+		});
 
 		this.addSelectableChild(this.searchBox);
 		this.setInitialFocus(this.searchBox);
 	}
 
 	@Inject(method = "render", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/widget/option/KeyBindListWidget;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
-			shift = At.Shift.AFTER
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/widget/option/KeyBindListWidget;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
+		shift = At.Shift.AFTER
 	))
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (disabled()) return;

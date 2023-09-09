@@ -52,8 +52,12 @@ public class ServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 
 	@Override
 	public boolean searchable$matches(String query) {
-		return this.serverNameMatchManager.hasMatches(this.serverName, query)
-			|| (Searchable.config.selectServer.matchMotd && this.serverLabelMatchManager.hasMatches(this.serverLabel, query));
+		if (this.serverNameMatchManager.hasMatches(this.serverName, query)) return true;
+
+		if (Searchable.config.selectServer.matchMotd)
+			return this.serverLabelMatchManager.hasMatches(this.serverLabel, query);
+
+		return false;
 	}
 
 	@Inject(method = "<init>", at = @At("TAIL"))

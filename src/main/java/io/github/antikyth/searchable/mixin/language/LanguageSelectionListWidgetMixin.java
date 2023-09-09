@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LanguageOptionsScreen.LanguageSelectionListWidget.class)
 public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget.Entry<E>> extends EntryListWidgetMixin<E> implements LanguageSelectionListWidgetAccessor {
 	@Shadow
-	protected abstract void method_48261(String languageCode, String selectedLanguageCode, LanguageDefinition definition);
+	protected abstract void method_48261(String selectedLanguageCode, String languageCode, LanguageDefinition definition);
 
 	/**
 	 * The last selected language entry. Used so that if the entry is hidden and later shown, it can be re-selected.
@@ -136,52 +136,6 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 
 		return true;
 	}
-
-//	@Override
-//	@Unique
-//	@SuppressWarnings("unchecked")
-//	public void searchable$filter(String query, Map<String, LanguageDefinition> languages) {
-//		// If the query has changed...
-//		if (query != null && !query.equals(this.query)) {
-//			Searchable.LOGGER.debug("filtering language selection list by query \"" + query + "\"...");
-//
-//			this.clearEntries();
-//
-//			languages.forEach((code, definition) -> {
-//				// Add each entry matching the query back
-//				if (this.languageMatches(query, definition)) {
-//					var entry = ((LanguageSelectionListWidget) (Object) this).new LanguageEntry(code, definition);
-//
-//					((SetQueryAccessor) entry).searchable$setQuery(query);
-//
-//					this.addEntry((E) entry);
-//
-//					// If it's the previously selected language, select it again.
-//					if (Searchable.config.reselectLastSelection && selectedLanguage != null && code.equals(selectedLanguage.languageCode)) {
-//						this.setSelected((E) entry);
-//					}
-//				}
-//			});
-//
-//			// After filtering, set the scroll to be centered on the selected entry if there is one, or otherwise at the
-//			// top.
-//			if (this.getSelectedOrNull() != null) {
-//				this.centerScrollOn(this.getSelectedOrNull());
-//			} else {
-//				this.setScrollAmount(0.0);
-//			}
-//
-//			this.query = query;
-//		}
-//	}
-//
-//	/**
-//	 * Whether the given language matches the given query.
-//	 */
-//	@Unique
-//	private boolean languageMatches(String query, LanguageDefinition language) {
-//		return MatchManager.hasMatches(language.getDisplayText(), query);
-//	}
 
 	@Unique
 	private static boolean disabled() {

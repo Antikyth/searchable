@@ -9,6 +9,7 @@ package io.github.antikyth.searchable.mixin.multiplayer;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.multiplayer.MultiplayerServerListWidgetAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -68,6 +69,8 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 	@Override
 	public void searchable$setQuery(String query) {
 		if (enabled() && query != null && !query.equals(this.query)) {
+			this.query = query;
+
 			this.updateEntries();
 			this.screen.updateButtonActivationStates();
 
@@ -76,8 +79,6 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 			} else {
 				this.setScrollAmount(0.0);
 			}
-
-			this.query = query;
 		}
 	}
 
@@ -101,15 +102,17 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 		target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	))
 	private static boolean filterServerEntry(MultiplayerServerListWidget instance, EntryListWidget.Entry<MultiplayerServerListWidget.Entry> entry) {
-		if (enabled() && entry instanceof ServerEntry serverEntry) {
-			MultiplayerServerListWidgetAccessor self = (MultiplayerServerListWidgetAccessor) instance;
+		var self = (MultiplayerServerListWidgetMixin<?>) (Object) instance;
 
-			if (reselectLastSelection() && serverEntry == self.searchable$getLastSelection()) {
+		if (enabled() && entry instanceof ServerEntry serverEntry) {
+			// No need to close, this is just comparing the reference, it is then closed in the target class.
+			if (reselectLastSelection() && serverEntry == self.lastSelection) {
 				instance.setSelected(serverEntry);
 			}
 
-			String query = self.searchable$getQuery();
-			return ((MatchesAccessor) serverEntry).searchable$matches(query);
+			((SetQueryAccessor) serverEntry).searchable$setQuery(self.query);
+
+			return ((MatchesAccessor) serverEntry).searchable$matches(self.query);
 		}
 
 		return true;
@@ -121,15 +124,17 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 		target = "net/minecraft/client/gui/screen/multiplayer/MultiplayerServerListWidget.addEntry (Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 	))
 	private static boolean filterLanServerEntry(MultiplayerServerListWidget instance, EntryListWidget.Entry<MultiplayerServerListWidget.Entry> entry) {
-		if (enabled() && entry instanceof LanServerEntry lanServerEntry) {
-			MultiplayerServerListWidgetAccessor self = (MultiplayerServerListWidgetAccessor) instance;
+		var self = (MultiplayerServerListWidgetMixin<?>) (Object) instance;
 
-			if (reselectLastSelection() && lanServerEntry == self.searchable$getLastSelection()) {
+		if (enabled() && entry instanceof LanServerEntry lanServerEntry) {
+			// No need to close, this is just comparing the reference, it is then closed in the target class.
+			if (reselectLastSelection() && lanServerEntry == self.lastSelection) {
 				instance.setSelected(lanServerEntry);
 			}
 
-			String query = ((MultiplayerServerListWidgetAccessor) instance).searchable$getQuery();
-			return ((MatchesAccessor) lanServerEntry).searchable$matches(query);
+			((SetQueryAccessor) lanServerEntry).searchable$setQuery(self.query);
+
+			return ((MatchesAccessor) lanServerEntry).searchable$matches(self.query);
 		}
 
 		return true;

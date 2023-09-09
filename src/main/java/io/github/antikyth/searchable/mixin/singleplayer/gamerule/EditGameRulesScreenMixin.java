@@ -3,7 +3,9 @@ package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
 import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
@@ -48,7 +50,14 @@ public class EditGameRulesScreenMixin extends Screen implements GetSearchBoxAcce
 
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
-		this.searchBox.setChangedListener(query -> ((SetQueryAccessor) this.ruleListWidget).searchable$setQuery(query));
+		this.searchBox.setChangedListener(query -> {
+			boolean valid = MatchManager.matcher().validateQuery(query);
+
+			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(valid);
+
+			if (!valid) query = "";
+			((SetQueryAccessor) this.ruleListWidget).searchable$setQuery(query);
+		});
 
 		this.addSelectableChild(this.searchBox);
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select

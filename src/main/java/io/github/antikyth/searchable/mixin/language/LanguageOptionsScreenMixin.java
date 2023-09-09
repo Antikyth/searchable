@@ -10,8 +10,10 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
 import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
 import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
@@ -70,7 +72,14 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		// Filter the language selection list when the query is changed.
-		this.searchBox.setChangedListener(query -> ((SetQueryAccessor) this.languageSelectionList).searchable$setQuery(query));
+		this.searchBox.setChangedListener(query -> {
+			boolean valid = MatchManager.matcher().validateQuery(query);
+
+			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(valid);
+
+			if (!valid) query = "";
+			((SetQueryAccessor) this.languageSelectionList).searchable$setQuery(query);
+		});
 
 		this.addSelectableChild(this.searchBox);
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select
@@ -85,9 +94,9 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 
 	// Move the title text up 8 pixels to make room for the search box.
 	@ModifyArg(method = "render", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredShadowedText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V",
-			ordinal = 0
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredShadowedText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V",
+		ordinal = 0
 	), index = 3)
 	public int adjustTitleTextYCoord(int y) {
 		if (disabled()) return y;
@@ -101,9 +110,9 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 	// Render the search box (after the language selection list has been rendered, so the search box isn't hidden by the
 	// background)
 	@Inject(method = "render", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
-			shift = At.Shift.AFTER
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/screen/option/LanguageOptionsScreen$LanguageSelectionListWidget;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
+		shift = At.Shift.AFTER
 	))
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (disabled()) return;
@@ -113,8 +122,8 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 
 	// Only select a language when a toggle key is pressed if the language selection list is focused.
 	@ModifyExpressionValue(method = "keyPressed", at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/CommonInputs;isToggle(I)Z"
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/gui/CommonInputs;isToggle(I)Z"
 	))
 	private boolean onlySelectLanguageIfFocused(boolean original) {
 		if (disabled()) return original;
@@ -127,8 +136,8 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 	//
 	// NOTE: The Minecraft Development plugin has false positive errors here. This is how it is meant to be written.
 	@ModifyVariable(method = "onDone", at = @At(
-			value = "STORE",
-			ordinal = 0
+		value = "STORE",
+		ordinal = 0
 	))
 	private LanguageEntry setSelectedLanguageEvenIfHidden(LanguageEntry original) {
 		if (disabled()) return original;

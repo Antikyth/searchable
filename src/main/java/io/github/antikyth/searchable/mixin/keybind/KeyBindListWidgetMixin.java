@@ -9,6 +9,7 @@ package io.github.antikyth.searchable.mixin.keybind;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.accessor.SetSearchBoxValidityAccessor;
 import io.github.antikyth.searchable.util.Pair;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.MinecraftClient;
@@ -33,6 +34,8 @@ import java.util.Map;
 
 @Mixin(KeyBindListWidget.class)
 public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.Entry> implements SetQueryAccessor {
+	@Unique
+	private KeyBindsScreen parent;
 	@Unique
 	private final Map<String, Pair<MatchManager, List<KeyBind>>> map = new LinkedHashMap<>();
 
@@ -71,6 +74,8 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 	private void onConstructor(KeyBindsScreen parent, MinecraftClient client, CallbackInfo ci, KeyBind[] keyBinds) {
 		if (!enabled()) return;
 
+		this.parent = parent;
+
 		for (KeyBind keyBind : keyBinds) {
 			// Store the key binds in a map from their category to that category's `MatchManager` and the key binds in it.
 			this.map.computeIfAbsent(keyBind.getCategory(), category -> new Pair<>(new MatchManager(), new ArrayList<>())).second.add(keyBind);
@@ -89,8 +94,13 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 		this.map.forEach((category, pair) -> {
 			var categoryTranslation = Text.translatable(category);
 
+			Boolean categoryMatches = pair.first.hasMatches(categoryTranslation, query);
+
+			((SetSearchBoxValidityAccessor) this.parent).searchable$setSearchBoxValidity(categoryMatches != null);
+			if (categoryMatches == null) return;
+
 			// If the category matches the query...
-			if (pair.first.hasMatches(categoryTranslation, query)) {
+			if (categoryMatches) {
 				// Add the category.
 				this.addCategoryEntry((Text) pair.first.getHighlightedText(categoryTranslation, query));
 
@@ -132,72 +142,6 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 
 		this.addEntry(entry);
 	}
-
-//	@Unique
-//	private void filter(String query) {
-//		this.clearEntries();
-//
-//		String categoryMatch = null;
-//		String keyMatchCategory = null;
-//
-//		for (KeyBind keyBind : this.keyBinds) {
-//			String category = keyBind.getCategory();
-//
-//			if (category.equals(categoryMatch)) {
-//				// Whole category already matches.
-//
-//				// Add all keys in category.
-//				this.addEntry(((KeyBindListWidget) (Object) this).new KeyBindEntry(keyBind, Text.translatable(keyBind.getTranslationKey())));
-//			} else if (Searchable.config.keybinds.matchCategory && matches(query, category)) {
-//				// New whole category match.
-//				categoryMatch = category;
-//
-//				var categoryTranslation = Text.translatable(category);
-//				var categoryText = Searchable.config.highlightMatches ? (Text) MatchManager.getHighlightedText(categoryTranslation, query) : categoryTranslation;
-//
-//				// Add category.
-//				this.addEntry(((KeyBindListWidget) (Object) this).new CategoryEntry(categoryText));
-//				// Add key.
-//				this.addEntry(((KeyBindListWidget) (Object) this).new KeyBindEntry(keyBind, Text.translatable(keyBind.getTranslationKey())));
-//			} else {
-//				if (categoryMatch != null) {
-//					// End of whole category match.
-//					categoryMatch = null;
-//				}
-//
-//				if (keyBindMatches(query, keyBind)) {
-//					// This key matches.
-//
-//					if (!category.equals(keyMatchCategory)) {
-//						// This is a new category.
-//						keyMatchCategory = category;
-//
-//						// Add category.
-//						this.addEntry(((KeyBindListWidget) (Object) this).new CategoryEntry(Text.translatable(category)));
-//					}
-//
-//					var keyEntry = ((KeyBindListWidget) (Object) this).new KeyBindEntry(keyBind, Text.translatable(keyBind.getTranslationKey()));
-//					// Highlight the query within the key entry.
-//					((SetQueryAccessor) keyEntry).searchable$setQuery(query);
-//					// Add key entry.
-//					this.addEntry(keyEntry);
-//				}
-//			}
-//		}
-//	}
-
-//	@Unique
-//	private static boolean keyBindMatches(String query, KeyBind keyBind) {
-//		var bindNameMatches = matches(query, keyBind.getTranslationKey());
-//		var boundKeyMatches = Searchable.config.keybinds.matchBoundKey && matches(query, keyBind.getKeyTranslationKey());
-//
-//		return bindNameMatches || boundKeyMatches;
-//	}
-//
-//	@Unique
-//	private static boolean matches(String query, String translationKey) {
-//		return MatchManager.hasMatches(I18n.translate(translationKey), query);
-//	}
 
 	@Unique
 	private static boolean enabled() {

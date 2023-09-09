@@ -20,18 +20,30 @@ public abstract class KeyBindMixin implements MatchesAccessor, GetMatchManagerAc
 	public abstract Text getKeyName();
 
 	@Unique
-	private final MatchManager matchManager = new MatchManager();
+	private final MatchManager boundKeyMatchManager = new MatchManager();
+	@Unique
+	private final MatchManager bindNameMatchManager = new MatchManager();
 
 	@Unique
 	@Override
 	public MatchManager searchable$getMatchManager() {
-		return this.matchManager;
+		return this.bindNameMatchManager;
 	}
 
 	@Unique
 	@Override
 	public boolean searchable$matches(String query) {
-		return (Searchable.config.keybinds.matchBoundKey && this.matchManager.hasMatches(this.getKeyName(), query))
-			|| this.matchManager.hasMatches(I18n.translate(this.getTranslationKey()), query);
+		if (matchBoundKey()) {
+			Boolean boundKeyMatches = this.boundKeyMatchManager.hasMatches(this.getKeyName(), query);
+
+			if (boundKeyMatches == null || boundKeyMatches) return boundKeyMatches;
+		}
+
+		return this.bindNameMatchManager.hasMatches(I18n.translate(this.getTranslationKey()), query);
+	}
+
+	@Unique
+	private static boolean matchBoundKey() {
+		return Searchable.config.keybinds.matchBoundKey;
 	}
 }

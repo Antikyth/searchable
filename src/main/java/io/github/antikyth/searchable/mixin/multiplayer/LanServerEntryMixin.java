@@ -53,7 +53,12 @@ public class LanServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 
 	@Override
 	public boolean searchable$matches(String query) {
-		return this.titleMatchManager.hasMatches(this.title, query) || (matchMotd() && this.motdMatchManager.hasMatches(this.motd, query));
+		Boolean titleMatches = this.titleMatchManager.hasMatches(this.title, query);
+
+		if (titleMatches == null || titleMatches) return titleMatches;
+		if (matchMotd()) return this.motdMatchManager.hasMatches(this.motd, query);
+
+		return false;
 	}
 
 	@Inject(method = "<init>", at = @At("TAIL"))

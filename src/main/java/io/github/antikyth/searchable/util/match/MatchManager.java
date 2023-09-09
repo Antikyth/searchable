@@ -1,32 +1,24 @@
 package io.github.antikyth.searchable.util.match;
 
+import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.function.BiFunctionTempCache;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
 
 public class MatchManager {
 	/**
-	 * Wraps {@link Matchers#PLAIN} with caches and support for {@link StringVisitable}s and highlighting.
+	 * Wraps the global matcher with caches and support for {@link StringVisitable}s and
+	 * highlighting.
 	 * <p>
 	 * An instance of this class keeps very temporary caches of the last result, as the same inputs tend to be used many
 	 * times all in a row when it comes to search queries and highlighting their matches.
 	 */
 	public MatchManager() {
-		this(Matchers.PLAIN);
-	}
-
-	/**
-	 * Wraps the given {@link Matcher matcher} with caches and support for {@link StringVisitable}s and highlighting.
-	 * <p>
-	 * An instance of this class keeps very temporary caches of the last result, as the same inputs tend to be used many
-	 * times all in a row when it comes to search queries and highlighting their matches.
-	 */
-	public MatchManager(Matcher matcher) {
-		this.matcher = matcher;
 	}
 
 	/**
@@ -51,7 +43,7 @@ public class MatchManager {
 	 * @see MatchManager#getMatches(StringVisitable, String)
 	 */
 	public List<Match> getMatches(String target, String query) {
-		return getMatchesCache.apply(target, query, matcher::findMatches);
+		return getMatchesCache.apply(target, query, matcher()::findMatches);
 	}
 
 	/**
@@ -61,8 +53,10 @@ public class MatchManager {
 	 */
 	public boolean hasMatches(StringVisitable target, String query) {
 		return visitableHasMatchesCache.apply(target, query, (_target, _query) -> {
+			if (_target == null) return true;
+
 			var stripped = Formatting.strip(_target.getString());
-			if (stripped == null) return false;
+			assert (stripped != null);
 
 			return hasMatches(stripped, _query);
 		});
@@ -74,7 +68,7 @@ public class MatchManager {
 	 * @see MatchManager#hasMatches(StringVisitable, String)
 	 */
 	public boolean hasMatches(String target, String query) {
-		return hasMatchesCache.apply(target, query, matcher::hasMatches);
+		return hasMatchesCache.apply(target, query, matcher()::hasMatches);
 	}
 
 	/**
@@ -146,5 +140,15 @@ public class MatchManager {
 	private final BiFunctionTempCache<String, String, StringVisitable> stringHighlightCache = BiFunctionTempCache.create();
 	private final BiFunctionTempCache<String, List<Match>, StringVisitable> stringMatchesHighlightCache = BiFunctionTempCache.create();
 
-	private final Matcher matcher;
+	/**
+	 * Returns the {@link Matcher} currently in use by all {@link MatchManager}s.
+	 */
+	public static Matcher matcher() {
+		return useRegexMatching() ? Matchers.REGEX : Matchers.PLAIN;
+	}
+
+	@Unique
+	private static boolean useRegexMatching() {
+		return Searchable.config != null && Searchable.config.useRegexMatching;
+	}
 }

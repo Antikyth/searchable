@@ -24,6 +24,9 @@ public class SearchableConfig implements ConfigData {
 	@ConfigEntry.Gui.Tooltip
 	public boolean highlightMatches = true;
 
+	@ConfigEntry.Gui.Tooltip
+	public boolean useRegexMatching = false;
+
 	/**
 	 * Options relating to modifying the {@link KeyBindsScreen}.
 	 */

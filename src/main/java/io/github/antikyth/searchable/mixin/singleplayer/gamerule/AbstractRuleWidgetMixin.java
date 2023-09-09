@@ -45,7 +45,9 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 	@Override
 	public boolean searchable$matches(String query) {
 		if (Searchable.config.editGamerule.matchTechnicalName && this.technicalName != null) {
-			if (this.technicalNameMatchManager.hasMatches(this.technicalName, query)) return true;
+			boolean technicalNameMatches = this.technicalNameMatchManager.hasMatches(this.technicalName, query);
+
+			if (technicalNameMatches) return true;
 		}
 
 		if (Searchable.config.editGamerule.matchDescription && this.descriptionString != null) {

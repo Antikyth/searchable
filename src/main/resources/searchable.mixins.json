@@ -9,6 +9,7 @@
 	],
 	"client": [
 		"EntryListWidgetMixin",
+		"TextFieldWidgetMixin",
 		"keybind.KeyBindEntryMixin",
 		"keybind.KeyBindListWidgetMixin",
 		"keybind.KeyBindMixin",

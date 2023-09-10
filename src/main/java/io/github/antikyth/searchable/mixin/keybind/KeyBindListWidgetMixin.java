@@ -9,7 +9,6 @@ package io.github.antikyth.searchable.mixin.keybind;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
-import io.github.antikyth.searchable.accessor.SetSearchBoxValidityAccessor;
 import io.github.antikyth.searchable.util.Pair;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.MinecraftClient;
@@ -34,8 +33,6 @@ import java.util.Map;
 
 @Mixin(KeyBindListWidget.class)
 public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.Entry> implements SetQueryAccessor {
-	@Unique
-	private KeyBindsScreen parent;
 	@Unique
 	private final Map<String, Pair<MatchManager, List<KeyBind>>> map = new LinkedHashMap<>();
 
@@ -74,8 +71,6 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 	private void onConstructor(KeyBindsScreen parent, MinecraftClient client, CallbackInfo ci, KeyBind[] keyBinds) {
 		if (!enabled()) return;
 
-		this.parent = parent;
-
 		for (KeyBind keyBind : keyBinds) {
 			// Store the key binds in a map from their category to that category's `MatchManager` and the key binds in it.
 			this.map.computeIfAbsent(keyBind.getCategory(), category -> new Pair<>(new MatchManager(), new ArrayList<>())).second.add(keyBind);
@@ -94,13 +89,8 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 		this.map.forEach((category, pair) -> {
 			var categoryTranslation = Text.translatable(category);
 
-			Boolean categoryMatches = pair.first.hasMatches(categoryTranslation, query);
-
-			((SetSearchBoxValidityAccessor) this.parent).searchable$setSearchBoxValidity(categoryMatches != null);
-			if (categoryMatches == null) return;
-
 			// If the category matches the query...
-			if (categoryMatches) {
+			if (pair.first.hasMatches(categoryTranslation, query)) {
 				// Add the category.
 				this.addCategoryEntry((Text) pair.first.getHighlightedText(categoryTranslation, query));
 

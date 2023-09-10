@@ -1,6 +1,8 @@
 package io.github.antikyth.searchable.util.match;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.PatternSyntaxException;
 
 public interface Matcher {
 	/**
@@ -9,8 +11,8 @@ public interface Matcher {
 	 * By default, this always returns {@code true}, but it may be overridden e.g. for
 	 * {@linkplain Matchers#REGEX the regex matcher}.
 	 */
-	default boolean validateQuery(String query) {
-		return true;
+	default Optional<PatternSyntaxException> validateQueryError(String query) {
+		return Optional.empty();
 	}
 
 	/**

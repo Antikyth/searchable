@@ -25,6 +25,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Optional;
+import java.util.regex.PatternSyntaxException;
+
 @Mixin(MultiplayerScreen.class)
 public class MultiplayerScreenMixin extends Screen {
 	@Unique
@@ -63,18 +66,17 @@ public class MultiplayerScreenMixin extends Screen {
 
 	@Inject(method = "init", at = @At("HEAD"))
 	private void onInit(CallbackInfo ci) {
-		if (!enabled()) return;
+		if (disabled()) return;
 
 		Searchable.LOGGER.debug("adding search box to multiplayer servers screen...");
 
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		this.searchBox.setChangedListener(query -> {
-			boolean valid = MatchManager.matcher().validateQuery(query);
+			Optional<PatternSyntaxException> valid = MatchManager.matcher().validateQueryError(query);
 
 			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(valid);
 
-			if (!valid) query = "";
 			((SetQueryAccessor) this.serverListWidget).searchable$setQuery(query);
 		});
 
@@ -103,7 +105,7 @@ public class MultiplayerScreenMixin extends Screen {
 
 	@Unique
 	private int adjustServerListTopCoord(int top) {
-		if (!enabled()) return top;
+		if (disabled()) return top;
 
 		Searchable.LOGGER.debug("moving multiplayer servers screen server list down by 16px...");
 
@@ -117,7 +119,7 @@ public class MultiplayerScreenMixin extends Screen {
 		ordinal = 0
 	), index = 3)
 	public int adjustTitleTextYCoord(int y) {
-		if (!enabled()) return y;
+		if (disabled()) return y;
 
 		Searchable.LOGGER.debug("moving multiplayer servers screen title up by 12px...");
 
@@ -130,13 +132,13 @@ public class MultiplayerScreenMixin extends Screen {
 		shift = At.Shift.AFTER
 	))
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-		if (!enabled()) return;
+		if (disabled()) return;
 
 		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
 	}
 
 	@Unique
-	private static boolean enabled() {
-		return Searchable.config.selectServer.enable;
+	private static boolean disabled() {
+		return !Searchable.config.selectServer.enable;
 	}
 }

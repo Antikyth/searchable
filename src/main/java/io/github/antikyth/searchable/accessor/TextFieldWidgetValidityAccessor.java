@@ -1,7 +1,10 @@
 package io.github.antikyth.searchable.accessor;
 
-public interface TextFieldWidgetValidityAccessor {
-	void searchable$setValidity(boolean valid);
+import java.util.Optional;
+import java.util.regex.PatternSyntaxException;
 
-	boolean searchable$getValidity();
+public interface TextFieldWidgetValidityAccessor {
+	void searchable$setValidity(Optional<PatternSyntaxException> validityError);
+
+	Optional<PatternSyntaxException> searchable$getValidityError();
 }

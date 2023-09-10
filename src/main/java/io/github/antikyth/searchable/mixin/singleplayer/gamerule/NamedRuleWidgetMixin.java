@@ -100,17 +100,12 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 	@Unique
 	@Override
 	public boolean searchable$matches(String query) {
-		Boolean nameMatches = this.nameMatchManager.hasMatches(this.nameText, query);
+		boolean nameMatches = this.nameMatchManager.hasMatches(this.nameText, query);
 
-		if (nameMatches == null || nameMatches) {
-			return nameMatches;
+		if (nameMatches) {
+			return true;
 		} else {
 			return super.searchable$matches(query);
 		}
-	}
-
-	@Override
-	protected boolean enabled() {
-		return super.enabled();
 	}
 }

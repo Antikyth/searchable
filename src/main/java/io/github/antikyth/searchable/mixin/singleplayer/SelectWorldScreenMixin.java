@@ -11,8 +11,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Optional;
+import java.util.regex.PatternSyntaxException;
 
 @Mixin(SelectWorldScreen.class)
 public class SelectWorldScreenMixin {
@@ -35,18 +37,10 @@ public class SelectWorldScreenMixin {
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 	}
 
-	@ModifyVariable(
-		method = "method_2744",
-		at = @At("HEAD"),
-		name = "query",
-		ordinal = 0,
-		argsOnly = true
-	)
-	private String onSearchBoxChange(String query) {
-		boolean valid = MatchManager.matcher().validateQuery(query);
+	@Inject(method = "method_2744", at = @At("HEAD"))
+	private void onSearchBoxChange(String query, CallbackInfo ci) {
+		Optional<PatternSyntaxException> valid = MatchManager.matcher().validateQueryError(query);
 
 		((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(valid);
-
-		return valid ? query : query;
 	}
 }

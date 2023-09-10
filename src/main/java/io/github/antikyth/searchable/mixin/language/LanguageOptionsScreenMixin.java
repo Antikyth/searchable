@@ -34,6 +34,9 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Optional;
+import java.util.regex.PatternSyntaxException;
+
 @Mixin(LanguageOptionsScreen.class)
 public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen implements GetSearchBoxAccessor {
 	@Unique
@@ -73,11 +76,10 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		// Filter the language selection list when the query is changed.
 		this.searchBox.setChangedListener(query -> {
-			boolean valid = MatchManager.matcher().validateQuery(query);
+			Optional<PatternSyntaxException> valid = MatchManager.matcher().validateQueryError(query);
 
 			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(valid);
 
-			if (!valid) query = "";
 			((SetQueryAccessor) this.languageSelectionList).searchable$setQuery(query);
 		});
 

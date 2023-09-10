@@ -42,6 +42,6 @@ public abstract class KeyBindMixin implements MatchesAccessor, GetMatchManagerAc
 
 	@Unique
 	private static boolean matchBoundKey() {
-		return SearchableConfig.INSTANCE.keybinds_screen.match_bound_key.value();
+		return SearchableConfig.INSTANCE.keybinds_screen.match_bound_keys.value();
 	}
 }

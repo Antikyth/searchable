@@ -42,7 +42,7 @@ public abstract class KeyBindEntryMixin extends KeyBindListWidget.Entry implemen
 		ordinal = 0
 	), index = 0)
 	private Text highlightBindButtonText(Text message) {
-		if (disabled() || !SearchableConfig.INSTANCE.keybinds_screen.match_bound_key.value()) return message;
+		if (disabled() || !SearchableConfig.INSTANCE.keybinds_screen.match_bound_keys.value()) return message;
 
 		// safe cast: input is Text, output will be Text
 		return (Text) bindButtonMatchManager.getHighlightedText(message, this.query);

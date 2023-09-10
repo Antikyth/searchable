@@ -54,7 +54,7 @@ public class ServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 	public boolean searchable$matches(String query) {
 		if (this.serverNameMatchManager.hasMatches(this.serverName, query)) return true;
 
-		if (SearchableConfig.INSTANCE.select_server_screen.match_motd.value())
+		if (SearchableConfig.INSTANCE.select_server_screen.match_motds.value())
 			return this.serverLabelMatchManager.hasMatches(this.serverLabel, query);
 
 		return false;
@@ -68,7 +68,7 @@ public class ServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 		this.serverName = this.server.name;
 
 		// Used for `searchable$matches`
-		if (SearchableConfig.INSTANCE.select_server_screen.match_motd.value()) {
+		if (SearchableConfig.INSTANCE.select_server_screen.match_motds.value()) {
 			this.serverLabel = this.server.label;
 		}
 	}
@@ -103,7 +103,7 @@ public class ServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 		ordinal = 0
 	))
 	private StringVisitable drawServerLabelWithHighlight(StringVisitable label) {
-		if (!enabled() || !SearchableConfig.INSTANCE.select_server_screen.match_motd.value() || label == null)
+		if (!enabled() || !SearchableConfig.INSTANCE.select_server_screen.match_motds.value() || label == null)
 			return label;
 
 		if (label instanceof Text serverLabel && !serverLabel.equals(this.serverLabel)) {

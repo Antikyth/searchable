@@ -1,6 +1,7 @@
 package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 
 import io.github.antikyth.searchable.config.SearchableConfig;
+import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
@@ -40,7 +41,7 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 		if (technicalName != null && !technicalName.equals(this.technicalName)) {
 			this.technicalName = technicalName;
 
-			this.technicalNameText = Text.literal(this.technicalName).formatted(Formatting.GRAY, Formatting.ITALIC);
+			this.technicalNameText = Util.technicalName(Text.literal(this.technicalName));
 			this.updateHighlight(this.query);
 		}
 	}

@@ -21,11 +21,23 @@ public class SearchableConfig extends ReflectiveConfig {
 	@Comment("Whether text should be searched using the query as a regular expression.")
 	public final TrackedValue<Boolean> use_regex_matching = value(false);
 
+	public final SearchableConfigScreenOptions searchable_config_screen = new SearchableConfigScreenOptions();
+
 	public final KeyBindScreenOptions keybinds_screen = new KeyBindScreenOptions();
 	public final LanguageScreenOptions language_screen = new LanguageScreenOptions();
 	public final ServerSelectScreenOptions select_server_screen = new ServerSelectScreenOptions();
 	public final WorldSelectScreenOptions select_world_screen = new WorldSelectScreenOptions();
 	public final EditGameRulesScreenOptions edit_gamerules_screen = new EditGameRulesScreenOptions();
+
+	public static class SearchableConfigScreenOptions extends Section {
+		@Comment("Whether config option technical names should be shown under their names.")
+		public final TrackedValue<Boolean> show_technical_names = value(false);
+
+		@Comment("Whether config category names should be scanned for matching text during a search.")
+		public final TrackedValue<Boolean> match_categories = value(true);
+		@Comment("Whether config option technical names should be scanned for matching text during a search.")
+		public final TrackedValue<Boolean> match_technical_names = value(true);
+	}
 
 	public static class KeyBindScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
@@ -33,7 +45,7 @@ public class SearchableConfig extends ReflectiveConfig {
 		@Comment("Whether key bind category names should be scanned for matching text during a search.")
 		public final TrackedValue<Boolean> match_categories = value(true);
 		@Comment("Whether the keys bound to their respective key binds should be scanned for matching text during a search.")
-		public final TrackedValue<Boolean> match_bound_key = value(true);
+		public final TrackedValue<Boolean> match_bound_keys = value(true);
 	}
 
 	public static class LanguageScreenOptions extends Section {
@@ -49,7 +61,7 @@ public class SearchableConfig extends ReflectiveConfig {
 		public final TrackedValue<Boolean> change_title = value(false);
 
 		@Comment("Whether server descriptions should be scanned for matching text during a search.")
-		public final TrackedValue<Boolean> match_motd = value(true);
+		public final TrackedValue<Boolean> match_motds = value(true);
 	}
 
 	public static class WorldSelectScreenOptions extends Section {
@@ -60,14 +72,14 @@ public class SearchableConfig extends ReflectiveConfig {
 	public static class EditGameRulesScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
 
-		@Comment("Whether game rule technical names should be shown under their titles.")
+		@Comment("Whether game rule technical names should be shown under their names.")
 		public final TrackedValue<Boolean> show_technical_names = value(false);
 
 		@Comment("Whether game rule category names should be scanned for matching text during a search.")
 		public final TrackedValue<Boolean> match_categories = value(true);
 		@Comment("Whether game rule descriptions should be scanned for matching text during a search.")
 		public final TrackedValue<Boolean> match_descriptions = value(false);
-		@Comment("Whether game rule technical names should be shown under their titles.")
+		@Comment("Whether game rule technical names should be scanned for matching text during a search.")
 		public final TrackedValue<Boolean> match_technical_names = value(true);
 	}
 }

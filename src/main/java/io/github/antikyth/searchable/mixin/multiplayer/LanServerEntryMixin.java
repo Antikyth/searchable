@@ -87,7 +87,7 @@ public class LanServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 		ordinal = 0
 	))
 	private int drawMotdWithHighlight(GuiGraphics graphics, TextRenderer textRenderer, String motd, int x, int y, int color, boolean shadowed, Operation<Integer> original) {
-		if (!enabled() || !SearchableConfig.INSTANCE.select_server_screen.match_motd.value() || motd == null) {
+		if (!enabled() || !SearchableConfig.INSTANCE.select_server_screen.match_motds.value() || motd == null) {
 			return original.call(graphics, textRenderer, motd, x, y, color, shadowed);
 		}
 
@@ -100,7 +100,7 @@ public class LanServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 
 	@Unique
 	private static boolean matchMotd() {
-		return SearchableConfig.INSTANCE.select_server_screen.add_search.value() && SearchableConfig.INSTANCE.select_server_screen.match_motd.value();
+		return SearchableConfig.INSTANCE.select_server_screen.add_search.value() && SearchableConfig.INSTANCE.select_server_screen.match_motds.value();
 	}
 
 	@Unique

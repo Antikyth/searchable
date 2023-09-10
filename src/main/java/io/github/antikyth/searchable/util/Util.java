@@ -27,6 +27,10 @@ public class Util {
 		return hint.formatted(Formatting.DARK_GRAY);
 	}
 
+	public static MutableText technicalName(MutableText technicalName) {
+		return technicalName.formatted(Formatting.GRAY, Formatting.ITALIC);
+	}
+
 	static Style highlight(Style style) {
 		return style.withFormatting(Formatting.UNDERLINE, Formatting.WHITE);
 	}

@@ -11,6 +11,7 @@ import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.mixin.EntryListWidgetMixin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen;
@@ -94,7 +95,7 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	protected void onSetSelected(@Nullable E entry, CallbackInfo ci) {
 		if (disabled()) return;
 
-		if (Searchable.config.reselectLastSelection && entry != null && !entry.equals(selectedLanguage)) {
+		if (SearchableConfig.INSTANCE.reselect_last_selection.value() && entry != null && !entry.equals(selectedLanguage)) {
 			Searchable.LOGGER.debug("updating selected language...");
 
 			selectedLanguage = (LanguageEntry) entry;
@@ -105,7 +106,7 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 	private void filter() {
 		this.clearEntries();
 
-		String selectedLanguageCode = Searchable.config.reselectLastSelection && this.selectedLanguage != null
+		String selectedLanguageCode = SearchableConfig.INSTANCE.reselect_last_selection.value() && this.selectedLanguage != null
 			? this.selectedLanguage.languageCode : this.parent.languageManager.getLanguage();
 
 		this.parent.languageManager.getAllLanguages()
@@ -139,6 +140,6 @@ public abstract class LanguageSelectionListWidgetMixin<E extends EntryListWidget
 
 	@Unique
 	private static boolean disabled() {
-		return !Searchable.config.language.enable;
+		return !SearchableConfig.INSTANCE.language_screen.add_search.value();
 	}
 }

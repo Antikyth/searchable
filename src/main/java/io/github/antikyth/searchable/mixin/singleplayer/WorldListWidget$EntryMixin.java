@@ -2,8 +2,8 @@ package io.github.antikyth.searchable.mixin.singleplayer;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.GuiGraphics;
@@ -84,11 +84,11 @@ public class WorldListWidget$EntryMixin implements SetQueryAccessor {
 
 	@Unique
 	private static boolean matchWorldDetails() {
-		return Searchable.config.selectWorld.matchWorldDetails;
+		return SearchableConfig.INSTANCE.select_world_screen.match_world_details.value();
 	}
 
 	@Unique
 	private static boolean enabled() {
-		return Searchable.config.highlightMatches;
+		return SearchableConfig.INSTANCE.highlight_matches.value();
 	}
 }

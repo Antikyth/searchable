@@ -3,9 +3,9 @@ package io.github.antikyth.searchable.mixin.multiplayer;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.GuiGraphics;
@@ -87,7 +87,7 @@ public class LanServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 		ordinal = 0
 	))
 	private int drawMotdWithHighlight(GuiGraphics graphics, TextRenderer textRenderer, String motd, int x, int y, int color, boolean shadowed, Operation<Integer> original) {
-		if (!enabled() || !Searchable.config.selectServer.matchMotd || motd == null) {
+		if (!enabled() || !SearchableConfig.INSTANCE.select_server_screen.match_motd.value() || motd == null) {
 			return original.call(graphics, textRenderer, motd, x, y, color, shadowed);
 		}
 
@@ -100,11 +100,11 @@ public class LanServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 
 	@Unique
 	private static boolean matchMotd() {
-		return Searchable.config.selectServer.enable && Searchable.config.selectServer.matchMotd;
+		return SearchableConfig.INSTANCE.select_server_screen.add_search.value() && SearchableConfig.INSTANCE.select_server_screen.match_motd.value();
 	}
 
 	@Unique
 	private static boolean enabled() {
-		return Searchable.config.selectServer.enable && Searchable.config.highlightMatches;
+		return SearchableConfig.INSTANCE.select_server_screen.add_search.value() && SearchableConfig.INSTANCE.highlight_matches.value();
 	}
 }

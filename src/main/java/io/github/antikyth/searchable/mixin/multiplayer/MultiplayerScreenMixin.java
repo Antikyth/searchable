@@ -9,6 +9,7 @@ package io.github.antikyth.searchable.mixin.multiplayer;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
@@ -55,7 +56,7 @@ public class MultiplayerScreenMixin extends Screen {
 		ordinal = 0
 	), index = 0)
 	private static String changeSelectServerTitle(String title) {
-		if (Searchable.config.selectServer.changeSelectServerTitle) {
+		if (SearchableConfig.INSTANCE.select_server_screen.change_title.value()) {
 			Searchable.LOGGER.debug("changing server selection screen title translation key to {}", ALT_TITLE_TRANSLATION_KEY);
 
 			return ALT_TITLE_TRANSLATION_KEY;
@@ -139,6 +140,6 @@ public class MultiplayerScreenMixin extends Screen {
 
 	@Unique
 	private static boolean disabled() {
-		return !Searchable.config.selectServer.enable;
+		return !SearchableConfig.INSTANCE.select_server_screen.add_search.value();
 	}
 }

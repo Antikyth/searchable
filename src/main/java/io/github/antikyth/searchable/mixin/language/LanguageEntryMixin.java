@@ -1,8 +1,8 @@
 package io.github.antikyth.searchable.mixin.language;
 
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
@@ -63,6 +63,6 @@ public abstract class LanguageEntryMixin extends AlwaysSelectedEntryListWidget.E
 
 	@Unique
 	private boolean disabled() {
-		return !Searchable.config.language.enable || !Searchable.config.highlightMatches;
+		return !SearchableConfig.INSTANCE.language_screen.add_search.value() || !SearchableConfig.INSTANCE.highlight_matches.value();
 	}
 }

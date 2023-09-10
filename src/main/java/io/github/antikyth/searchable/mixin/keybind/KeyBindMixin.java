@@ -1,8 +1,8 @@
 package io.github.antikyth.searchable.mixin.keybind;
 
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.GetMatchManagerAccessor;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.option.KeyBind;
 import net.minecraft.client.resource.language.I18n;
@@ -34,9 +34,7 @@ public abstract class KeyBindMixin implements MatchesAccessor, GetMatchManagerAc
 	@Override
 	public boolean searchable$matches(String query) {
 		if (matchBoundKey()) {
-			Boolean boundKeyMatches = this.boundKeyMatchManager.hasMatches(this.getKeyName(), query);
-
-			if (boundKeyMatches == null || boundKeyMatches) return boundKeyMatches;
+			if (this.boundKeyMatchManager.hasMatches(this.getKeyName(), query)) return true;
 		}
 
 		return this.bindNameMatchManager.hasMatches(I18n.translate(this.getTranslationKey()), query);
@@ -44,6 +42,6 @@ public abstract class KeyBindMixin implements MatchesAccessor, GetMatchManagerAc
 
 	@Unique
 	private static boolean matchBoundKey() {
-		return Searchable.config.keybinds.matchBoundKey;
+		return SearchableConfig.INSTANCE.keybinds_screen.match_bound_key.value();
 	}
 }

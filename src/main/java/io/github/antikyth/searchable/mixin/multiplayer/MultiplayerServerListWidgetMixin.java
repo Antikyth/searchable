@@ -7,10 +7,10 @@
 package io.github.antikyth.searchable.mixin.multiplayer;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.multiplayer.MultiplayerServerListWidgetAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget;
@@ -142,11 +142,11 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 
 	@Unique
 	private static boolean reselectLastSelection() {
-		return Searchable.config.reselectLastSelection;
+		return SearchableConfig.INSTANCE.reselect_last_selection.value();
 	}
 
 	@Unique
 	private static boolean enabled() {
-		return Searchable.config.selectServer.enable;
+		return SearchableConfig.INSTANCE.select_server_screen.add_search.value();
 	}
 }

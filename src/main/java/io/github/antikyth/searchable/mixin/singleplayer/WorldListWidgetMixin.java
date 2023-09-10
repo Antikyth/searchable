@@ -7,9 +7,9 @@
 package io.github.antikyth.searchable.mixin.singleplayer;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
@@ -71,13 +71,13 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 	// Keep track of the last (non-null) selected world.
 	@Inject(method = "setSelected(Lnet/minecraft/client/gui/screen/world/WorldListWidget$AbstractWorldEntry;)V", at = @At("TAIL"))
 	public void onSetSelected(WorldListWidget.AbstractWorldEntry abstractWorldEntry, CallbackInfo ci) {
-		if (Searchable.config.reselectLastSelection && abstractWorldEntry instanceof WorldListWidget.Entry entry) {
+		if (SearchableConfig.INSTANCE.reselect_last_selection.value() && abstractWorldEntry instanceof WorldListWidget.Entry entry) {
 			this.lastSelection = entry.level;
 		}
 	}
 
 	@Unique
 	private static boolean reselectLastSelection() {
-		return Searchable.config.reselectLastSelection;
+		return SearchableConfig.INSTANCE.reselect_last_selection.value();
 	}
 }

@@ -1,6 +1,6 @@
 package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 
-import io.github.antikyth.searchable.Searchable;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
@@ -51,7 +51,7 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 		ordinal = 0
 	))
 	public void onConstructor(EditGameRulesScreen instance, @Nullable List<OrderedText> description, Text name, CallbackInfo ci) {
-		if (!enabled() || !Searchable.config.highlightMatches) return;
+		if (!enabled() || !SearchableConfig.INSTANCE.highlight_matches.value()) return;
 
 		this.instance = instance;
 
@@ -61,7 +61,7 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 
 	@Override
 	protected void updateHighlight(String query) {
-		if (!enabled() || !Searchable.config.highlightMatches) return;
+		if (!enabled() || !SearchableConfig.INSTANCE.highlight_matches.value()) return;
 
 		var nameWithHighlight = this.nameMatchManager.getHighlightedText(this.nameText, query);
 		this.name = this.instance.getTextRenderer().wrapLines(nameWithHighlight, 175);
@@ -73,7 +73,7 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 		ordinal = 0
 	), index = 3)
 	private int adjustNameYCoord(int y) {
-		if (enabled() && Searchable.config.editGamerule.showTechnicalName && this.technicalNameText != null) {
+		if (enabled() && SearchableConfig.INSTANCE.edit_gamerules_screen.show_technical_names.value() && this.technicalNameText != null) {
 			return y - 5;
 		} else {
 			return y;
@@ -89,7 +89,7 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 	private void drawTechnicalName(GuiGraphics graphics, int y, int x, CallbackInfo ci) {
 		if (!enabled()) return;
 
-		if (Searchable.config.editGamerule.showTechnicalName && this.technicalNameText != null) {
+		if (SearchableConfig.INSTANCE.edit_gamerules_screen.show_technical_names.value() && this.technicalNameText != null) {
 			Integer color = Formatting.WHITE.getColorValue();
 			assert color != null;
 

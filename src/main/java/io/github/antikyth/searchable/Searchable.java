@@ -7,8 +7,6 @@
 package io.github.antikyth.searchable;
 
 import io.github.antikyth.searchable.config.SearchableConfig;
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.serializer.Toml4jConfigSerializer;
 import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;
 import org.slf4j.Logger;
@@ -27,9 +25,5 @@ public class Searchable implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient(ModContainer mod) {
-		// Register config.
-		AutoConfig.register(SearchableConfig.class, Toml4jConfigSerializer::new);
-		// Load config.
-		Searchable.config = AutoConfig.getConfigHolder(SearchableConfig.class).getConfig();
 	}
 }

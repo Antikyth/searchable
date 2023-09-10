@@ -21,8 +21,7 @@
 		"intermediate_mappings": "net.fabricmc:intermediary",
 		"entrypoints": {
 			"pre_launch": "io.github.antikyth.searchable.SearchablePreLaunch",
-			"client_init": "io.github.antikyth.searchable.Searchable",
-			"modmenu": "io.github.antikyth.searchable.SearchableModMenuIntegration"
+			"client_init": "io.github.antikyth.searchable.Searchable"
 		},
 		"depends": [
 			{

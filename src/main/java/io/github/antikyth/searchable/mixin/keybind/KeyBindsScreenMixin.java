@@ -6,9 +6,9 @@
 
 package io.github.antikyth.searchable.mixin.keybind;
 
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
@@ -78,6 +78,6 @@ public class KeyBindsScreenMixin extends GameOptionsScreen {
 
 	@Unique
 	private static boolean disabled() {
-		return !Searchable.config.keybinds.enable;
+		return !SearchableConfig.INSTANCE.keybinds_screen.add_search.value();
 	}
 }

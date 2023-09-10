@@ -1,7 +1,7 @@
 package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.singleplayer.gamerule.AbstractRuleWidgetAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import org.jetbrains.annotations.Nullable;
@@ -44,13 +44,13 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 
 	@Override
 	public boolean searchable$matches(String query) {
-		if (Searchable.config.editGamerule.matchTechnicalName && this.technicalName != null) {
+		if (SearchableConfig.INSTANCE.edit_gamerules_screen.match_technical_names.value() && this.technicalName != null) {
 			boolean technicalNameMatches = this.technicalNameMatchManager.hasMatches(this.technicalName, query);
 
 			if (technicalNameMatches) return true;
 		}
 
-		if (Searchable.config.editGamerule.matchDescription && this.descriptionString != null) {
+		if (SearchableConfig.INSTANCE.edit_gamerules_screen.match_descriptions.value() && this.descriptionString != null) {
 			return this.descriptionStringMatchManager.hasMatches(this.descriptionString, query);
 		}
 
@@ -59,6 +59,6 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 
 	@Unique
 	protected boolean enabled() {
-		return Searchable.config.editGamerule.enable;
+		return SearchableConfig.INSTANCE.edit_gamerules_screen.add_search.value();
 	}
 }

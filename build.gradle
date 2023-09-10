@@ -31,11 +31,6 @@ repositories {
 		name = "Terraformers"
 		url = "https://maven.terraformersmc.com/releases/"
 	}
-
-	maven {
-		name = "shedaniel"
-		url = "https://maven.shedaniel.me/"
-	}
 }
 
 // All the dependencies are declared at gradle/libs.version.toml and referenced with "libs.<id>"
@@ -64,9 +59,6 @@ dependencies {
 
 	// Mod Menu
 	modApi "com.terraformersmc:modmenu:7.2.1"
-
-	// Cloth Config
-	modApi "me.shedaniel.cloth:cloth-config-fabric:11.1.106"
 }
 
 processResources {

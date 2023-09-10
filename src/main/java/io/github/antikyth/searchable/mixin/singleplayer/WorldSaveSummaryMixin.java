@@ -1,8 +1,8 @@
 package io.github.antikyth.searchable.mixin.singleplayer;
 
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.GetMatchManagerAccessor;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.text.Text;
 import net.minecraft.world.storage.WorldSaveSummary;
@@ -36,12 +36,12 @@ public abstract class WorldSaveSummaryMixin implements GetMatchManagerAccessor, 
 	@Override
 	public boolean searchable$matches(String query) {
 		return this.worldDisplayNameMatchManager.hasMatches(this.getDisplayName(), query)
-			|| this.worldNameMatchManager.hasMatches(this.getName(), query)
-			|| (matchDetails() && this.worldDetailsMatchManager.hasMatches(this.getDetails(), query));
+		       || this.worldNameMatchManager.hasMatches(this.getName(), query)
+		       || (matchDetails() && this.worldDetailsMatchManager.hasMatches(this.getDetails(), query));
 	}
 
 	@Unique
 	private static boolean matchDetails() {
-		return Searchable.config.selectWorld.matchWorldDetails;
+		return SearchableConfig.INSTANCE.select_world_screen.match_world_details.value();
 	}
 }

@@ -2,9 +2,9 @@ package io.github.antikyth.searchable.mixin.multiplayer;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.GuiGraphics;
@@ -54,7 +54,7 @@ public class ServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 	public boolean searchable$matches(String query) {
 		if (this.serverNameMatchManager.hasMatches(this.serverName, query)) return true;
 
-		if (Searchable.config.selectServer.matchMotd)
+		if (SearchableConfig.INSTANCE.select_server_screen.match_motd.value())
 			return this.serverLabelMatchManager.hasMatches(this.serverLabel, query);
 
 		return false;
@@ -68,7 +68,7 @@ public class ServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 		this.serverName = this.server.name;
 
 		// Used for `searchable$matches`
-		if (Searchable.config.selectServer.matchMotd) {
+		if (SearchableConfig.INSTANCE.select_server_screen.match_motd.value()) {
 			this.serverLabel = this.server.label;
 		}
 	}
@@ -103,7 +103,8 @@ public class ServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 		ordinal = 0
 	))
 	private StringVisitable drawServerLabelWithHighlight(StringVisitable label) {
-		if (!enabled() || !Searchable.config.selectServer.matchMotd || label == null) return label;
+		if (!enabled() || !SearchableConfig.INSTANCE.select_server_screen.match_motd.value() || label == null)
+			return label;
 
 		if (label instanceof Text serverLabel && !serverLabel.equals(this.serverLabel)) {
 			this.serverLabel = serverLabel;
@@ -114,6 +115,6 @@ public class ServerEntryMixin implements SetQueryAccessor, MatchesAccessor {
 
 	@Unique
 	private static boolean enabled() {
-		return Searchable.config.selectServer.enable && Searchable.config.highlightMatches;
+		return SearchableConfig.INSTANCE.select_server_screen.add_search.value() && SearchableConfig.INSTANCE.highlight_matches.value();
 	}
 }

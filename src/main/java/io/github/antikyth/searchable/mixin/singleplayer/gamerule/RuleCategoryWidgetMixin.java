@@ -1,6 +1,6 @@
 package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 
-import io.github.antikyth.searchable.Searchable;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.text.Text;
@@ -29,6 +29,6 @@ public class RuleCategoryWidgetMixin extends AbstractRuleWidgetMixin {
 
 	@Override
 	protected boolean enabled() {
-		return super.enabled() && Searchable.config.highlightMatches && Searchable.config.editGamerule.matchCategory;
+		return super.enabled() && SearchableConfig.INSTANCE.highlight_matches.value() && SearchableConfig.INSTANCE.edit_gamerules_screen.match_categories.value();
 	}
 }

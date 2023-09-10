@@ -1,11 +1,11 @@
 package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.singleplayer.gamerule.AbstractRuleWidgetAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.widget.ElementListWidget;
@@ -115,7 +115,7 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 
 	@Unique
 	private boolean filterCategory(String query, Map.Entry<GameRules.Category, Map<GameRules.Key<?>, EditGameRulesScreen.AbstractRuleWidget>> entry) {
-		this.currentCategoryMatches = Searchable.config.editGamerule.matchCategory && ((MatchesAccessor) (Object) entry.getKey()).searchable$matches(query);
+		this.currentCategoryMatches = SearchableConfig.INSTANCE.edit_gamerules_screen.match_categories.value() && ((MatchesAccessor) (Object) entry.getKey()).searchable$matches(query);
 
 		if (this.currentCategoryMatches) {
 			return true;
@@ -151,6 +151,6 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 
 	@Unique
 	private static boolean enabled() {
-		return Searchable.config.editGamerule.enable;
+		return SearchableConfig.INSTANCE.edit_gamerules_screen.add_search.value();
 	}
 }

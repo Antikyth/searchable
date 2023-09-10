@@ -1,8 +1,8 @@
 package io.github.antikyth.searchable.mixin.keybind;
 
-import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.GetMatchManagerAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.widget.option.KeyBindListWidget;
 import net.minecraft.client.option.KeyBind;
@@ -42,7 +42,7 @@ public abstract class KeyBindEntryMixin extends KeyBindListWidget.Entry implemen
 		ordinal = 0
 	), index = 0)
 	private Text highlightBindButtonText(Text message) {
-		if (disabled() || !Searchable.config.keybinds.matchBoundKey) return message;
+		if (disabled() || !SearchableConfig.INSTANCE.keybinds_screen.match_bound_key.value()) return message;
 
 		// safe cast: input is Text, output will be Text
 		return (Text) bindButtonMatchManager.getHighlightedText(message, this.query);
@@ -62,6 +62,6 @@ public abstract class KeyBindEntryMixin extends KeyBindListWidget.Entry implemen
 
 	@Unique
 	private static boolean disabled() {
-		return !Searchable.config.keybinds.enable || !Searchable.config.highlightMatches;
+		return !SearchableConfig.INSTANCE.keybinds_screen.add_search.value() || !SearchableConfig.INSTANCE.highlight_matches.value();
 	}
 }

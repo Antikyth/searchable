@@ -1,6 +1,6 @@
 package io.github.antikyth.searchable.util.match;
 
-import io.github.antikyth.searchable.Searchable;
+import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.function.BiFunctionTempCache;
 import io.github.antikyth.searchable.util.function.MatcherTriFunctionTempCache;
@@ -154,6 +154,6 @@ public class MatchManager {
 
 	@Unique
 	private static boolean useRegexMatching() {
-		return Searchable.config != null && Searchable.config.useRegexMatching;
+		return SearchableConfig.INSTANCE != null && SearchableConfig.INSTANCE.use_regex_matching.value();
 	}
 }

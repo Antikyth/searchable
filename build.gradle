@@ -91,6 +91,19 @@ java {
 
 loom {
 	accessWidenerPath = file("src/main/resources/${base.archivesName.get()}.accesswidener")
+
+	runs {
+		// Adds a new gradle task that runs the Fabric datagen API
+		datagenClient {
+			inherit client
+			name "Data Generation"
+			vmArg "-Dfabric-api.datagen"
+			vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+			vmArg "-Dfabric-api.datagen.modid=${archives_base_name}"
+
+			runDir "build/datagen"
+		}
+	}
 }
 
 // If you plan to use a different file for the license, don't forget to change the file name here!

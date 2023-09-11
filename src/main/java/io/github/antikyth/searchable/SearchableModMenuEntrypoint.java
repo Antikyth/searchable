@@ -12,7 +12,7 @@ import io.github.antikyth.searchable.config.screen.SearchableConfigScreen;
 import org.quiltmc.loader.api.minecraft.ClientOnly;
 
 @ClientOnly
-public class SearchableModMenuIntegration implements ModMenuApi {
+public class SearchableModMenuEntrypoint implements ModMenuApi {
 	@Override
 	public ConfigScreenFactory<?> getModConfigScreenFactory() {
 		return SearchableConfigScreen::new;

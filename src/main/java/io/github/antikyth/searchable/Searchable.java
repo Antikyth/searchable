@@ -6,13 +6,16 @@
 
 package io.github.antikyth.searchable;
 
-import io.github.antikyth.searchable.config.SearchableConfig;
+import com.llamalad7.mixinextras.MixinExtrasBootstrap;
+import io.github.antikyth.searchable.config.metadata.Description;
+import org.quiltmc.config.api.annotations.ConfigFieldAnnotationProcessor;
 import org.quiltmc.loader.api.ModContainer;
+import org.quiltmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Searchable implements ClientModInitializer {
+public class Searchable implements PreLaunchEntrypoint, ClientModInitializer {
 	public static final String NAME = "Searchable";
 	public static final String MOD_ID = "searchable";
 
@@ -21,7 +24,14 @@ public class Searchable implements ClientModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
 
-	public static SearchableConfig config;
+	@Override
+	public void onPreLaunch(ModContainer mod) {
+		// Initialise Mixin Extras.
+		MixinExtrasBootstrap.init();
+
+		// Register the `@Description` annotation processor for config fields
+		ConfigFieldAnnotationProcessor.register(Description.class, new Description.AnnotationProcessor());
+	}
 
 	@Override
 	public void onInitializeClient(ModContainer mod) {

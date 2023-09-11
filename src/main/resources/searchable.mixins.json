@@ -8,6 +8,7 @@
 		"singleplayer.gamerule.GameRules$CategoryMixin"
 	],
 	"client": [
+		"ClickableWidgetMixin",
 		"EntryListWidgetMixin",
 		"TextFieldWidgetMixin",
 		"keybind.KeyBindEntryMixin",

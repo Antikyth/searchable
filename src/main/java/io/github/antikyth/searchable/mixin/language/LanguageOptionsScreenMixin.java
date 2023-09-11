@@ -35,7 +35,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
 
 @Mixin(LanguageOptionsScreen.class)
@@ -77,9 +76,9 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		// Filter the language selection list when the query is changed.
 		this.searchBox.setChangedListener(query -> {
-			Optional<PatternSyntaxException> valid = MatchManager.matcher().validateQueryError(query);
+			PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);
 
-			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(valid);
+			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(validityError);
 
 			((SetQueryAccessor) this.languageSelectionList).searchable$setQuery(query);
 		});
@@ -90,10 +89,10 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 		this.setInitialFocus(this.searchBox);
 	}
 
-	/******************************************************************************************************************\
-	 * The language selection list is moved down in the `LanguageSelectionListMixin`, as its coords are hardcoded in    *
-	 * its constructor.                                                                                                 *
-	 \******************************************************************************************************************/
+	/* ************************************************************************************************************** *\
+	|* The language selection list is moved down in the `LanguageSelectionListMixin`, as its coords are hardcoded in  *|
+	|* its constructor.                                                                                               *|
+	\* ************************************************************************************************************** */
 
 	// Move the title text up 8 pixels to make room for the search box.
 	@ModifyArg(method = "render", at = @At(

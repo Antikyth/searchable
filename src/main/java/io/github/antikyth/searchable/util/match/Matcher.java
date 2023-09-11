@@ -6,8 +6,9 @@
 
 package io.github.antikyth.searchable.util.match;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
 
 public interface Matcher {
@@ -17,8 +18,8 @@ public interface Matcher {
 	 * By default, this always returns {@code true}, but it may be overridden e.g. for
 	 * {@linkplain Matchers#REGEX the regex matcher}.
 	 */
-	default Optional<PatternSyntaxException> validateQueryError(String query) {
-		return Optional.empty();
+	default @Nullable PatternSyntaxException validateQueryError(String query) {
+		return null;
 	}
 
 	/**

@@ -11,7 +11,6 @@ import io.github.antikyth.searchable.Searchable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -85,14 +84,14 @@ public class Matchers {
 		}
 
 		@Override
-		public Optional<PatternSyntaxException> validateQueryError(String query) {
+		public PatternSyntaxException validateQueryError(String query) {
 			try {
 				Pattern.compile(query);
 			} catch (PatternSyntaxException exception) {
-				return Optional.of(exception);
+				return exception;
 			}
 
-			return Optional.empty();
+			return null;
 		}
 
 		@Override

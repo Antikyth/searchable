@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
 
 @Mixin(SelectWorldScreen.class)
@@ -45,8 +44,8 @@ public class SelectWorldScreenMixin {
 
 	@Inject(method = "method_2744", at = @At("HEAD"))
 	private void onSearchBoxChange(String query, CallbackInfo ci) {
-		Optional<PatternSyntaxException> valid = MatchManager.matcher().validateQueryError(query);
+		PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);
 
-		((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(valid);
+		((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(validityError);
 	}
 }

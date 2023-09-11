@@ -21,7 +21,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
 
 @Mixin(TextFieldWidget.class)
@@ -30,7 +29,8 @@ public abstract class TextFieldWidgetMixin extends ClickableWidgetMixin implemen
 	private static final int INVALID_COLOR = Colors.RED;
 
 	@Unique
-	private Optional<PatternSyntaxException> validityError = Optional.empty();
+	@Nullable
+	private PatternSyntaxException validityError = null;
 
 	@Unique
 	private Tooltip validityErrorTooltip;
@@ -40,11 +40,9 @@ public abstract class TextFieldWidgetMixin extends ClickableWidgetMixin implemen
 	}
 
 	@Override
-	public void searchable$setValidity(Optional<PatternSyntaxException> validityError) {
-		if (validityError.isPresent()) {
-			var error = validityError.get();
-
-			this.validityErrorTooltip = Tooltip.create(Text.literal(error.getMessage()).formatted(Formatting.RED), Text.literal(error.getDescription()));
+	public void searchable$setValidity(@Nullable PatternSyntaxException validityError) {
+		if (validityError != null) {
+			this.validityErrorTooltip = Tooltip.create(Text.literal(validityError.getMessage()).formatted(Formatting.RED), Text.literal(validityError.getDescription()));
 		} else {
 			this.validityErrorTooltip = null;
 		}
@@ -59,26 +57,26 @@ public abstract class TextFieldWidgetMixin extends ClickableWidgetMixin implemen
 		ordinal = 0
 	))
 	private int drawTextWithInvalidColor(int color) {
-		return this.validityError.isEmpty() ? color : INVALID_COLOR;
+		return this.validityError != null ? INVALID_COLOR : color;
 	}
 
 	@Override
 	protected @Nullable Tooltip switchTooltipInUpdateTooltipCondition(@Nullable Tooltip tooltip) {
-		return this.validityError.isPresent() ? this.validityErrorTooltip : tooltip;
+		return this.validityErrorTooltip != null ? this.validityErrorTooltip : tooltip;
 	}
 
 	@Override
 	protected Tooltip switchTooltipInSetDeferredTooltipCall(@NotNull Tooltip tooltip) {
-		return this.validityError.isPresent() ? this.validityErrorTooltip : tooltip;
+		return this.validityErrorTooltip != null ? this.validityErrorTooltip : tooltip;
 	}
 
 	@Override
 	protected @Nullable Tooltip switchTooltipInAppendNarrationsCondition(@Nullable Tooltip tooltip) {
-		return this.validityError.isPresent() ? this.validityErrorTooltip : tooltip;
+		return this.validityErrorTooltip != null ? this.validityErrorTooltip : tooltip;
 	}
 
 	@Override
 	protected Tooltip switchTooltipInAppendNarrationsCall(Tooltip tooltip, NarrationMessageBuilder builder) {
-		return this.validityError.isPresent() ? this.validityErrorTooltip : tooltip;
+		return this.validityErrorTooltip != null ? this.validityErrorTooltip : tooltip;
 	}
 }

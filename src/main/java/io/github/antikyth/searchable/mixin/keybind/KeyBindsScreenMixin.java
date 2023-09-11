@@ -26,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
 
 @Mixin(KeyBindsScreen.class)
@@ -54,7 +53,7 @@ public class KeyBindsScreenMixin extends GameOptionsScreen {
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		this.searchBox.setChangedListener(query -> {
-			Optional<PatternSyntaxException> validityError = MatchManager.matcher().validateQueryError(query);
+			PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);
 
 			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(validityError);
 
@@ -73,7 +72,7 @@ public class KeyBindsScreenMixin extends GameOptionsScreen {
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (disabled()) return;
 
-		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
+		this.searchBox.render(graphics, mouseX, mouseY, delta);
 	}
 
 	@Unique

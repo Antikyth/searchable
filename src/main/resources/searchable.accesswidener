@@ -26,6 +26,9 @@ accessible field net/minecraft/client/gui/widget/TextFieldWidget editableColor I
 # int TextFieldWidget.uneditableColor
 accessible field net/minecraft/client/gui/widget/TextFieldWidget uneditableColor I
 
+# Text Tooltip.message
+accessible field net/minecraft/client/gui/tooltip/Tooltip message Lnet/minecraft/text/Text;
+
 # WorldSaveSummary WorldListWidget.Entry.level
 accessible field net/minecraft/client/gui/screen/world/WorldListWidget$Entry level Lnet/minecraft/world/storage/WorldSaveSummary;
 

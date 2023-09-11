@@ -26,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
 
 @Mixin(EditGameRulesScreen.class)
@@ -61,9 +60,9 @@ public class EditGameRulesScreenMixin extends Screen implements GetSearchBoxAcce
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		this.searchBox.setChangedListener(query -> {
-			Optional<PatternSyntaxException> valid = MatchManager.matcher().validateQueryError(query);
+			PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);
 
-			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(valid);
+			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(validityError);
 
 			((SetQueryAccessor) this.ruleListWidget).searchable$setQuery(query);
 		});
@@ -93,7 +92,7 @@ public class EditGameRulesScreenMixin extends Screen implements GetSearchBoxAcce
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (disabled()) return;
 
-		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
+		this.searchBox.render(graphics, mouseX, mouseY, delta);
 	}
 
 	@Unique

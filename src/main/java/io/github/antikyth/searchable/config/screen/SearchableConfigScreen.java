@@ -65,7 +65,7 @@ public class SearchableConfigScreen extends Screen {
 		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		this.searchBox.setChangedListener(query -> {
-			Optional<PatternSyntaxException> validityError = MatchManager.matcher().validateQueryError(query);
+			PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);
 
 			((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(validityError);
 
@@ -256,11 +256,14 @@ public class SearchableConfigScreen extends Screen {
 		protected List<OrderedText> createTooltip(@NotNull Text description, String query) {
 			ArrayList<OrderedText> tooltip = new ArrayList<>();
 
+			// Name
 			Text tooltipName = this.getRenderedTooltipName();
 			if (tooltipName != null) tooltip.add(tooltipName.asOrderedText());
 
+			// Description
 			tooltip.addAll(this.createDescriptionTooltip(description, query));
 
+			// Default value
 			Text defaultValue = Text.literal(this.configOption.getDefaultValue().toString());
 			MutableText defaultText = Text.translatable(String.format("config.%s.default", Searchable.MOD_ID), defaultValue);
 

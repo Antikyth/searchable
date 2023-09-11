@@ -1,8 +1,9 @@
 package io.github.antikyth.searchable.accessor;
 
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.regex.PatternSyntaxException;
 
 public interface TextFieldWidgetValidityAccessor {
-	void searchable$setValidity(Optional<PatternSyntaxException> validityError);
+	void searchable$setValidity(@Nullable PatternSyntaxException validityError);
 }

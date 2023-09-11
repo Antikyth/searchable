@@ -87,6 +87,8 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 
 	@Unique
 	private void filter(String query) {
+		this.clearEntries();
+
 		this.map.forEach((category, pair) -> {
 			var categoryTranslation = Text.translatable(category);
 

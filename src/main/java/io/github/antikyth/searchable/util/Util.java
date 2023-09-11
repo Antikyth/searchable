@@ -168,7 +168,7 @@ public class Util {
 				}
 
 				// Find the next formatting code.
-				nextCodeIndex = legacy.indexOf(code, index);
+				nextCodeIndex = legacy.indexOf(code, nextCodeIndex + FORMATTING_CODE_LENGTH);
 			} while (index < legacy.length() && nextCodeIndex >= 0);
 
 			// Add the last section of text if it wasn't already added.

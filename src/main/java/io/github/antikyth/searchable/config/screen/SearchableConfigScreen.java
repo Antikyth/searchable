@@ -1,10 +1,14 @@
-package io.github.antikyth.searchable.config;
+package io.github.antikyth.searchable.config.screen;
 
 import com.google.common.collect.ImmutableList;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
+import io.github.antikyth.searchable.config.SearchableConfig;
+import io.github.antikyth.searchable.config.metadata.Description;
 import io.github.antikyth.searchable.util.Colors;
+import io.github.antikyth.searchable.util.Pair;
 import io.github.antikyth.searchable.util.Util;
+import io.github.antikyth.searchable.util.function.MatcherTriFunctionTempCache;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,11 +17,12 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.narration.NarrationPart;
 import net.minecraft.client.gui.widget.*;
-import net.minecraft.text.CommonTexts;
-import net.minecraft.text.Text;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.quiltmc.config.api.annotations.Comment;
 import org.quiltmc.config.api.values.TrackedValue;
 import org.quiltmc.config.api.values.ValueKey;
 import org.quiltmc.config.api.values.ValueTreeNode;
@@ -31,13 +36,15 @@ public class SearchableConfigScreen extends Screen {
 	private static final Text SEARCH_BOX_NARRATION_MESSAGE = Text.translatable(String.format("config.%s.search", Searchable.MOD_ID));
 	private static final Text SEARCH_BOX_HINT = Util.hint(Text.translatable(String.format("config.%s.search.hint", Searchable.MOD_ID)));
 
+	private static final int DESCRIPTION_LINE_LIMIT = 150;
+
 	private final GridWidget grid = new GridWidget().setColumnSpacing(10);
 
 	private TextFieldWidget searchBox;
 	private String currentQuery;
 
 	private SearchableConfigEntryListWidget entryListWidget;
-	private final Set<AbstractConfigOptionEntry> invalidConfigOptionEntries = new HashSet<>();
+	private final Set<AbstractConfigOptionEntry<?>> invalidConfigOptionEntries = new HashSet<>();
 	private ButtonWidget doneButton;
 
 	public SearchableConfigScreen(Screen parent) {
@@ -115,39 +122,104 @@ public class SearchableConfigScreen extends Screen {
 		this.doneButton.active = this.invalidConfigOptionEntries.isEmpty();
 	}
 
-	void markInvalid(AbstractConfigOptionEntry configOptionEntry) {
+	<T> void markInvalid(AbstractConfigOptionEntry<T> configOptionEntry) {
 		this.invalidConfigOptionEntries.add(configOptionEntry);
 		this.updateDoneButton();
 	}
 
-	void markValid(AbstractConfigOptionEntry configOptionEntry) {
+	<T> void markValid(AbstractConfigOptionEntry<T> configOptionEntry) {
 		this.invalidConfigOptionEntries.remove(configOptionEntry);
 		this.updateDoneButton();
 	}
 
-	public abstract static class AbstractEntry extends ElementListWidget.Entry<AbstractEntry> {
+	public abstract class AbstractEntry extends ElementListWidget.Entry<AbstractEntry> {
+		@Nullable
+		protected Text description;
+		@Nullable
+		protected List<OrderedText> tooltip;
+
+		protected final MatchManager descriptionMatchManager = new MatchManager();
+
+		public AbstractEntry(@Nullable Text description) {
+			this.description = description;
+		}
+
+		public boolean matches() {
+			return this.description != null && matchDescription() && this.descriptionMatchManager.hasMatches(this.description, this.getQuery());
+		}
+
+		protected void updateTooltip(@Nullable Text description, String query) {
+			if (description == null) {
+				this.tooltip = null;
+			} else {
+				this.tooltip = this.createTooltip(description, query);
+			}
+		}
+
+		protected List<OrderedText> createTooltip(@NotNull Text description, String query) {
+			return this.createDescriptionTooltip(description, query);
+		}
+
+		protected ArrayList<OrderedText> createDescriptionTooltip(@NotNull Text description, String query) {
+			return this.tooltipHighlightCache.apply(MatchManager.matcher(), description, query, (matcher, _description, _query) -> {
+				StringVisitable descriptionText = _description;
+				if (highlightMatches() && matchDescription()) {
+					descriptionText = this.descriptionMatchManager.getHighlightedText(_description, _query);
+				}
+
+				return new ArrayList<>(SearchableConfigScreen.this.textRenderer.wrapLines(descriptionText, DESCRIPTION_LINE_LIMIT));
+			});
+		}
+
+		@Override
+		public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+			if (hovered) updateTooltip(this.description, this.getQuery());
+		}
+
+		protected String getQuery() {
+			return SearchableConfigScreen.this.searchBox.getText();
+		}
+
+		protected static boolean highlightMatches() {
+			return SearchableConfig.INSTANCE.highlight_matches.value();
+		}
+
+		protected static boolean matchDescription() {
+			return SearchableConfig.INSTANCE.searchable_config_screen.match_descriptions.value();
+		}
+
+		protected final MatcherTriFunctionTempCache<StringVisitable, String, ArrayList<OrderedText>> tooltipHighlightCache = MatcherTriFunctionTempCache.create();
 	}
 
 	/**
 	 * An entry for a {@linkplain TrackedValue config option}.
 	 */
-	public abstract class AbstractConfigOptionEntry extends AbstractEntry {
+	public abstract class AbstractConfigOptionEntry<T> extends AbstractEntry {
 		protected final List<ClickableWidget> children = new ArrayList<>();
+
+		protected TrackedValue<T> configOption;
 
 		protected Text name;
 		protected Text technicalName;
 
 		protected final MatchManager nameMatchManager = new MatchManager();
 		protected final MatchManager technicalNameMatchManager = new MatchManager();
+		protected final MatchManager tooltipNameMatchManager = new MatchManager();
 
-		public AbstractConfigOptionEntry(Text name, Text technicalName) {
+		public AbstractConfigOptionEntry(Text name, Text technicalName, @Nullable Text description, TrackedValue<T> configOption) {
+			super(description);
+
+			this.configOption = configOption;
+
 			this.name = name;
 			this.technicalName = technicalName;
 		}
 
+		@Override
 		public boolean matches() {
 			return nameMatchManager.hasMatches(this.name, this.getQuery())
-			       || (matchTechnicalName() && this.technicalNameMatchManager.hasMatches(this.technicalName, this.getQuery()));
+				|| (matchTechnicalName() && this.technicalNameMatchManager.hasMatches(this.technicalName, this.getQuery()))
+				|| super.matches();
 		}
 
 		protected void drawName(@NotNull GuiGraphics graphics, int x, int y) {
@@ -175,6 +247,35 @@ public class SearchableConfigScreen extends Screen {
 		}
 
 		@Override
+		protected List<OrderedText> createTooltip(@NotNull Text description, String query) {
+			ArrayList<OrderedText> tooltip = new ArrayList<>();
+
+			Text tooltipName = this.getRenderedTooltipName();
+			if (tooltipName != null) tooltip.add(tooltipName.asOrderedText());
+
+			tooltip.addAll(this.createDescriptionTooltip(description, query));
+
+			Text defaultValue = Text.literal(this.configOption.getDefaultValue().toString());
+			MutableText defaultText = Text.translatable(String.format("config.%s.default", Searchable.MOD_ID), defaultValue);
+
+			tooltip.add(defaultText.formatted(Formatting.GRAY).asOrderedText());
+
+			return tooltip;
+		}
+
+		protected Text getRenderedTooltipName() {
+			if (this.technicalName == null) return null;
+
+			Text name = this.technicalName.copyContentOnly().formatted(Formatting.YELLOW);
+
+			if (highlightMatches() && matchTechnicalName()) {
+				return (Text) this.tooltipNameMatchManager.getHighlightedText(name, this.getQuery());
+			}
+
+			return name;
+		}
+
+		@Override
 		public List<? extends Element> children() {
 			return this.children;
 		}
@@ -182,14 +283,6 @@ public class SearchableConfigScreen extends Screen {
 		@Override
 		public List<? extends Selectable> selectableChildren() {
 			return this.children;
-		}
-
-		protected String getQuery() {
-			return SearchableConfigScreen.this.searchBox.getText();
-		}
-
-		protected static boolean highlightMatches() {
-			return SearchableConfig.INSTANCE.highlight_matches.value();
 		}
 
 		protected static boolean showTechnicalName() {
@@ -204,11 +297,11 @@ public class SearchableConfigScreen extends Screen {
 	/**
 	 * An entry for a {@link Boolean} {@linkplain TrackedValue config option}.
 	 */
-	public class BooleanConfigOptionEntry extends AbstractConfigOptionEntry {
+	public class BooleanConfigOptionEntry extends AbstractConfigOptionEntry<Boolean> {
 		private final CyclingButtonWidget<Boolean> toggleButton;
 
-		public BooleanConfigOptionEntry(Text name, Text technicalName, TrackedValue<Boolean> configOption) {
-			super(name, technicalName);
+		public BooleanConfigOptionEntry(Text name, Text technicalName, @Nullable Text description, TrackedValue<Boolean> configOption) {
+			super(name, technicalName, description, configOption);
 
 			this.toggleButton = CyclingButtonWidget.onOffBuilder(configOption.value())
 				.omitKeyText()
@@ -219,6 +312,8 @@ public class SearchableConfigScreen extends Screen {
 
 		@Override
 		public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+			super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+
 			this.drawName(graphics, x, y);
 
 			this.toggleButton.setX(x + entryWidth - 45);
@@ -235,31 +330,32 @@ public class SearchableConfigScreen extends Screen {
 		private final Text name;
 		private final MatchManager matchManager;
 
-		public CategoryEntry(ValueKey key) {
-			this(Text.translatable(categoryTranslationKey(key)).formatted(Formatting.YELLOW, Formatting.BOLD));
+		public CategoryEntry(Text name, @Nullable Text description) {
+			this(name, description, new MatchManager());
 		}
 
-		public CategoryEntry(Text name) {
-			this(name, new MatchManager());
-		}
+		public CategoryEntry(Text name, @Nullable Text description, MatchManager matchManager) {
+			super(description);
 
-		public CategoryEntry(Text name, MatchManager matchManager) {
 			this.name = name;
 			this.matchManager = matchManager;
 		}
 
+		@Override
 		public boolean matches() {
-			return matchName() && this.matchManager.hasMatches(this.name, this.getQuery());
+			return (matchName() && this.matchManager.hasMatches(this.name, this.getQuery())) || super.matches();
 		}
 
 		@Override
 		public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+			super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+
 			// Draw category name.
 			graphics.drawCenteredShadowedText(SearchableConfigScreen.this.textRenderer, this.getRenderedName(), x + entryWidth / 2, y + 5, Colors.WHITE);
 		}
 
 		private Text getRenderedName() {
-			if (highlightName()) {
+			if (highlightMatches() && matchName()) {
 				return (Text) this.matchManager.getHighlightedText(this.name, this.getQuery());
 			}
 
@@ -286,21 +382,13 @@ public class SearchableConfigScreen extends Screen {
 			return ImmutableList.of();
 		}
 
-		private String getQuery() {
-			return SearchableConfigScreen.this.searchBox.getText();
-		}
-
-		private static boolean highlightName() {
-			return SearchableConfig.INSTANCE.highlight_matches.value() && matchName();
-		}
-
 		private static boolean matchName() {
 			return SearchableConfig.INSTANCE.searchable_config_screen.match_categories.value();
 		}
 	}
 
 	public class SearchableConfigEntryListWidget extends ElementListWidget<AbstractEntry> {
-		private final Map<@Nullable ValueKey, List<AbstractConfigOptionEntry>> configOptionMap;
+		private final Map<@Nullable ValueKey, List<AbstractConfigOptionEntry<?>>> configOptionMap;
 		// I'm not sure why this is a warning? Indeed, there is no need to update this map - that is why it is not
 		// updated.
 		@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -321,6 +409,16 @@ public class SearchableConfigScreen extends Screen {
 			}
 
 			updateEntries();
+		}
+
+		@Override
+		public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+			super.render(graphics, mouseX, mouseY, delta);
+
+			var hoveredEntry = this.getHoveredEntry();
+			if (hoveredEntry != null && hoveredEntry.tooltip != null) {
+				SearchableConfigScreen.this.setDeferredTooltip(hoveredEntry.tooltip);
+			}
 		}
 
 		private void updateEntries() {
@@ -369,7 +467,7 @@ public class SearchableConfigScreen extends Screen {
 
 		// unchecked cast warnings are suppressed because they _are_ checked by doing `instanceof` on their `value()`s.
 		@SuppressWarnings("unchecked")
-		private void addNodeToMap(@Nullable ValueTreeNode parentSection, ValueTreeNode node) {
+		private void addNodeToMap(@Nullable ValueTreeNode.Section parentSection, ValueTreeNode node) {
 			if (node instanceof ValueTreeNode.Section sectionNode) {
 				// If it is a section, add all its nodes.
 
@@ -378,12 +476,22 @@ public class SearchableConfigScreen extends Screen {
 				// If it is a config option, add an entry.
 
 				if (configOption.value() instanceof Boolean) {
-					ValueKey categoryKey = null;
+					ValueKey categoryKey;
 
-					if (parentSection != null) {
+					if (parentSection == null) {
+						categoryKey = null;
+					} else {
 						categoryKey = parentSection.key();
+
 						// Create the category entry if it hasn't been created before.
-						this.categoryMap.computeIfAbsent(categoryKey, CategoryEntry::new);
+						this.categoryMap.computeIfAbsent(categoryKey, category -> {
+							String translationKey = categoryTranslationKey(category);
+
+							Text name = Text.translatable(translationKey).formatted(Formatting.YELLOW, Formatting.BOLD);
+							Text description = descriptionText(parentSection, translationKey);
+
+							return new CategoryEntry(name, description);
+						});
 					}
 
 					this.addEntryToMap(categoryKey, (TrackedValue<Boolean>) configOption, BooleanConfigOptionEntry::new);
@@ -392,16 +500,64 @@ public class SearchableConfigScreen extends Screen {
 		}
 
 		private <T> void addEntryToMap(@Nullable ValueKey categoryKey, TrackedValue<T> configOption, ConfigOptionEntryFactory<T> entryFactory) {
-			Text name = Text.translatable(configOptionTranslationKey(configOption.key()));
-			Text technicalName = Util.technicalName(Text.literal(configOption.key().getLastComponent()));
+			ValueKey key = configOption.key();
+			String translationKey = configOptionTranslationKey(key);
 
-			configOptionMap.computeIfAbsent(categoryKey, category -> new ArrayList<>()).add(entryFactory.create(name, technicalName, configOption));
+			Text name = Text.translatable(translationKey);
+			Text technicalName = Util.technicalName(Text.literal(key.getLastComponent()));
+
+			Text description = descriptionText(configOption, translationKey);
+
+			configOptionMap.computeIfAbsent(categoryKey, category -> new ArrayList<>())
+				.add(entryFactory.create(name, technicalName, description, configOption));
 		}
 	}
 
 	private static <T> void applyConfigOptionOverride(TrackedValue<T> configOption) {
 		configOption.setValue(configOption.value(), true);
 		configOption.removeOverride();
+	}
+
+	@Nullable
+	private static Text descriptionText(ValueTreeNode node, String nodeTranslationKey) {
+		MutableText description;
+
+		String translationKey = descriptionTranslationKey(nodeTranslationKey);
+
+		if (node.hasMetadata(Description.TYPE)) {
+			// If `@Description` is used.
+
+			Pair<String, Text[]> pair = node.metadata(Description.TYPE);
+
+			String descriptionTranslationKey = pair.first;
+			descriptionTranslationKey = descriptionTranslationKey.isEmpty() ? translationKey : descriptionTranslationKey;
+
+			description = Text.translatable(descriptionTranslationKey, (Object[]) pair.second);
+		} else if (I18n.hasTranslation(translationKey)) {
+			// `@Description` is not used, but there is a translation provided for the default description key.
+
+			description = Text.translatable(translationKey);
+		} else if (node.hasMetadata(Comment.TYPE)) {
+			// If `@Description` is not used but `@Comment` is.
+
+			description = Text.empty();
+
+			Iterator<String> comments = node.metadata(Comment.TYPE).iterator();
+			if (comments.hasNext()) {
+				// First comment.
+				description.append(comments.next());
+				// All the rest, with a line in between.
+				comments.forEachRemaining(additionalComment -> description.append("\n\n").append(additionalComment));
+			}
+		} else {
+			description = null;
+		}
+
+		return description;
+	}
+
+	private static String descriptionTranslationKey(String translationKey) {
+		return String.format("%s.description", translationKey);
 	}
 
 	private static String categoryTranslationKey(ValueKey categoryKey) {
@@ -414,6 +570,6 @@ public class SearchableConfigScreen extends Screen {
 
 	@FunctionalInterface
 	public interface ConfigOptionEntryFactory<T> {
-		SearchableConfigScreen.AbstractConfigOptionEntry create(Text name, Text technicalName, TrackedValue<T> configOption);
+		SearchableConfigScreen.AbstractConfigOptionEntry<T> create(Text name, Text technicalName, @Nullable Text description, TrackedValue<T> configOption);
 	}
 }

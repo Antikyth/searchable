@@ -7,6 +7,8 @@
 package io.github.antikyth.searchable;
 
 import com.llamalad7.mixinextras.MixinExtrasBootstrap;
+import io.github.antikyth.searchable.config.metadata.Description;
+import org.quiltmc.config.api.annotations.ConfigFieldAnnotationProcessor;
 import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.loader.api.entrypoint.PreLaunchEntrypoint;
 
@@ -15,5 +17,8 @@ public class SearchablePreLaunch implements PreLaunchEntrypoint {
 	public void onPreLaunch(ModContainer mod) {
 		// Initialise Mixin Extras.
 		MixinExtrasBootstrap.init();
+
+		// Register the `@Description` annotation processor for config fields
+		ConfigFieldAnnotationProcessor.register(Description.class, new Description.AnnotationProcessor());
 	}
 }

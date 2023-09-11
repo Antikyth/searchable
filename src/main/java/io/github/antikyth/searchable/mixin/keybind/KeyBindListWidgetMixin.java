@@ -91,9 +91,13 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 			var categoryTranslation = Text.translatable(category);
 
 			// If the category matches the query...
-			if (pair.first.hasMatches(categoryTranslation, query)) {
+			if (matchCategories() && pair.first.hasMatches(categoryTranslation, query)) {
 				// Add the category.
-				this.addCategoryEntry((Text) pair.first.getHighlightedText(categoryTranslation, query));
+				if (highlightMatches()) {
+					this.addCategoryEntry((Text) pair.first.getHighlightedText(categoryTranslation, query));
+				} else {
+					this.addCategoryEntry(categoryTranslation);
+				}
 
 				// Add all its key binds.
 				for (KeyBind keyBind : pair.second) {
@@ -107,7 +111,7 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 					if (((MatchesAccessor) keyBind).searchable$matches(query)) {
 						// If its category hasn't been added, add the category.
 						if (!addedCategory) {
-							this.addEntry(((KeyBindListWidget) (Object) this).new CategoryEntry(categoryTranslation));
+							this.addCategoryEntry(categoryTranslation);
 							addedCategory = true;
 						}
 
@@ -132,6 +136,16 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 		if (query != null) ((SetQueryAccessor) entry).searchable$setQuery(query);
 
 		this.addEntry(entry);
+	}
+
+	@Unique
+	private static boolean matchCategories() {
+		return SearchableConfig.INSTANCE.keybinds_screen.match_categories.value();
+	}
+
+	@Unique
+	private static boolean highlightMatches() {
+		return SearchableConfig.INSTANCE.highlight_matches.value();
 	}
 
 	@Unique

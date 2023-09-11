@@ -5,6 +5,4 @@ import java.util.regex.PatternSyntaxException;
 
 public interface TextFieldWidgetValidityAccessor {
 	void searchable$setValidity(Optional<PatternSyntaxException> validityError);
-
-	Optional<PatternSyntaxException> searchable$getValidityError();
 }

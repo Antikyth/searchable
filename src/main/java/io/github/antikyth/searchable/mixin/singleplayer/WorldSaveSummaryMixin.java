@@ -1,3 +1,9 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package io.github.antikyth.searchable.mixin.singleplayer;
 
 import io.github.antikyth.searchable.accessor.GetMatchManagerAccessor;
@@ -36,8 +42,8 @@ public abstract class WorldSaveSummaryMixin implements GetMatchManagerAccessor, 
 	@Override
 	public boolean searchable$matches(String query) {
 		return this.worldDisplayNameMatchManager.hasMatches(this.getDisplayName(), query)
-		       || this.worldNameMatchManager.hasMatches(this.getName(), query)
-		       || (matchDetails() && this.worldDetailsMatchManager.hasMatches(this.getDetails(), query));
+			|| this.worldNameMatchManager.hasMatches(this.getName(), query)
+			|| (matchDetails() && this.worldDetailsMatchManager.hasMatches(this.getDetails(), query));
 	}
 
 	@Unique

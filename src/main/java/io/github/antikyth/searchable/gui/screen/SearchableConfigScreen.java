@@ -14,7 +14,7 @@ import io.github.antikyth.searchable.config.metadata.Description;
 import io.github.antikyth.searchable.util.Colors;
 import io.github.antikyth.searchable.util.Pair;
 import io.github.antikyth.searchable.util.Util;
-import io.github.antikyth.searchable.util.function.MatcherTriFunctionTempCache;
+import io.github.antikyth.searchable.util.function.MatcherQuadFunctionTempCache;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.GuiGraphics;
@@ -140,101 +140,28 @@ public class SearchableConfigScreen extends Screen {
 	}
 
 	public abstract class AbstractEntry extends ElementListWidget.Entry<AbstractEntry> {
+		protected Text name;
+		protected Text technicalName;
 		@Nullable
 		protected Text description;
+
 		@Nullable
 		protected List<OrderedText> tooltip;
 
+		protected final MatchManager nameMatchManager = new MatchManager();
+		protected final MatchManager technicalNameMatchManager = new MatchManager();
 		protected final MatchManager descriptionMatchManager = new MatchManager();
 
-		public AbstractEntry(@Nullable Text description) {
+		public AbstractEntry(Text name, Text technicalName, @Nullable Text description) {
+			this.name = name;
+			this.technicalName = technicalName;
 			this.description = description;
 		}
 
 		public boolean matches() {
-			return this.description != null && matchDescription() && this.descriptionMatchManager.hasMatches(this.description, this.getQuery());
-		}
-
-		protected void updateTooltip(@Nullable Text description, String query) {
-			if (description == null) {
-				this.tooltip = null;
-			} else {
-				this.tooltip = this.createTooltip(description, query);
-			}
-		}
-
-		protected List<OrderedText> createTooltip(@NotNull Text description, String query) {
-			return this.createDescriptionTooltip(description, query);
-		}
-
-		protected ArrayList<OrderedText> createDescriptionTooltip(@NotNull Text description, String query) {
-			return this.tooltipHighlightCache.apply(MatchManager.matcher(), description, query, (matcher, _description, _query) -> {
-				StringVisitable descriptionText = _description;
-				if (highlightMatches() && matchDescription()) {
-					descriptionText = this.descriptionMatchManager.getHighlightedText(_description, _query);
-				}
-
-				return new ArrayList<>(SearchableConfigScreen.this.textRenderer.wrapLines(descriptionText, DESCRIPTION_LINE_LIMIT));
-			});
-		}
-
-		@Override
-		public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-			if (hovered) updateTooltip(this.description, this.getQuery());
-		}
-
-		protected String getQuery() {
-			return SearchableConfigScreen.this.searchBox.getText();
-		}
-
-		protected static boolean highlightMatches() {
-			return SearchableConfig.INSTANCE.highlight_matches.value();
-		}
-
-		protected static boolean matchDescription() {
-			return SearchableConfig.INSTANCE.searchable_config_screen.match_descriptions.value();
-		}
-
-		protected final MatcherTriFunctionTempCache<StringVisitable, String, ArrayList<OrderedText>> tooltipHighlightCache = MatcherTriFunctionTempCache.create();
-	}
-
-	/**
-	 * An entry for a {@linkplain TrackedValue config option}.
-	 */
-	public abstract class AbstractConfigOptionEntry<T> extends AbstractEntry {
-		protected final List<ClickableWidget> children = new ArrayList<>();
-
-		protected TrackedValue<T> configOption;
-
-		protected Text name;
-		protected Text technicalName;
-
-		protected final MatchManager nameMatchManager = new MatchManager();
-		protected final MatchManager technicalNameMatchManager = new MatchManager();
-		protected final MatchManager tooltipNameMatchManager = new MatchManager();
-
-		public AbstractConfigOptionEntry(Text name, Text technicalName, @Nullable Text description, TrackedValue<T> configOption) {
-			super(description);
-
-			this.configOption = configOption;
-
-			this.name = name;
-			this.technicalName = technicalName;
-		}
-
-		@Override
-		public boolean matches() {
-			return nameMatchManager.hasMatches(this.name, this.getQuery())
-				|| (matchTechnicalName() && this.technicalNameMatchManager.hasMatches(this.technicalName, this.getQuery()))
-				|| super.matches();
-		}
-
-		protected void drawName(@NotNull GuiGraphics graphics, int x, int y) {
-			graphics.drawText(SearchableConfigScreen.this.textRenderer, this.getRenderedName(), x, showTechnicalName() ? y : y + 5, Colors.WHITE, false);
-
-			if (showTechnicalName()) {
-				graphics.drawText(SearchableConfigScreen.this.textRenderer, this.getRenderedTechnicalName(), x, y + 10, Colors.WHITE, false);
-			}
+			return this.nameMatchManager.hasMatches(this.name, this.getQuery())
+				|| matchTechnicalName() && this.technicalNameMatchManager.hasMatches(this.technicalName, this.getQuery())
+				|| this.description != null && matchDescription() && this.descriptionMatchManager.hasMatches(this.description, this.getQuery());
 		}
 
 		protected Text getRenderedName() {
@@ -253,36 +180,106 @@ public class SearchableConfigScreen extends Screen {
 			return this.technicalName;
 		}
 
-		@Override
-		protected List<OrderedText> createTooltip(@NotNull Text description, String query) {
-			ArrayList<OrderedText> tooltip = new ArrayList<>();
-
-			// Name
-			Text tooltipName = this.getRenderedTooltipName();
-			if (tooltipName != null) tooltip.add(tooltipName.asOrderedText());
-
-			// Description
-			tooltip.addAll(this.createDescriptionTooltip(description, query));
-
-			// Default value
-			Text defaultValue = Text.literal(this.configOption.getDefaultValue().toString());
-			MutableText defaultText = Text.translatable(String.format("config.%s.default", Searchable.MOD_ID), defaultValue);
-
-			tooltip.add(defaultText.formatted(Formatting.GRAY).asOrderedText());
-
-			return tooltip;
+		protected List<OrderedText> createTooltip() {
+			return this.createDefaultTooltip();
 		}
 
-		protected Text getRenderedTooltipName() {
+		protected ArrayList<OrderedText> createDefaultTooltip() {
+			return this.tooltipHighlightCache.apply(MatchManager.matcher(), this.technicalName, this.description, this.getQuery(), (matcher, _technicalName, _description, _query) -> {
+				StringVisitable descriptionText = _description;
+				List<OrderedText> descriptionLines;
+
+				if (descriptionText != null) {
+					if (highlightMatches() && matchDescription()) {
+						descriptionText = this.descriptionMatchManager.getHighlightedText(_description, _query);
+					}
+
+					descriptionLines = SearchableConfigScreen.this.textRenderer.wrapLines(descriptionText, DESCRIPTION_LINE_LIMIT);
+				} else {
+					descriptionLines = List.of();
+				}
+
+				ArrayList<OrderedText> list = new ArrayList<>();
+
+				list.add(this.getRenderedTechnicalName().asOrderedText());
+				list.addAll(descriptionLines);
+
+				return list;
+			});
+		}
+
+		@Override
+		public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+			if (hovered) this.tooltip = createTooltip();
+		}
+
+		protected String getQuery() {
+			return SearchableConfigScreen.this.searchBox.getText();
+		}
+
+		protected static boolean highlightMatches() {
+			return SearchableConfig.INSTANCE.highlight_matches.value();
+		}
+
+		protected static boolean matchTechnicalName() {
+			return SearchableConfig.INSTANCE.searchable_config_screen.match_technical_names.value();
+		}
+
+		protected static boolean matchDescription() {
+			return SearchableConfig.INSTANCE.searchable_config_screen.match_descriptions.value();
+		}
+
+		protected final MatcherQuadFunctionTempCache<StringVisitable, @Nullable StringVisitable, String, ArrayList<OrderedText>> tooltipHighlightCache = MatcherQuadFunctionTempCache.create();
+	}
+
+	/**
+	 * An entry for a {@linkplain TrackedValue config option}.
+	 */
+	public abstract class AbstractConfigOptionEntry<T> extends AbstractEntry {
+		protected final List<ClickableWidget> children = new ArrayList<>();
+
+		protected TrackedValue<T> configOption;
+
+		protected final MatchManager tooltipNameMatchManager = new MatchManager();
+
+		public AbstractConfigOptionEntry(Text name, Text technicalName, @Nullable Text description, TrackedValue<T> configOption) {
+			super(name, technicalName, description);
+
+			this.configOption = configOption;
+		}
+
+		protected void drawName(@NotNull GuiGraphics graphics, int x, int y) {
+			graphics.drawText(SearchableConfigScreen.this.textRenderer, this.getRenderedName(), x, showTechnicalName() ? y : y + 5, Colors.WHITE, false);
+
+			if (showTechnicalName()) {
+				graphics.drawText(SearchableConfigScreen.this.textRenderer, this.getRenderedEntryTechnicalNameText(), x, y + 10, Colors.WHITE, false);
+			}
+		}
+
+		protected Text getRenderedEntryTechnicalNameText() {
 			if (this.technicalName == null) return null;
 
-			Text name = this.technicalName.copyContentOnly().formatted(Formatting.YELLOW);
+			Text name = this.technicalName.copyContentOnly().formatted(Formatting.GRAY);
 
 			if (highlightMatches() && matchTechnicalName()) {
 				return (Text) this.tooltipNameMatchManager.getHighlightedText(name, this.getQuery());
 			}
 
 			return name;
+		}
+
+		@Override
+		protected List<OrderedText> createTooltip() {
+			// Tooltip
+			ArrayList<OrderedText> tooltip = new ArrayList<>(this.createDefaultTooltip());
+
+			// Add default value
+			Text defaultValue = Text.literal(this.configOption.getDefaultValue().toString());
+			MutableText defaultText = Text.translatable(String.format("config.%s.default", Searchable.MOD_ID), defaultValue);
+
+			tooltip.add(defaultText.formatted(Formatting.GRAY).asOrderedText());
+
+			return tooltip;
 		}
 
 		@Override
@@ -337,23 +334,8 @@ public class SearchableConfigScreen extends Screen {
 	 * An entry for a {@linkplain org.quiltmc.config.api.ReflectiveConfig.Section section}.
 	 */
 	public class CategoryEntry extends AbstractEntry {
-		private final Text name;
-		private final MatchManager matchManager;
-
-		public CategoryEntry(Text name, @Nullable Text description) {
-			this(name, description, new MatchManager());
-		}
-
-		public CategoryEntry(Text name, @Nullable Text description, MatchManager matchManager) {
-			super(description);
-
-			this.name = name;
-			this.matchManager = matchManager;
-		}
-
-		@Override
-		public boolean matches() {
-			return (matchName() && this.matchManager.hasMatches(this.name, this.getQuery())) || super.matches();
+		public CategoryEntry(Text name, Text technicalName, @Nullable Text description) {
+			super(name, technicalName, description);
 		}
 
 		@Override
@@ -364,9 +346,10 @@ public class SearchableConfigScreen extends Screen {
 			graphics.drawCenteredShadowedText(SearchableConfigScreen.this.textRenderer, this.getRenderedName(), x + entryWidth / 2, y + 5, Colors.WHITE);
 		}
 
-		private Text getRenderedName() {
+		@Override
+		protected Text getRenderedName() {
 			if (highlightMatches() && matchName()) {
-				return (Text) this.matchManager.getHighlightedText(this.name, this.getQuery());
+				return (Text) this.nameMatchManager.getHighlightedText(this.name, this.getQuery());
 			}
 
 			return this.name;
@@ -508,9 +491,11 @@ public class SearchableConfigScreen extends Screen {
 							String translationKey = categoryTranslationKey(category);
 
 							Text name = Text.translatable(translationKey).formatted(Formatting.YELLOW, Formatting.BOLD);
+							Text technicalName = Text.literal(categoryKey.toString()).formatted(Formatting.YELLOW);
+
 							Text description = descriptionText(parentSection, translationKey);
 
-							return new CategoryEntry(name, description);
+							return new CategoryEntry(name, technicalName, description);
 						});
 					}
 
@@ -524,7 +509,7 @@ public class SearchableConfigScreen extends Screen {
 			String translationKey = configOptionTranslationKey(key);
 
 			Text name = Text.translatable(translationKey);
-			Text technicalName = Util.technicalName(Text.literal(key.getLastComponent()));
+			Text technicalName = Text.literal(key.getLastComponent()).formatted(Formatting.YELLOW);
 
 			Text description = descriptionText(configOption, translationKey);
 

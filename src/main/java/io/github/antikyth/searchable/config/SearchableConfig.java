@@ -19,6 +19,8 @@ import org.quiltmc.loader.api.config.v2.QuiltConfig;
 public class SearchableConfig extends ReflectiveConfig {
 	public static final SearchableConfig INSTANCE = QuiltConfig.create(Searchable.MOD_ID, Searchable.MOD_ID, SearchableConfig.class);
 
+	@Comment(EnglishUsLangProvider.Config.SHOW_CONFIG_BUTTON_DESCRIPTION)
+	public final TrackedValue<Boolean> show_config_button = value(true);
 	@Comment(EnglishUsLangProvider.Config.RESELECT_LAST_SELECTION_DESCRIPTION)
 	public final TrackedValue<Boolean> reselect_last_selection = value(true);
 	@Comment(EnglishUsLangProvider.Config.HIGHLIGHT_MATCHES_DESCRIPTION)
@@ -34,7 +36,7 @@ public class SearchableConfig extends ReflectiveConfig {
 	public final EditGameRulesScreenOptions edit_gamerules_screen = new EditGameRulesScreenOptions();
 
 	public static class SearchableConfigScreenOptions extends Section {
-		//		@Comment(EnglishUsLangProvider.Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION)
+		//		@Comment(EnglishUsLangProvider.SearchableConfigScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION)
 		public final TrackedValue<Boolean> show_technical_names = value(false);
 
 		public final TrackedValue<Boolean> match_categories = value(true);

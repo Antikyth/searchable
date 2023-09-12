@@ -13,6 +13,7 @@ import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
 import io.github.antikyth.searchable.accessor.language.LanguageSelectionListWidgetAccessor;
 import io.github.antikyth.searchable.config.SearchableConfig;
+import io.github.antikyth.searchable.gui.widget.SearchableConfigButton;
 import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,9 +24,7 @@ import net.minecraft.client.gui.screen.option.LanguageOptionsScreen.LanguageSele
 import net.minecraft.client.gui.screen.option.LanguageOptionsScreen.LanguageSelectionListWidget.LanguageEntry;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.text.Text;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -55,9 +54,6 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 
 	@Shadow
 	private LanguageSelectionListWidget languageSelectionList;
-	@Final
-	@Shadow
-	public LanguageManager languageManager;
 
 	// Mixin will ignore this - required because of extending `GameOptionsScreen`
 	public LanguageOptionsScreenMixin(Screen parent, GameOptions gameOptions, Text title) {
@@ -66,13 +62,13 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 
 	// Add the search box to the UI
 	@Inject(method = "init", at = @At("HEAD"))
-	public void onInit(CallbackInfo ci) {
+	protected void onInitHead(CallbackInfo ci) {
 		if (disabled()) return;
 
 		Searchable.LOGGER.debug("adding search box to language options screen...");
 
-		// Search box coordinates and size copied from the world selection screen.
-		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
+		// Search box {{{
+		this.searchBox = new TextFieldWidget(this.textRenderer, (this.width - Searchable.SEARCH_BOX_WIDTH) / 2, 22, Searchable.searchBoxWidth(), 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		// Filter the language selection list when the query is changed.
 		this.searchBox.setChangedListener(query -> {
@@ -87,6 +83,22 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select
 		// screen's search box.
 		this.setInitialFocus(this.searchBox);
+		// }}}
+
+		// Config button {{{
+		if (SearchableConfig.INSTANCE.show_config_button.value()) {
+			this.addDrawableChild(new SearchableConfigButton(
+				this.searchBox.getX() + this.searchBox.getWidth() + Searchable.CONFIG_BUTTON_OFFSET,
+				this.searchBox.getY() + ((this.searchBox.getHeight() - SearchableConfigButton.CONFIG_BUTTON_SIZE) / 2),
+				this
+			));
+		}
+		// }}}
+	}
+
+	@Inject(method = "init", at = @At("TAIL"))
+	protected void onInitTail(CallbackInfo ci) {
+		((SetQueryAccessor) this.languageSelectionList).searchable$setQuery(this.searchBox.getText());
 	}
 
 	/* ************************************************************************************************************** *\

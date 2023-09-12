@@ -8,7 +8,7 @@ package io.github.antikyth.searchable;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
-import io.github.antikyth.searchable.config.screen.SearchableConfigScreen;
+import io.github.antikyth.searchable.gui.screen.SearchableConfigScreen;
 import org.quiltmc.loader.api.minecraft.ClientOnly;
 
 @ClientOnly

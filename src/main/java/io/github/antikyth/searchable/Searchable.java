@@ -24,6 +24,9 @@ public class Searchable implements PreLaunchEntrypoint, ClientModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
 
+	public static final int SEARCH_BOX_WIDTH = 200;
+	public static final int CONFIG_BUTTON_OFFSET = 3;
+
 	@Override
 	public void onPreLaunch(ModContainer mod) {
 		// Initialise Mixin Extras.
@@ -35,5 +38,10 @@ public class Searchable implements PreLaunchEntrypoint, ClientModInitializer {
 
 	@Override
 	public void onInitializeClient(ModContainer mod) {
+	}
+
+	public static int searchBoxWidth() {
+//		return SearchableConfig.INSTANCE.show_config_button.value() ? SEARCH_BOX_WIDTH - CONFIG_BUTTON_SIZE - CONFIG_BUTTON_OFFSET : SEARCH_BOX_WIDTH;
+		return SEARCH_BOX_WIDTH;
 	}
 }

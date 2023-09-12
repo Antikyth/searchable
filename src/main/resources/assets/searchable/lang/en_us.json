@@ -43,6 +43,8 @@
   "config.searchable.option.select_server_screen.match_motds.description": "Whether server descriptions should be searched for matching text during a search.",
   "config.searchable.option.select_world_screen.match_world_details": "Match World Details",
   "config.searchable.option.select_world_screen.match_world_details.description": "Whether world details should be searched for matching text during a search.",
+  "config.searchable.option.show_config_button": "Show Config Button",
+  "config.searchable.option.show_config_button.description": "Whether a button to open Searchable's config screen should be added next to search boxes added or modified by Searchable.",
   "config.searchable.option.use_regex_matching": "RegEx Matching",
   "config.searchable.search": "search for config options",
   "config.searchable.search.hint": "Search...",

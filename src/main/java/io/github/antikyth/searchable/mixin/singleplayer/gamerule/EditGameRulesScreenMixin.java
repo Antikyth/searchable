@@ -11,6 +11,7 @@ import io.github.antikyth.searchable.accessor.GetSearchBoxAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
 import io.github.antikyth.searchable.config.SearchableConfig;
+import io.github.antikyth.searchable.gui.widget.SearchableConfigButton;
 import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
@@ -57,7 +58,8 @@ public class EditGameRulesScreenMixin extends Screen implements GetSearchBoxAcce
 
 		Searchable.LOGGER.debug("adding search box to edit gamerules screen");
 
-		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
+		// Search box {{{
+		this.searchBox = new TextFieldWidget(this.textRenderer, (this.width - Searchable.SEARCH_BOX_WIDTH) / 2, 22, Searchable.searchBoxWidth(), 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		this.searchBox.setChangedListener(query -> {
 			PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);
@@ -71,6 +73,17 @@ public class EditGameRulesScreenMixin extends Screen implements GetSearchBoxAcce
 		// Set the search box to be the initial focus.  This is to be consistent with the behavior of the world select
 		// screen's search box.
 		this.setInitialFocus(this.searchBox);
+		// }}}
+
+		// Config button {{{
+		if (SearchableConfig.INSTANCE.show_config_button.value()) {
+			this.addDrawableChild(new SearchableConfigButton(
+				this.searchBox.getX() + this.searchBox.getWidth() + Searchable.CONFIG_BUTTON_OFFSET,
+				this.searchBox.getY() + ((this.searchBox.getHeight() - SearchableConfigButton.CONFIG_BUTTON_SIZE) / 2),
+				this
+			));
+		}
+		// }}}
 	}
 
 	@ModifyArg(method = "render", at = @At(

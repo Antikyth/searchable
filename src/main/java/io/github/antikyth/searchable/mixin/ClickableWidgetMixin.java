@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
@@ -24,8 +25,22 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
  */
 @Mixin(ClickableWidget.class)
 public abstract class ClickableWidgetMixin {
+	@Shadow
+	protected int width;
+	@Shadow
+	protected int height;
+
+	@Shadow
+	protected boolean hovered;
+
 	public ClickableWidgetMixin(int x, int y, int width, int height, Text message) {
 	}
+
+	@Shadow
+	public abstract int getX();
+
+	@Shadow
+	public abstract int getY();
 
 	@ModifyExpressionValue(method = "updateTooltip", at = @At(
 		value = "FIELD",

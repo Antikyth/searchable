@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.config.screen;
+package io.github.antikyth.searchable.gui.screen;
 
 import com.google.common.collect.ImmutableList;
 import io.github.antikyth.searchable.Searchable;
@@ -61,8 +61,8 @@ public class SearchableConfigScreen extends Screen {
 
 	@Override
 	protected void init() {
-		// Search box
-		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
+		// Search box {{{
+		this.searchBox = new TextFieldWidget(this.textRenderer, (this.width - Searchable.SEARCH_BOX_WIDTH) / 2, 22, Searchable.SEARCH_BOX_WIDTH, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		this.searchBox.setChangedListener(query -> {
 			PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);
@@ -78,6 +78,7 @@ public class SearchableConfigScreen extends Screen {
 
 		this.addSelectableChild(this.searchBox);
 		this.setInitialFocus(this.searchBox);
+		// }}}
 
 		// Entry list widget
 		this.entryListWidget = new SearchableConfigEntryListWidget(48, this.height - 32, 24, this.entryListWidget);

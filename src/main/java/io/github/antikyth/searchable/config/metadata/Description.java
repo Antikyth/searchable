@@ -6,8 +6,8 @@
 
 package io.github.antikyth.searchable.config.metadata;
 
-import io.github.antikyth.searchable.config.screen.SearchableConfigScreen.AbstractConfigOptionEntry;
-import io.github.antikyth.searchable.config.screen.SearchableConfigScreen.CategoryEntry;
+import io.github.antikyth.searchable.gui.screen.SearchableConfigScreen.AbstractConfigOptionEntry;
+import io.github.antikyth.searchable.gui.screen.SearchableConfigScreen.CategoryEntry;
 import io.github.antikyth.searchable.util.Pair;
 import net.minecraft.text.Text;
 import org.quiltmc.config.api.ReflectiveConfig.Section;

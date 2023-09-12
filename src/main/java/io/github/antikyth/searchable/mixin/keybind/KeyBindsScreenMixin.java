@@ -6,9 +6,11 @@
 
 package io.github.antikyth.searchable.mixin.keybind;
 
+import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
 import io.github.antikyth.searchable.config.SearchableConfig;
+import io.github.antikyth.searchable.gui.widget.SearchableConfigButton;
 import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.GuiGraphics;
@@ -50,7 +52,10 @@ public class KeyBindsScreenMixin extends GameOptionsScreen {
 	public void onInit(CallbackInfo ci) {
 		if (disabled()) return;
 
-		this.searchBox = new TextFieldWidget(this.textRenderer, this.width / 2 - 100, 22, 200, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
+		Searchable.LOGGER.debug("adding search box to key binds screen");
+
+		// Search box {{{
+		this.searchBox = new TextFieldWidget(this.textRenderer, (this.width - Searchable.SEARCH_BOX_WIDTH) / 2, 22, Searchable.searchBoxWidth(), 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		this.searchBox.setChangedListener(query -> {
 			PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);
@@ -62,6 +67,17 @@ public class KeyBindsScreenMixin extends GameOptionsScreen {
 
 		this.addSelectableChild(this.searchBox);
 		this.setInitialFocus(this.searchBox);
+		// }}}
+
+		// Config button {{{
+		if (addConfigButton()) {
+			this.addDrawableChild(new SearchableConfigButton(
+				this.searchBox.getX() + this.searchBox.getWidth() + Searchable.CONFIG_BUTTON_OFFSET,
+				this.searchBox.getY() + ((this.searchBox.getHeight() - SearchableConfigButton.CONFIG_BUTTON_SIZE) / 2),
+				this
+			));
+		}
+		// }}}
 	}
 
 	@Inject(method = "render", at = @At(
@@ -73,6 +89,11 @@ public class KeyBindsScreenMixin extends GameOptionsScreen {
 		if (disabled()) return;
 
 		this.searchBox.render(graphics, mouseX, mouseY, delta);
+	}
+
+	@Unique
+	private static boolean addConfigButton() {
+		return SearchableConfig.INSTANCE.show_config_button.value();
 	}
 
 	@Unique

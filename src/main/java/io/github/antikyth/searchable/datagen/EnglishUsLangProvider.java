@@ -24,6 +24,8 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 		public static final String SUMMARY = "Makes more GUIs searchable.";
 	}
 
+	public static final String CONFIG_BUTTON_TOOLTIP = "Configure search...";
+
 	public static final String KEY_BINDS_SEARCH_NARRATION = "search for key binds";
 	public static final String LANGUAGE_SEARCH_NARRATION = "search for languages";
 	public static final String SELECT_SERVER_SEARCH_NARRATION = "search for multiplayer servers";
@@ -34,6 +36,11 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 		public static final String SEARCH_NARRATION = "search for config options";
 		public static final String DEFAULT = "Default: %s";
 
+
+		public static final String SHOW_CONFIG_BUTTON = "Show Config Button";
+		public static final String SHOW_CONFIG_BUTTON_DESCRIPTION = """
+			Whether a button to open Searchable's config screen should be added next to search boxes added or modified \
+			by Searchable.""";
 
 		public static final String RESELECT_LAST_SELECTION = "Keep Selection Selected";
 		public static final String RESELECT_LAST_SELECTION_DESCRIPTION = """
@@ -82,7 +89,7 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 
 		public static class SelectServerScreen {
 			public static final String NAME = "Select Server Screen";
-			public static final String NAME_DESCRIPTION = "The multiplayer server selection screen.";
+			public static final String DESCRIPTION = "The multiplayer server selection screen.";
 
 			public static final String ADD_SEARCH = EnglishUsLangProvider.ADD_SEARCH;
 
@@ -97,7 +104,7 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 
 		public static final class SelectWorldScreen {
 			public static final String NAME = "Select World Screen";
-			public static final String NAME_DESCRIPTION = "The singleplayer world selection screen.";
+			public static final String DESCRIPTION = "The singleplayer world selection screen.";
 
 			public static final String MATCH_WORLD_DETAILS = "Match World Details";
 			public static final String MATCH_WORLD_DETAILS_DESCRIPTION = matchDescription("world details");
@@ -105,7 +112,7 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 
 		public static final class EditGameRulesScreen {
 			public static final String NAME = "Edit Game Rules Screen";
-			public static final String NAME_DESCRIPTION = "The game rules editing screen, used during world creation.";
+			public static final String DESCRIPTION = "The game rules editing screen, used during world creation.";
 
 			public static final String ADD_SEARCH = EnglishUsLangProvider.ADD_SEARCH;
 
@@ -126,6 +133,8 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 	@Override
 	public void generateTranslations(TranslationBuilder translationBuilder) {
 		translationBuilder.add(modid("modmenu.summaryTranslation.%s"), ModMenu.SUMMARY);
+
+		translationBuilder.add(modid("search.%s.config.tooltip"), CONFIG_BUTTON_TOOLTIP);
 
 		translationBuilder.add("controls.keybinds.search", KEY_BINDS_SEARCH_NARRATION);
 		translationBuilder.add("controls.keybinds.search.hint", SEARCH_HINT);
@@ -153,87 +162,55 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 		// Config
 		//
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.reselect_last_selection, Config.RESELECT_LAST_SELECTION);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.reselect_last_selection, Config.RESELECT_LAST_SELECTION_DESCRIPTION);
-
-		configOption(translationBuilder, SearchableConfig.INSTANCE.highlight_matches, Config.HIGHLIGHT_MATCHES);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.highlight_matches, Config.HIGHLIGHT_MATCHES_DESCRIPTION);
-
+		configOption(translationBuilder, SearchableConfig.INSTANCE.show_config_button, Config.SHOW_CONFIG_BUTTON, Config.SHOW_CONFIG_BUTTON_DESCRIPTION);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.reselect_last_selection, Config.RESELECT_LAST_SELECTION, Config.RESELECT_LAST_SELECTION_DESCRIPTION);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.highlight_matches, Config.HIGHLIGHT_MATCHES, Config.HIGHLIGHT_MATCHES_DESCRIPTION);
 		configOption(translationBuilder, SearchableConfig.INSTANCE.use_regex_matching, Config.USE_REGEX_MATCHING);
-
 
 		// Searchable Options Screen
 		configCategory(translationBuilder, "searchable_config_screen", Config.SearchableConfigScreen.NAME);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.show_technical_names, Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.show_technical_names, Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.show_technical_names, Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES, Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_categories, Config.SearchableConfigScreen.MATCH_CATEGORIES);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_categories, Config.SearchableConfigScreen.MATCH_CATEGORIES_DESCRIPTION);
-
-		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_descriptions, Config.SearchableConfigScreen.MATCH_DESCRIPTIONS);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_descriptions, Config.SearchableConfigScreen.MATCH_DESCRIPTIONS_DESCRIPTION);
-
-		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_technical_names, Config.SearchableConfigScreen.MATCH_TECHNICAL_NAMES);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_technical_names, Config.SearchableConfigScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION);
-
+		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_categories, Config.SearchableConfigScreen.MATCH_CATEGORIES, Config.SearchableConfigScreen.MATCH_CATEGORIES_DESCRIPTION);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_descriptions, Config.SearchableConfigScreen.MATCH_DESCRIPTIONS, Config.SearchableConfigScreen.MATCH_DESCRIPTIONS_DESCRIPTION);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_technical_names, Config.SearchableConfigScreen.MATCH_TECHNICAL_NAMES, Config.SearchableConfigScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION);
 
 		// Key Binds Screen
 		configCategory(translationBuilder, "keybinds_screen", Config.KeyBindsScreen.NAME);
 
 		configOption(translationBuilder, SearchableConfig.INSTANCE.keybinds_screen.add_search, Config.KeyBindsScreen.ADD_SEARCH);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.keybinds_screen.match_categories, Config.KeyBindsScreen.MATCH_CATEGORIES);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.keybinds_screen.match_categories, Config.KeyBindsScreen.MATCH_CATEGORIES_DESCRIPTION);
-
-		configOption(translationBuilder, SearchableConfig.INSTANCE.keybinds_screen.match_bound_keys, Config.KeyBindsScreen.MATCH_BOUND_KEYS);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.keybinds_screen.match_bound_keys, Config.KeyBindsScreen.MATCH_BOUND_KEYS_DESCRIPTION);
-
+		configOption(translationBuilder, SearchableConfig.INSTANCE.keybinds_screen.match_categories, Config.KeyBindsScreen.MATCH_CATEGORIES, Config.KeyBindsScreen.MATCH_CATEGORIES_DESCRIPTION);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.keybinds_screen.match_bound_keys, Config.KeyBindsScreen.MATCH_BOUND_KEYS, Config.KeyBindsScreen.MATCH_BOUND_KEYS_DESCRIPTION);
 
 		// Languages Screen
 		configCategory(translationBuilder, "language_screen", Config.LanguageScreen.NAME);
 
 		configOption(translationBuilder, SearchableConfig.INSTANCE.language_screen.add_search, Config.LanguageScreen.ADD_SEARCH);
 
-
 		// Select Server Screen
-		configCategory(translationBuilder, "select_server_screen", Config.SelectServerScreen.NAME);
-		configCategoryDesc(translationBuilder, "select_server_screen", Config.SelectServerScreen.NAME_DESCRIPTION);
+		configCategory(translationBuilder, "select_server_screen", Config.SelectServerScreen.NAME, Config.SelectServerScreen.DESCRIPTION);
 
 		configOption(translationBuilder, SearchableConfig.INSTANCE.select_server_screen.add_search, Config.SelectServerScreen.ADD_SEARCH);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.select_server_screen.change_title, Config.SelectServerScreen.CHANGE_TITLE);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.select_server_screen.change_title, Config.SelectServerScreen.CHANGE_TITLE_DESCRIPTION);
-
-		configOption(translationBuilder, SearchableConfig.INSTANCE.select_server_screen.match_motds, Config.SelectServerScreen.MATCH_MOTDS);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.select_server_screen.match_motds, Config.SelectServerScreen.MATCH_MOTDS_DESCRIPTION);
-
+		configOption(translationBuilder, SearchableConfig.INSTANCE.select_server_screen.change_title, Config.SelectServerScreen.CHANGE_TITLE, Config.SelectServerScreen.CHANGE_TITLE_DESCRIPTION);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.select_server_screen.match_motds, Config.SelectServerScreen.MATCH_MOTDS, Config.SelectServerScreen.MATCH_MOTDS_DESCRIPTION);
 
 		// Select World Screen
-		configCategory(translationBuilder, "select_world_screen", Config.SelectWorldScreen.NAME);
-		configCategoryDesc(translationBuilder, "select_world_screen", Config.SelectWorldScreen.NAME_DESCRIPTION);
+		configCategory(translationBuilder, "select_world_screen", Config.SelectWorldScreen.NAME, Config.SelectWorldScreen.DESCRIPTION);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.select_world_screen.match_world_details, Config.SelectWorldScreen.MATCH_WORLD_DETAILS);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.select_world_screen.match_world_details, Config.SelectWorldScreen.MATCH_WORLD_DETAILS_DESCRIPTION);
-
+		configOption(translationBuilder, SearchableConfig.INSTANCE.select_world_screen.match_world_details, Config.SelectWorldScreen.MATCH_WORLD_DETAILS, Config.SelectWorldScreen.MATCH_WORLD_DETAILS_DESCRIPTION);
 
 		// Edit Game Rules Screen
-		configCategory(translationBuilder, "edit_gamerules_screen", Config.EditGameRulesScreen.NAME);
-		configCategoryDesc(translationBuilder, "edit_gamerules_screen", Config.EditGameRulesScreen.NAME_DESCRIPTION);
+		configCategory(translationBuilder, "edit_gamerules_screen", Config.EditGameRulesScreen.NAME, Config.EditGameRulesScreen.DESCRIPTION);
 
 		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.add_search, Config.EditGameRulesScreen.ADD_SEARCH);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.show_technical_names, Config.EditGameRulesScreen.SHOW_TECHNICAL_NAMES, Config.EditGameRulesScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.show_technical_names, Config.EditGameRulesScreen.SHOW_TECHNICAL_NAMES);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.show_technical_names, Config.EditGameRulesScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION);
-
-		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_categories, Config.EditGameRulesScreen.MATCH_CATEGORIES);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_categories, Config.EditGameRulesScreen.MATCH_CATEGORIES_DESCRIPTION);
-
-		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_descriptions, Config.EditGameRulesScreen.MATCH_DESCRIPTIONS);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_descriptions, Config.EditGameRulesScreen.MATCH_DESCRIPTIONS_DESCRIPTION);
-
-		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_technical_names, Config.EditGameRulesScreen.MATCH_TECHNICAL_NAMES);
-		configOptionDesc(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_technical_names, Config.EditGameRulesScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_categories, Config.EditGameRulesScreen.MATCH_CATEGORIES, Config.EditGameRulesScreen.MATCH_CATEGORIES_DESCRIPTION);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_descriptions, Config.EditGameRulesScreen.MATCH_DESCRIPTIONS, Config.EditGameRulesScreen.MATCH_DESCRIPTIONS_DESCRIPTION);
+		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_technical_names, Config.EditGameRulesScreen.MATCH_TECHNICAL_NAMES, Config.EditGameRulesScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION);
 	}
 
 	private static String modid(String string) {
@@ -252,15 +229,17 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 		builder.add(String.format("config.%s.option.%s", Searchable.MOD_ID, configOption.key()), translation);
 	}
 
-	private static void configOptionDesc(TranslationBuilder builder, TrackedValue<?> configOption, String translation) {
-		builder.add(String.format("config.%s.option.%s.description", Searchable.MOD_ID, configOption.key()), translation);
+	private static void configOption(TranslationBuilder builder, TrackedValue<?> configOption, String translation, String descriptionTranslation) {
+		configOption(builder, configOption, translation);
+		builder.add(String.format("config.%s.option.%s.description", Searchable.MOD_ID, configOption.key()), descriptionTranslation);
 	}
 
 	private static void configCategory(TranslationBuilder builder, String key, String translation) {
 		builder.add(String.format("config.%s.category.%s", Searchable.MOD_ID, key), translation);
 	}
 
-	private static void configCategoryDesc(TranslationBuilder builder, String key, String translation) {
-		builder.add(String.format("config.%s.category.%s.description", Searchable.MOD_ID, key), translation);
+	private static void configCategory(TranslationBuilder builder, String key, String translation, String descriptionTranslation) {
+		configCategory(builder, key, translation);
+		builder.add(String.format("config.%s.category.%s.description", Searchable.MOD_ID, key), descriptionTranslation);
 	}
 }

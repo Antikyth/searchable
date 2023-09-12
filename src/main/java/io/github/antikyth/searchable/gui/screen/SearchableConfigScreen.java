@@ -422,6 +422,16 @@ public class SearchableConfigScreen extends Screen {
 		}
 
 		@Override
+		public int getRowWidth() {
+			return 310;
+		}
+
+		@Override
+		protected int getScrollbarPositionX() {
+			return ((this.width + this.getRowWidth()) / 2) + 14;
+		}
+
+		@Override
 		public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 			super.render(graphics, mouseX, mouseY, delta);
 

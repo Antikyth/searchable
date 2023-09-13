@@ -39,7 +39,7 @@ import java.util.regex.PatternSyntaxException;
 public class SearchableConfigScreen extends Screen {
 	protected final Screen parent;
 
-	private static final Text SEARCH_BOX_NARRATION_MESSAGE = Text.translatable(String.format("config.%s.search", Searchable.MOD_ID));
+	private static final Text SEARCH_BOX_NARRATION_MESSAGE = Text.translatable(String.format("config.%s.search.narration", Searchable.MOD_ID));
 	private static final Text SEARCH_BOX_HINT = Util.hint(Text.translatable(String.format("config.%s.search.hint", Searchable.MOD_ID)));
 
 	private static final int DESCRIPTION_LINE_LIMIT = 150;

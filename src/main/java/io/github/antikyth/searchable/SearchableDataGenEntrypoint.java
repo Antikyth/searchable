@@ -6,7 +6,7 @@
 
 package io.github.antikyth.searchable;
 
-import io.github.antikyth.searchable.datagen.EnglishUsLangProvider;
+import io.github.antikyth.searchable.datagen.lang.EnglishUs;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
@@ -14,6 +14,6 @@ public class SearchableDataGenEntrypoint implements DataGeneratorEntrypoint {
 	@Override
 	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
 		FabricDataGenerator.Pack pack = dataGenerator.createPack();
-		pack.addProvider(EnglishUsLangProvider::new);
+		pack.addProvider(EnglishUs::new);
 	}
 }

@@ -56,6 +56,7 @@
   "modmenu.summaryTranslation.searchable": "Makes more GUIs searchable.",
   "option.language.search": "search for languages",
   "option.language.search.hint": "Search...",
+  "search.searchable.config.tooltip": "Configure search...",
   "selectServer.search": "search for multiplayer servers",
   "selectServer.search.hint": "Search...",
   "selectWorld.search.hint": "Search..."

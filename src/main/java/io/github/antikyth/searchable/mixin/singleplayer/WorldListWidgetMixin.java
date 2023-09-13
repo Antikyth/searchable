@@ -10,6 +10,8 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.config.SearchableConfig;
+import io.github.antikyth.searchable.util.match.MatchManager;
+import io.github.antikyth.searchable.util.match.Matchers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
@@ -57,6 +59,10 @@ public class WorldListWidgetMixin extends AlwaysSelectedEntryListWidget<WorldLis
 	// altering the return value.
 	@ModifyReturnValue(method = "worldNameMatches", at = @At("RETURN"))
 	private boolean worldSummaryMatches(boolean matches, String query, WorldSaveSummary summary) {
+		if (MatchManager.matcher().equals(Matchers.PLAIN) && matches) {
+			return true;
+		}
+
 		// Replace the return value with our matcher implementation.
 		return ((MatchesAccessor) summary).searchable$matches(query);
 	}

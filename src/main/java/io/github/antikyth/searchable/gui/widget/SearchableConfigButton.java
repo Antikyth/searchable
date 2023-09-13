@@ -25,6 +25,6 @@ public class SearchableConfigButton extends TexturedButtonWidget {
 	public SearchableConfigButton(int x, int y, PressAction action) {
 		super(x, y, CONFIG_BUTTON_SIZE, CONFIG_BUTTON_SIZE, 0, 0, ICONS_TEXTURE, action);
 
-		this.setTooltip(Tooltip.create(Text.translatable(String.format("search.%s.config.tooltip", Searchable.MOD_ID))));
+		this.setTooltip(Tooltip.create(Text.translatable(String.format("button.%s.openConfig.tooltip", Searchable.MOD_ID))));
 	}
 }

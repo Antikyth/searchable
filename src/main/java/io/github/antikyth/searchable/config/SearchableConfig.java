@@ -7,10 +7,7 @@
 package io.github.antikyth.searchable.config;
 
 import io.github.antikyth.searchable.Searchable;
-import io.github.antikyth.searchable.config.metadata.Description;
-import io.github.antikyth.searchable.config.metadata.FormatArg;
 import io.github.antikyth.searchable.datagen.EnglishUsLangProvider;
-import net.minecraft.util.Formatting;
 import org.quiltmc.config.api.ReflectiveConfig;
 import org.quiltmc.config.api.annotations.Comment;
 import org.quiltmc.config.api.values.TrackedValue;
@@ -40,16 +37,14 @@ public class SearchableConfig extends ReflectiveConfig {
 		public final TrackedValue<Boolean> show_technical_names = value(false);
 
 		public final TrackedValue<Boolean> match_categories = value(true);
-		public final TrackedValue<Boolean> match_descriptions = value(true);
-		public final TrackedValue<Boolean> match_technical_names = value(true);
+		public final TrackedValue<Boolean> match_descriptions = value(false);
+		public final TrackedValue<Boolean> match_technical_names = value(false);
 	}
 
 	public static class KeyBindScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
 
-		@Description
 		public final TrackedValue<Boolean> match_categories = value(true);
-		@Description
 		public final TrackedValue<Boolean> match_bound_keys = value(true);
 	}
 
@@ -59,11 +54,6 @@ public class SearchableConfig extends ReflectiveConfig {
 
 	public static class ServerSelectScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
-		@Description(args = {
-			@FormatArg(value = "multiplayer.title", type = FormatArg.Type.TRANSLATION_KEY, formattings = Formatting.BLUE),
-			@FormatArg(value = "selectServer.title", type = FormatArg.Type.TRANSLATION_KEY, formattings = Formatting.BLUE)
-		})
-		public final TrackedValue<Boolean> change_title = value(false);
 
 		public final TrackedValue<Boolean> match_motds = value(true);
 	}

@@ -50,21 +50,6 @@ public class MultiplayerScreenMixin extends Screen {
 		super(title);
 	}
 
-	@ModifyArg(method = "<init>", at = @At(
-		value = "INVOKE",
-		target = "net/minecraft/text/Text.translatable (Ljava/lang/String;)Lnet/minecraft/text/MutableText;",
-		ordinal = 0
-	), index = 0)
-	private static String changeSelectServerTitle(String title) {
-		if (SearchableConfig.INSTANCE.select_server_screen.change_title.value()) {
-			Searchable.LOGGER.debug("changing server selection screen title translation key to {}", ALT_TITLE_TRANSLATION_KEY);
-
-			return ALT_TITLE_TRANSLATION_KEY;
-		} else {
-			return title;
-		}
-	}
-
 	@Inject(method = "init", at = @At("HEAD"))
 	private void onInit(CallbackInfo ci) {
 		if (disabled()) return;

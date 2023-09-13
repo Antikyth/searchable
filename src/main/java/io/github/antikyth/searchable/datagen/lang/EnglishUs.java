@@ -28,7 +28,8 @@ public class EnglishUs extends FabricLanguageProvider {
 
 	public static class ModMenu {
 		@Translation("modmenu.summaryTranslation.%s")
-		public static final String SUMMARY = "Makes more GUIs searchable.";
+		public static final String SUMMARY = """
+			Improves the singleplayer select world screen search and adds it to other GUIs.""";
 	}
 
 	@Translation("button.%s.openConfig.tooltip")

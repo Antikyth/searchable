@@ -6,13 +6,13 @@
 		"version": "${version}",
 		"metadata": {
 			"name": "Searchable",
-			"description": "Improves singleplayer world searching and adds search boxes for servers, languages, keybinds, and game rules.",
+			"description": "Improves the search functionality of the singleplayer world selection screen and brings it to the multiplayer server selection screen, languages screen, key binds screen, and game rules editing screen.",
 			"license": "MPL-2.0",
 			"contributors": {
 				"Antikyth": "Owner"
 			},
 			"contact": {
-				"homepage": "https://github.com/Antikyth/searchable",
+				"homepage": "https://modrinth.com/mod/searchable",
 				"issues": "https://github.com/Antikyth/searchable/issues",
 				"sources": "https://github.com/Antikyth/searchable"
 			},
@@ -37,6 +37,10 @@
 			{
 				"id": "minecraft",
 				"versions": ">=1.20"
+			},
+			{
+				"id": "modmenu",
+				"optional": true
 			}
 		]
 	},

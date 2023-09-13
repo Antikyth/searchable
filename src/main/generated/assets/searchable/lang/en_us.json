@@ -54,9 +54,9 @@
   "controls.keybinds.search.hint": "Search...",
   "editGamerule.search": "search for game rules",
   "editGamerule.search.hint": "Search...",
-  "modmenu.summaryTranslation.searchable": "Makes more GUIs searchable.",
+  "modmenu.summaryTranslation.searchable": "Improves the singleplayer select world screen search and adds it to other GUIs.",
+  "option.language.search": "search for languages",
   "option.language.search.hint": "Search...",
-  "options.language.search": "search for languages",
   "selectServer.search": "search for multiplayer servers",
   "selectServer.search.hint": "Search...",
   "selectWorld.search.hint": "Search..."

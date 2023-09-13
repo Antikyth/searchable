@@ -81,7 +81,7 @@ public class SearchableConfigScreen extends Screen {
 		// }}}
 
 		// Entry list widget
-		this.entryListWidget = new SearchableConfigEntryListWidget(48, this.height - 32, 24, this.entryListWidget);
+		this.entryListWidget = new SearchableConfigEntryListWidget(48, this.height - 32, 28, this.entryListWidget);
 		this.addSelectableChild(this.entryListWidget);
 
 		// Buttons
@@ -249,10 +249,10 @@ public class SearchableConfigScreen extends Screen {
 		}
 
 		protected void drawName(@NotNull GuiGraphics graphics, int x, int y) {
-			graphics.drawText(SearchableConfigScreen.this.textRenderer, this.getRenderedName(), x, showTechnicalName() ? y : y + 5, Colors.WHITE, false);
+			graphics.drawText(SearchableConfigScreen.this.textRenderer, this.getRenderedName(), x, showTechnicalName() ? y : y + 6, Colors.WHITE, false);
 
 			if (showTechnicalName()) {
-				graphics.drawText(SearchableConfigScreen.this.textRenderer, this.getRenderedEntryTechnicalNameText(), x, y + 10, Colors.WHITE, false);
+				graphics.drawText(SearchableConfigScreen.this.textRenderer, this.getRenderedEntryTechnicalNameText(), x, y + 12, Colors.WHITE, false);
 			}
 		}
 
@@ -312,7 +312,7 @@ public class SearchableConfigScreen extends Screen {
 
 			this.toggleButton = CyclingButtonWidget.onOffBuilder(configOption.value())
 				.omitKeyText()
-				.build(10, 0, 44, 20, name, (button, value) -> configOption.setOverride(value));
+				.build(10, 3, 44, 20, name, (button, value) -> configOption.setOverride(value));
 
 			this.children.add(this.toggleButton);
 		}
@@ -343,7 +343,7 @@ public class SearchableConfigScreen extends Screen {
 			super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
 
 			// Draw category name.
-			graphics.drawCenteredShadowedText(SearchableConfigScreen.this.textRenderer, this.getRenderedName(), x + entryWidth / 2, y + 5, Colors.WHITE);
+			graphics.drawCenteredShadowedText(SearchableConfigScreen.this.textRenderer, this.getRenderedName(), x + entryWidth / 2, y + 6, Colors.WHITE);
 		}
 
 		@Override

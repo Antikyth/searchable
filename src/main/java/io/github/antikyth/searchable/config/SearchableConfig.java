@@ -28,23 +28,31 @@ public class SearchableConfig extends ReflectiveConfig {
 
 	public final KeyBindScreenOptions keybinds_screen = new KeyBindScreenOptions();
 	public final LanguageScreenOptions language_screen = new LanguageScreenOptions();
-	public final ServerSelectScreenOptions select_server_screen = new ServerSelectScreenOptions();
-	public final WorldSelectScreenOptions select_world_screen = new WorldSelectScreenOptions();
+	@Comment(EnglishUs.Config.SelectServerScreen.DESCRIPTION)
+	public final SelectServerScreenOptions select_server_screen = new SelectServerScreenOptions();
+	@Comment(EnglishUs.Config.SelectWorldScreen.DESCRIPTION)
+	public final SelectWorldScreenOptions select_world_screen = new SelectWorldScreenOptions();
+	@Comment(EnglishUs.Config.EditGameRulesScreen.DESCRIPTION)
 	public final EditGameRulesScreenOptions edit_gamerules_screen = new EditGameRulesScreenOptions();
 
 	public static class SearchableConfigScreenOptions extends Section {
-		//		@Comment(EnglishUsLangProvider.SearchableConfigScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION)
+		@Comment(EnglishUs.Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION)
 		public final TrackedValue<Boolean> show_technical_names = value(false);
 
+		@Comment(EnglishUs.Config.SearchableConfigScreen.MATCH_CATEGORIES_DESCRIPTION)
 		public final TrackedValue<Boolean> match_categories = value(true);
+		@Comment(EnglishUs.Config.SearchableConfigScreen.MATCH_DESCRIPTIONS_DESCRIPTION)
 		public final TrackedValue<Boolean> match_descriptions = value(false);
+		@Comment(EnglishUs.Config.SearchableConfigScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION)
 		public final TrackedValue<Boolean> match_technical_names = value(false);
 	}
 
 	public static class KeyBindScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
 
+		@Comment(EnglishUs.Config.KeyBindsScreen.MATCH_CATEGORIES_DESCRIPTION)
 		public final TrackedValue<Boolean> match_categories = value(true);
+		@Comment(EnglishUs.Config.KeyBindsScreen.MATCH_BOUND_KEYS_DESCRIPTION)
 		public final TrackedValue<Boolean> match_bound_keys = value(true);
 	}
 
@@ -52,23 +60,29 @@ public class SearchableConfig extends ReflectiveConfig {
 		public final TrackedValue<Boolean> add_search = value(true);
 	}
 
-	public static class ServerSelectScreenOptions extends Section {
+	public static class SelectServerScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
 
+		@Comment(EnglishUs.Config.SelectServerScreen.MATCH_MOTDS_DESCRIPTION)
 		public final TrackedValue<Boolean> match_motds = value(true);
 	}
 
-	public static class WorldSelectScreenOptions extends Section {
+	public static class SelectWorldScreenOptions extends Section {
+		@Comment(EnglishUs.Config.SelectWorldScreen.MATCH_WORLD_DETAILS_DESCRIPTION)
 		public final TrackedValue<Boolean> match_world_details = value(false);
 	}
 
 	public static class EditGameRulesScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
 
+		@Comment(EnglishUs.Config.EditGameRulesScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION)
 		public final TrackedValue<Boolean> show_technical_names = value(false);
 
+		@Comment(EnglishUs.Config.EditGameRulesScreen.MATCH_CATEGORIES_DESCRIPTION)
 		public final TrackedValue<Boolean> match_categories = value(true);
+		@Comment(EnglishUs.Config.EditGameRulesScreen.MATCH_DESCRIPTIONS_DESCRIPTION)
 		public final TrackedValue<Boolean> match_descriptions = value(false);
+		@Comment(EnglishUs.Config.EditGameRulesScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION)
 		public final TrackedValue<Boolean> match_technical_names = value(true);
 	}
 }

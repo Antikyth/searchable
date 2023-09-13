@@ -88,22 +88,26 @@ public class EnglishUs extends FabricLanguageProvider {
 			@Translation.ConfigOption.Name("show_technical_names")
 			public static final String SHOW_TECHNICAL_NAMES = "Show Technical Names";
 			@Translation.ConfigOption.Description("show_technical_names")
-			public static final String SHOW_TECHNICAL_NAMES_DESCRIPTION = showTechnicalNames("config option");
+			public static final String SHOW_TECHNICAL_NAMES_DESCRIPTION = """
+				Whether config option technical names should be shown under their titles.""";
 
 			@Translation.ConfigOption.Name("match_categories")
 			public static final String MATCH_CATEGORIES = "Match Categories";
 			@Translation.ConfigOption.Description("match_categories")
-			public static final String MATCH_CATEGORIES_DESCRIPTION = matchDescription("config category names");
+			public static final String MATCH_CATEGORIES_DESCRIPTION = """
+				Whether config category names should be searched for matching text during a search.""";
 
 			@Translation.ConfigOption.Name("match_descriptions")
 			public static final String MATCH_DESCRIPTIONS = "Match Descriptions";
 			@Translation.ConfigOption.Description("match_descriptions")
-			public static final String MATCH_DESCRIPTIONS_DESCRIPTION = matchDescription("config option or category descriptions");
+			public static final String MATCH_DESCRIPTIONS_DESCRIPTION = """
+				Whether config option or category descriptions should be searched for matching text during a search.""";
 
 			@Translation.ConfigOption.Name("match_technical_names")
 			public static final String MATCH_TECHNICAL_NAMES = "Match Technical Names";
 			@Translation.ConfigOption.Description("match_technical_names")
-			public static final String MATCH_TECHNICAL_NAMES_DESCRIPTION = matchDescription("config option technical names");
+			public static final String MATCH_TECHNICAL_NAMES_DESCRIPTION = """
+				Whether config option technical names should be searched for matching text during a search.""";
 		}
 
 		@Translation.ConfigCategory("keybinds_screen")
@@ -117,12 +121,15 @@ public class EnglishUs extends FabricLanguageProvider {
 			@Translation.ConfigOption.Name("match_categories")
 			public static final String MATCH_CATEGORIES = "Match Categories";
 			@Translation.ConfigOption.Description("match_categories")
-			public static final String MATCH_CATEGORIES_DESCRIPTION = matchDescription("key bind category names");
+			public static final String MATCH_CATEGORIES_DESCRIPTION = """
+				Whether key bind category names should be searched for matching text during a search.""";
 
 			@Translation.ConfigOption.Name("match_bound_keys")
 			public static final String MATCH_BOUND_KEYS = "Match Bound Keys";
 			@Translation.ConfigOption.Description("match_bound_keys")
-			public static final String MATCH_BOUND_KEYS_DESCRIPTION = matchDescription("the keys bound to their respective key binds");
+			public static final String MATCH_BOUND_KEYS_DESCRIPTION = """
+				Whether the keys bound to their respective key binds should be searched for matching text during a \
+				search.""";
 		}
 
 		@Translation.ConfigCategory("language_screen")
@@ -147,7 +154,8 @@ public class EnglishUs extends FabricLanguageProvider {
 			@Translation.ConfigOption.Name("match_motds")
 			public static final String MATCH_MOTDS = "Match MOTDs";
 			@Translation.ConfigOption.Description("match_motds")
-			public static final String MATCH_MOTDS_DESCRIPTION = matchDescription("server descriptions");
+			public static final String MATCH_MOTDS_DESCRIPTION = """
+				Whether server descriptions should be searched for matching text during a search.""";
 		}
 
 		@Translation.ConfigCategory("select_world_screen")
@@ -160,7 +168,8 @@ public class EnglishUs extends FabricLanguageProvider {
 			@Translation.ConfigOption.Name("match_world_details")
 			public static final String MATCH_WORLD_DETAILS = "Match World Details";
 			@Translation.ConfigOption.Description("match_world_details")
-			public static final String MATCH_WORLD_DETAILS_DESCRIPTION = matchDescription("world details");
+			public static final String MATCH_WORLD_DETAILS_DESCRIPTION = """
+				Whether world details should be searched for matching text during a search.""";
 		}
 
 		@Translation.ConfigCategory("edit_gamerules_screen")
@@ -176,36 +185,32 @@ public class EnglishUs extends FabricLanguageProvider {
 			@Translation.ConfigOption.Name("show_technical_names")
 			public static final String SHOW_TECHNICAL_NAMES = "Show Technical Names";
 			@Translation.ConfigOption.Description("show_technical_names")
-			public static final String SHOW_TECHNICAL_NAMES_DESCRIPTION = showTechnicalNames("game rule");
+			public static final String SHOW_TECHNICAL_NAMES_DESCRIPTION = """
+				Whether game rule technical names should be shown under their titles.""";
 
 			@Translation.ConfigOption.Name("match_categories")
 			public static final String MATCH_CATEGORIES = "Match Categories";
 			@Translation.ConfigOption.Description("match_categories")
-			public static final String MATCH_CATEGORIES_DESCRIPTION = matchDescription("game rule category names");
+			public static final String MATCH_CATEGORIES_DESCRIPTION = """
+				Whether game rule category names should be searched for matching text during a search.""";
 
 			@Translation.ConfigOption.Name("match_descriptions")
 			public static final String MATCH_DESCRIPTIONS = "Match Descriptions";
 			@Translation.ConfigOption.Description("match_descriptions")
-			public static final String MATCH_DESCRIPTIONS_DESCRIPTION = matchDescription("game rule descriptions");
+			public static final String MATCH_DESCRIPTIONS_DESCRIPTION = """
+				Whether game rule descriptions should be searched for matching text during a search.""";
 
 			@Translation.ConfigOption.Name("match_technical_names")
 			public static final String MATCH_TECHNICAL_NAMES = "Match Technical Names";
 			@Translation.ConfigOption.Description("match_technical_names")
-			public static final String MATCH_TECHNICAL_NAMES_DESCRIPTION = matchDescription("game rule technical names");
+			public static final String MATCH_TECHNICAL_NAMES_DESCRIPTION = """
+				Whether game rule technical names should be searched for matching text during a search.""";
 		}
 	}
 
 	@Override
 	public void generateTranslations(TranslationBuilder translationBuilder) {
 		this.processor.addAll(translationBuilder);
-	}
-
-	private static String showTechnicalNames(String thing) {
-		return String.format("Whether %s technical names should be shown under their titles.", thing);
-	}
-
-	private static String matchDescription(String things) {
-		return String.format("Whether %s should be searched for matching text during a search.", things);
 	}
 
 	private final DataGenProcessor<EnglishUs> processor = DataGenProcessor.create(this, EnglishUs.class, Searchable.MOD_ID);

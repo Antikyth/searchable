@@ -26,6 +26,9 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 
 	public static final String CONFIG_BUTTON_TOOLTIP = "Configure search...";
 
+	public static final String RESET_CONFIG_OPTION = "Reset";
+	public static final String RESET_CONFIG_OPTION_NARRATION = "reset %s to %s";
+
 	public static final String KEY_BINDS_SEARCH_NARRATION = "search for key binds";
 	public static final String LANGUAGE_SEARCH_NARRATION = "search for languages";
 	public static final String SELECT_SERVER_SEARCH_NARRATION = "search for multiplayer servers";
@@ -93,11 +96,6 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 
 			public static final String ADD_SEARCH = EnglishUsLangProvider.ADD_SEARCH;
 
-			public static final String CHANGE_TITLE = "Change Title";
-			public static final String CHANGE_TITLE_DESCRIPTION = """
-				Whether the server selection screen's title should be changed from §9"%s§9"§r to §9"%s§9"§r for \
-				consistency with the singleplayer world selection screen.""";
-
 			public static final String MATCH_MOTDS = "Match MOTDs";
 			public static final String MATCH_MOTDS_DESCRIPTION = matchDescription("server descriptions");
 		}
@@ -131,86 +129,88 @@ public class EnglishUsLangProvider extends FabricLanguageProvider {
 	}
 
 	@Override
-	public void generateTranslations(TranslationBuilder translationBuilder) {
-		translationBuilder.add(modid("modmenu.summaryTranslation.%s"), ModMenu.SUMMARY);
+	public void generateTranslations(TranslationBuilder tb) {
+		tb.add(modid("modmenu.summaryTranslation.%s"), ModMenu.SUMMARY);
 
-		translationBuilder.add(modid("search.%s.config.tooltip"), CONFIG_BUTTON_TOOLTIP);
+		tb.add(modid("search.%s.config.tooltip"), CONFIG_BUTTON_TOOLTIP);
 
-		translationBuilder.add("controls.keybinds.search", KEY_BINDS_SEARCH_NARRATION);
-		translationBuilder.add("controls.keybinds.search.hint", SEARCH_HINT);
+		tb.add(modid("config.%s.reset"), RESET_CONFIG_OPTION);
+		tb.add(modid("config.%s.reset.narration"), RESET_CONFIG_OPTION_NARRATION);
 
-		translationBuilder.add("option.language.search", LANGUAGE_SEARCH_NARRATION);
-		translationBuilder.add("option.language.search.hint", SEARCH_HINT);
+		tb.add("controls.keybinds.search", KEY_BINDS_SEARCH_NARRATION);
+		tb.add("controls.keybinds.search.hint", SEARCH_HINT);
 
-		translationBuilder.add("selectServer.search", SELECT_SERVER_SEARCH_NARRATION);
-		translationBuilder.add("selectServer.search.hint", SEARCH_HINT);
+		tb.add("option.language.search", LANGUAGE_SEARCH_NARRATION);
+		tb.add("option.language.search.hint", SEARCH_HINT);
 
-		translationBuilder.add("selectWorld.search.hint", SEARCH_HINT);
+		tb.add("selectServer.search", SELECT_SERVER_SEARCH_NARRATION);
+		tb.add("selectServer.search.hint", SEARCH_HINT);
 
-		translationBuilder.add("editGamerule.search", EDIT_GAME_RULE_SEARCH_NARRATION);
-		translationBuilder.add("editGamerule.search.hint", SEARCH_HINT);
+		tb.add("selectWorld.search.hint", SEARCH_HINT);
+
+		tb.add("editGamerule.search", EDIT_GAME_RULE_SEARCH_NARRATION);
+		tb.add("editGamerule.search.hint", SEARCH_HINT);
 
 
-		translationBuilder.add(modid("config.%s.title"), Config.TITLE);
+		tb.add(modid("config.%s.title"), Config.TITLE);
 
-		translationBuilder.add(modid("config.%s.search"), Config.SEARCH_NARRATION);
-		translationBuilder.add(modid("config.%s.search.hint"), SEARCH_HINT);
+		tb.add(modid("config.%s.search"), Config.SEARCH_NARRATION);
+		tb.add(modid("config.%s.search.hint"), SEARCH_HINT);
 
-		translationBuilder.add(modid("config.%s.default"), Config.DEFAULT);
+		tb.add(modid("config.%s.default"), Config.DEFAULT);
 
 		//
 		// Config
 		//
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.show_config_button, Config.SHOW_CONFIG_BUTTON, Config.SHOW_CONFIG_BUTTON_DESCRIPTION);
-		configOption(translationBuilder, SearchableConfig.INSTANCE.reselect_last_selection, Config.RESELECT_LAST_SELECTION, Config.RESELECT_LAST_SELECTION_DESCRIPTION);
-		configOption(translationBuilder, SearchableConfig.INSTANCE.highlight_matches, Config.HIGHLIGHT_MATCHES, Config.HIGHLIGHT_MATCHES_DESCRIPTION);
-		configOption(translationBuilder, SearchableConfig.INSTANCE.use_regex_matching, Config.USE_REGEX_MATCHING);
+		configOption(tb, SearchableConfig.INSTANCE.show_config_button, Config.SHOW_CONFIG_BUTTON, Config.SHOW_CONFIG_BUTTON_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.reselect_last_selection, Config.RESELECT_LAST_SELECTION, Config.RESELECT_LAST_SELECTION_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.highlight_matches, Config.HIGHLIGHT_MATCHES, Config.HIGHLIGHT_MATCHES_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.use_regex_matching, Config.USE_REGEX_MATCHING);
 
 		// Searchable Options Screen
-		configCategory(translationBuilder, "searchable_config_screen", Config.SearchableConfigScreen.NAME);
+		configCategory(tb, "searchable_config_screen", Config.SearchableConfigScreen.NAME);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.show_technical_names, Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES, Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.searchable_config_screen.show_technical_names, Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES, Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_categories, Config.SearchableConfigScreen.MATCH_CATEGORIES, Config.SearchableConfigScreen.MATCH_CATEGORIES_DESCRIPTION);
-		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_descriptions, Config.SearchableConfigScreen.MATCH_DESCRIPTIONS, Config.SearchableConfigScreen.MATCH_DESCRIPTIONS_DESCRIPTION);
-		configOption(translationBuilder, SearchableConfig.INSTANCE.searchable_config_screen.match_technical_names, Config.SearchableConfigScreen.MATCH_TECHNICAL_NAMES, Config.SearchableConfigScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.searchable_config_screen.match_categories, Config.SearchableConfigScreen.MATCH_CATEGORIES, Config.SearchableConfigScreen.MATCH_CATEGORIES_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.searchable_config_screen.match_descriptions, Config.SearchableConfigScreen.MATCH_DESCRIPTIONS, Config.SearchableConfigScreen.MATCH_DESCRIPTIONS_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.searchable_config_screen.match_technical_names, Config.SearchableConfigScreen.MATCH_TECHNICAL_NAMES, Config.SearchableConfigScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION);
 
 		// Key Binds Screen
-		configCategory(translationBuilder, "keybinds_screen", Config.KeyBindsScreen.NAME);
+		configCategory(tb, "keybinds_screen", Config.KeyBindsScreen.NAME);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.keybinds_screen.add_search, Config.KeyBindsScreen.ADD_SEARCH);
+		configOption(tb, SearchableConfig.INSTANCE.keybinds_screen.add_search, Config.KeyBindsScreen.ADD_SEARCH);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.keybinds_screen.match_categories, Config.KeyBindsScreen.MATCH_CATEGORIES, Config.KeyBindsScreen.MATCH_CATEGORIES_DESCRIPTION);
-		configOption(translationBuilder, SearchableConfig.INSTANCE.keybinds_screen.match_bound_keys, Config.KeyBindsScreen.MATCH_BOUND_KEYS, Config.KeyBindsScreen.MATCH_BOUND_KEYS_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.keybinds_screen.match_categories, Config.KeyBindsScreen.MATCH_CATEGORIES, Config.KeyBindsScreen.MATCH_CATEGORIES_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.keybinds_screen.match_bound_keys, Config.KeyBindsScreen.MATCH_BOUND_KEYS, Config.KeyBindsScreen.MATCH_BOUND_KEYS_DESCRIPTION);
 
 		// Languages Screen
-		configCategory(translationBuilder, "language_screen", Config.LanguageScreen.NAME);
+		configCategory(tb, "language_screen", Config.LanguageScreen.NAME);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.language_screen.add_search, Config.LanguageScreen.ADD_SEARCH);
+		configOption(tb, SearchableConfig.INSTANCE.language_screen.add_search, Config.LanguageScreen.ADD_SEARCH);
 
 		// Select Server Screen
-		configCategory(translationBuilder, "select_server_screen", Config.SelectServerScreen.NAME, Config.SelectServerScreen.DESCRIPTION);
+		configCategory(tb, "select_server_screen", Config.SelectServerScreen.NAME, Config.SelectServerScreen.DESCRIPTION);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.select_server_screen.add_search, Config.SelectServerScreen.ADD_SEARCH);
+		configOption(tb, SearchableConfig.INSTANCE.select_server_screen.add_search, Config.SelectServerScreen.ADD_SEARCH);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.select_server_screen.change_title, Config.SelectServerScreen.CHANGE_TITLE, Config.SelectServerScreen.CHANGE_TITLE_DESCRIPTION);
-		configOption(translationBuilder, SearchableConfig.INSTANCE.select_server_screen.match_motds, Config.SelectServerScreen.MATCH_MOTDS, Config.SelectServerScreen.MATCH_MOTDS_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.select_server_screen.match_motds, Config.SelectServerScreen.MATCH_MOTDS, Config.SelectServerScreen.MATCH_MOTDS_DESCRIPTION);
 
 		// Select World Screen
-		configCategory(translationBuilder, "select_world_screen", Config.SelectWorldScreen.NAME, Config.SelectWorldScreen.DESCRIPTION);
+		configCategory(tb, "select_world_screen", Config.SelectWorldScreen.NAME, Config.SelectWorldScreen.DESCRIPTION);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.select_world_screen.match_world_details, Config.SelectWorldScreen.MATCH_WORLD_DETAILS, Config.SelectWorldScreen.MATCH_WORLD_DETAILS_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.select_world_screen.match_world_details, Config.SelectWorldScreen.MATCH_WORLD_DETAILS, Config.SelectWorldScreen.MATCH_WORLD_DETAILS_DESCRIPTION);
 
 		// Edit Game Rules Screen
-		configCategory(translationBuilder, "edit_gamerules_screen", Config.EditGameRulesScreen.NAME, Config.EditGameRulesScreen.DESCRIPTION);
+		configCategory(tb, "edit_gamerules_screen", Config.EditGameRulesScreen.NAME, Config.EditGameRulesScreen.DESCRIPTION);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.add_search, Config.EditGameRulesScreen.ADD_SEARCH);
-		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.show_technical_names, Config.EditGameRulesScreen.SHOW_TECHNICAL_NAMES, Config.EditGameRulesScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.edit_gamerules_screen.add_search, Config.EditGameRulesScreen.ADD_SEARCH);
+		configOption(tb, SearchableConfig.INSTANCE.edit_gamerules_screen.show_technical_names, Config.EditGameRulesScreen.SHOW_TECHNICAL_NAMES, Config.EditGameRulesScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION);
 
-		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_categories, Config.EditGameRulesScreen.MATCH_CATEGORIES, Config.EditGameRulesScreen.MATCH_CATEGORIES_DESCRIPTION);
-		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_descriptions, Config.EditGameRulesScreen.MATCH_DESCRIPTIONS, Config.EditGameRulesScreen.MATCH_DESCRIPTIONS_DESCRIPTION);
-		configOption(translationBuilder, SearchableConfig.INSTANCE.edit_gamerules_screen.match_technical_names, Config.EditGameRulesScreen.MATCH_TECHNICAL_NAMES, Config.EditGameRulesScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.edit_gamerules_screen.match_categories, Config.EditGameRulesScreen.MATCH_CATEGORIES, Config.EditGameRulesScreen.MATCH_CATEGORIES_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.edit_gamerules_screen.match_descriptions, Config.EditGameRulesScreen.MATCH_DESCRIPTIONS, Config.EditGameRulesScreen.MATCH_DESCRIPTIONS_DESCRIPTION);
+		configOption(tb, SearchableConfig.INSTANCE.edit_gamerules_screen.match_technical_names, Config.EditGameRulesScreen.MATCH_TECHNICAL_NAMES, Config.EditGameRulesScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION);
 	}
 
 	private static String modid(String string) {

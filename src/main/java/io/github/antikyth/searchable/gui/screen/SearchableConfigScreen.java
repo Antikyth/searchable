@@ -242,10 +242,45 @@ public class SearchableConfigScreen extends Screen {
 
 		protected final MatchManager tooltipNameMatchManager = new MatchManager();
 
+		protected ButtonWidget resetButton;
+
 		public AbstractConfigOptionEntry(Text name, Text technicalName, @Nullable Text description, TrackedValue<T> configOption) {
 			super(name, technicalName, description);
 
 			this.configOption = configOption;
+
+			this.resetButton = ButtonWidget.builder(
+					Text.translatable(String.format("config.%s.reset", Searchable.MOD_ID)),
+					button -> {
+						this.configOption.setOverride(this.configOption.getDefaultValue());
+						this.updateButtonStates();
+					}
+				)
+				.size(50, 20)
+				.narration(supplier -> Text.translatable(String.format("config.%s.reset.narration", Searchable.MOD_ID), this.name, this.configOption.getDefaultValue()))
+				.build();
+
+			this.children.add(this.resetButton);
+
+			this.updateButtonStates();
+		}
+
+		protected void updateButtonStates() {
+			this.resetButton.active = !this.isDefault();
+		}
+
+		protected boolean isDefault() {
+			return this.configOption.value().equals(this.configOption.getDefaultValue());
+		}
+
+		@Override
+		public void render(GuiGraphics graphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+			super.render(graphics, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+
+			this.resetButton.setX(x + entryWidth - this.resetButton.getWidth());
+			this.resetButton.setY(y);
+
+			this.resetButton.render(graphics, mouseX, mouseY, tickDelta);
 		}
 
 		protected void drawName(@NotNull GuiGraphics graphics, int x, int y) {
@@ -312,7 +347,10 @@ public class SearchableConfigScreen extends Screen {
 
 			this.toggleButton = CyclingButtonWidget.onOffBuilder(configOption.value())
 				.omitKeyText()
-				.build(10, 3, 44, 20, name, (button, value) -> configOption.setOverride(value));
+				.build(0, 0, 50, 20, name, (button, value) -> {
+					configOption.setOverride(value);
+					this.updateButtonStates();
+				});
 
 			this.children.add(this.toggleButton);
 		}
@@ -323,7 +361,7 @@ public class SearchableConfigScreen extends Screen {
 
 			this.drawName(graphics, x, y);
 
-			this.toggleButton.setX(x + entryWidth - 45);
+			this.toggleButton.setX(x + entryWidth - this.resetButton.getWidth() - this.toggleButton.getWidth() - 10);
 			this.toggleButton.setY(y);
 
 			this.toggleButton.render(graphics, mouseX, mouseY, tickDelta);

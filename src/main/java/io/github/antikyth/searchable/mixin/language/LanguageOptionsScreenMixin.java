@@ -131,7 +131,7 @@ public abstract class LanguageOptionsScreenMixin extends GameOptionsScreen imple
 	public void onRender(GuiGraphics graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		if (disabled()) return;
 
-		this.searchBox.drawWidget(graphics, mouseX, mouseY, delta);
+		this.searchBox.render(graphics, mouseX, mouseY, delta);
 	}
 
 	// Only select a language when a toggle key is pressed if the language selection list is focused.

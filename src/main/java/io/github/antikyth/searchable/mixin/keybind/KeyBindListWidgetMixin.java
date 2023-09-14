@@ -18,7 +18,6 @@ import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.gui.widget.option.KeyBindListWidget;
 import net.minecraft.client.option.KeyBind;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -85,6 +84,10 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 		filter(this.query);
 	}
 
+	/**
+	 * This has to be reimplemented rather than calling vanilla methods to add the entries because they don't use lambda
+	 * methods in the constructor that would let us call those parts of the constructor.
+	 */
 	@Unique
 	private void filter(String query) {
 		this.clearEntries();
@@ -103,7 +106,7 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 
 				// Add all its key binds.
 				for (KeyBind keyBind : pair.second) {
-					this.addKeyEntry(keyBind, null);
+					this.addKeyEntry(keyBind, query);
 				}
 			} else {
 				boolean addedCategory = false;
@@ -131,11 +134,11 @@ public class KeyBindListWidgetMixin extends ElementListWidget<KeyBindListWidget.
 	}
 
 	@Unique
-	private void addKeyEntry(KeyBind keyBind, @Nullable String query) {
+	private void addKeyEntry(KeyBind keyBind, String query) {
 		Text keyBindTranslation = Text.translatable(keyBind.getTranslationKey());
 		var entry = ((KeyBindListWidget) (Object) this).new KeyBindEntry(keyBind, keyBindTranslation);
 
-		if (query != null) ((SetQueryAccessor) entry).searchable$setQuery(query);
+		((SetQueryAccessor) entry).searchable$setQuery(query);
 
 		this.addEntry(entry);
 	}

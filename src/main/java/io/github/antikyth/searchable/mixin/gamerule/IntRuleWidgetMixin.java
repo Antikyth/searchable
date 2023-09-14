@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.mixin.singleplayer.gamerule;
+package io.github.antikyth.searchable.mixin.gamerule;
 
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.text.OrderedText;

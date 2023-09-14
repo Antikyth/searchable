@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.mixin.singleplayer;
+package io.github.antikyth.searchable.mixin.selectworld;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;

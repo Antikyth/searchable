@@ -4,13 +4,20 @@
 	"package": "io.github.antikyth.searchable.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"singleplayer.WorldSaveSummaryMixin",
-		"singleplayer.gamerule.GameRules$CategoryMixin"
+		"gamerule.GameRules$CategoryMixin",
+		"selectworld.WorldSaveSummaryMixin"
 	],
 	"client": [
 		"ClickableWidgetMixin",
 		"EntryListWidgetMixin",
 		"TextFieldWidgetMixin",
+		"gamerule.AbstractRuleWidgetMixin",
+		"gamerule.BooleanRuleWidgetMixin",
+		"gamerule.EditGameRulesScreenMixin",
+		"gamerule.IntRuleWidgetMixin",
+		"gamerule.NamedRuleWidgetMixin",
+		"gamerule.RuleCategoryWidgetMixin",
+		"gamerule.RuleListWidgetMixin",
 		"keybind.KeyBindEntryMixin",
 		"keybind.KeyBindListWidgetMixin",
 		"keybind.KeyBindMixin",
@@ -18,20 +25,13 @@
 		"language.LanguageEntryMixin",
 		"language.LanguageOptionsScreenMixin",
 		"language.LanguageSelectionListWidgetMixin",
-		"multiplayer.LanServerEntryMixin",
-		"multiplayer.MultiplayerScreenMixin",
-		"multiplayer.MultiplayerServerListWidgetMixin",
-		"multiplayer.ServerEntryMixin",
-		"singleplayer.SelectWorldScreenMixin",
-		"singleplayer.WorldListWidget$EntryMixin",
-		"singleplayer.WorldListWidgetMixin",
-		"singleplayer.gamerule.AbstractRuleWidgetMixin",
-		"singleplayer.gamerule.BooleanRuleWidgetMixin",
-		"singleplayer.gamerule.EditGameRulesScreenMixin",
-		"singleplayer.gamerule.IntRuleWidgetMixin",
-		"singleplayer.gamerule.NamedRuleWidgetMixin",
-		"singleplayer.gamerule.RuleCategoryWidgetMixin",
-		"singleplayer.gamerule.RuleListWidgetMixin"
+		"selectserver.LanServerEntryMixin",
+		"selectserver.MultiplayerScreenMixin",
+		"selectserver.MultiplayerServerListWidgetMixin",
+		"selectserver.ServerEntryMixin",
+		"selectworld.SelectWorldScreenMixin",
+		"selectworld.WorldListWidget$EntryMixin",
+		"selectworld.WorldListWidgetMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

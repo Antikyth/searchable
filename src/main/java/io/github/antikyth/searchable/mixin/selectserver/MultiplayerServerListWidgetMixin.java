@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.mixin.multiplayer;
+package io.github.antikyth.searchable.mixin.selectserver;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;

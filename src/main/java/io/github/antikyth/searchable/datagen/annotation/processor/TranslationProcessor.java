@@ -16,15 +16,15 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DataGenProcessor<P> {
+public class TranslationProcessor<P> {
 	protected final Class<P> clazz;
 	protected final P instance;
 
 	protected final String namespace;
 	protected final Map<String, String> translations = new HashMap<>();
 
-	public static <P> DataGenProcessor<P> create(P langProviderInstance, Class<P> langProviderClass, String namespace) {
-		DataGenProcessor<P> instance = new DataGenProcessor<>(langProviderClass, langProviderInstance, namespace);
+	public static <P> TranslationProcessor<P> create(P langProviderInstance, Class<P> langProviderClass, String namespace) {
+		TranslationProcessor<P> instance = new TranslationProcessor<>(langProviderClass, langProviderInstance, namespace);
 		try {
 			instance.process();
 		} catch (IllegalAccessException e) {
@@ -113,11 +113,11 @@ public class DataGenProcessor<P> {
 			// `@Translation.ConfigCategory.Name` {{{
 			Translation.ConfigCategory.Name name = field.getAnnotation(Translation.ConfigCategory.Name.class);
 			if (name != null) {
-				if (categoryKey != null) {
+				if (!name.value().isBlank() || categoryKey != null) {
 					Object value = field.get(instance);
 
 					if (value instanceof String translation) {
-						translations.put(format("config.%s.category.%s", categoryKey), translation);
+						translations.put(format("config.%s.category.%s", name.value().isBlank() ? categoryKey : name.value()), translation);
 					} else {
 						throw new RuntimeException(mismatchedTypeMessage(field, "Translation.ConfigCategory.Name"));
 					}
@@ -130,11 +130,11 @@ public class DataGenProcessor<P> {
 			// `@Translation.ConfigCategory.Description` {{{
 			Translation.ConfigCategory.Description description = field.getAnnotation(Translation.ConfigCategory.Description.class);
 			if (description != null) {
-				if (categoryKey != null) {
+				if (!description.value().isBlank() || categoryKey != null) {
 					Object value = field.get(instance);
 
 					if (value instanceof String translation) {
-						translations.put(format("config.%s.category.%s.description", categoryKey), translation);
+						translations.put(format("config.%s.category.%s.description", description.value().isBlank() ? categoryKey : description.value()), translation);
 					} else {
 						throw new RuntimeException(mismatchedTypeMessage(field, "Translation.ConfigCategory.Description"));
 					}
@@ -160,7 +160,7 @@ public class DataGenProcessor<P> {
 
 	private static String categoryMessage(Field field, String type) {
 		return "Field '" + field.getName() + "' is annotated with @Translation.ConfigCategory." + type
-			+ " but is not within a class annotated with @Translation.ConfigCategory";
+			+ " has no specified technical name nor is within a class annotated with @Translation.ConfigCategory";
 	}
 
 	private static String mismatchedTypeMessage(Field field, String annotation) {
@@ -168,7 +168,7 @@ public class DataGenProcessor<P> {
 			+ field.getType().getName() + "', not 'String'";
 	}
 
-	protected DataGenProcessor(Class<P> clazz, P instance, String namespace) {
+	protected TranslationProcessor(Class<P> clazz, P instance, String namespace) {
 		this.clazz = clazz;
 		this.instance = instance;
 		this.namespace = namespace;

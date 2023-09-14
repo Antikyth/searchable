@@ -8,7 +8,7 @@ package io.github.antikyth.searchable.datagen.lang;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.datagen.annotation.Translation;
-import io.github.antikyth.searchable.datagen.annotation.processor.DataGenProcessor;
+import io.github.antikyth.searchable.datagen.annotation.processor.TranslationProcessor;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 
@@ -214,5 +214,5 @@ public class EnglishUs extends FabricLanguageProvider {
 		this.processor.addAll(translationBuilder);
 	}
 
-	private final DataGenProcessor<EnglishUs> processor = DataGenProcessor.create(this, EnglishUs.class, Searchable.MOD_ID);
+	private final TranslationProcessor<EnglishUs> processor = TranslationProcessor.create(this, EnglishUs.class, Searchable.MOD_ID);
 }

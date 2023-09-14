@@ -6,16 +6,16 @@
 
 package io.github.antikyth.searchable.datagen.annotation;
 
-import io.github.antikyth.searchable.datagen.annotation.processor.DataGenProcessor;
+import io.github.antikyth.searchable.datagen.annotation.processor.TranslationProcessor;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
-import org.quiltmc.config.api.ReflectiveConfig;
+import org.quiltmc.config.api.values.ValueTreeNode;
 
 import java.lang.annotation.*;
 
 /**
  * Provides the translation key for a translated string in a {@link FabricLanguageProvider}.
  * <p>
- * A {@link DataGenProcessor} must be {@linkplain DataGenProcessor#create created} so that {@link DataGenProcessor#addAll}
+ * A {@link TranslationProcessor} must be {@linkplain TranslationProcessor#create created} so that {@link TranslationProcessor#addAll}
  * can be called in the {@link FabricLanguageProvider#generateTranslations generateTranslations(TranslationBuilder)}
  * implementation.
  * <h2>Examples</h2>
@@ -53,12 +53,12 @@ public @interface Translation {
 	/**
 	 * The translation key for this translation.
 	 * <p>
-	 * The first {@code %s} will be replaced with the namespace provided to {@link DataGenProcessor#create}.
+	 * The first {@code %s} will be replaced with the namespace provided to {@link TranslationProcessor#create}.
 	 */
 	String value();
 
 	/**
-	 * Provides the technical name for a {@link ReflectiveConfig.Section}.
+	 * Provides the technical name for a {@link ValueTreeNode.Section}.
 	 * <p>
 	 * This should be used on a {@code static} inner class of the {@link FabricLanguageProvider} documented for
 	 * {@link Translation}. On its own, it won't achieve anything, but fields within that inner class annotated with one
@@ -123,16 +123,47 @@ public @interface Translation {
 	@Target(ElementType.TYPE)
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface ConfigCategory {
+		/**
+		 * The technical name/{@linkplain ValueTreeNode.Section#key key} of the {@linkplain ValueTreeNode.Section section}.
+		 * <p>
+		 * See {@link ConfigCategory} for more information.
+		 */
 		String value();
 
+		/**
+		 * Provides the translation for a {@link ValueTreeNode.Section Section}'s name.
+		 * <p>
+		 * The {@linkplain ValueTreeNode.Section section}'s technical name/{@linkplain ValueTreeNode.Section#key key}
+		 * must be specified if this annotation is not within a {@code static} inner class annotated with
+		 * {@link ConfigCategory} which can provide it.
+		 */
 		@Target(ElementType.FIELD)
 		@Retention(RetentionPolicy.RUNTIME)
 		@interface Name {
+			/**
+			 * The technical name/{@linkplain ValueTreeNode.Section#key key} of the {@linkplain ValueTreeNode.Section section}.
+			 * <p>
+			 * See {@link ConfigCategory.Name} for more information.
+			 */
+			String value() default "";
 		}
 
+		/**
+		 * Provides the translation for a {@link ValueTreeNode.Section Section}'s name.
+		 * <p>
+		 * The {@linkplain ValueTreeNode.Section section}'s technical name/{@linkplain ValueTreeNode.Section#key key}
+		 * must be specified if this annotation is not within a {@code static} inner class annotated with
+		 * {@link ConfigCategory} which can provide it.
+		 */
 		@Target(ElementType.FIELD)
 		@Retention(RetentionPolicy.RUNTIME)
 		@interface Description {
+			/**
+			 * The technical name/{@linkplain ValueTreeNode.Section#key key} of the {@linkplain ValueTreeNode.Section section}.
+			 * <p>
+			 * See {@link ConfigCategory.Description} for more information.
+			 */
+			String value() default "";
 		}
 	}
 

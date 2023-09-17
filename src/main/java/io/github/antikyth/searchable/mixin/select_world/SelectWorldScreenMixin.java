@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.mixin.selectworld;
+package io.github.antikyth.searchable.mixin.select_world;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
@@ -45,6 +45,15 @@ public abstract class SelectWorldScreenMixin extends Screen {
 	), index = 1)
 	private int adjustSearchBoxX(int x) {
 		return x + 100 - (Searchable.SEARCH_BOX_WIDTH / 2);
+	}
+
+	@ModifyArg(method = "init", at = @At(
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/widget/TextFieldWidget.<init> (Lnet/minecraft/client/font/TextRenderer;IIIILnet/minecraft/client/gui/widget/TextFieldWidget;Lnet/minecraft/text/Text;)V",
+		ordinal = 0
+	), index = 2)
+	private int adjustSearchBoxY(int y) {
+		return Searchable.SEARCH_BOX_Y + (y - 22);
 	}
 
 	@ModifyArg(method = "init", at = @At(

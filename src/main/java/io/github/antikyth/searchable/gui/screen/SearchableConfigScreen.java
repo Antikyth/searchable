@@ -62,7 +62,7 @@ public class SearchableConfigScreen extends Screen {
 	@Override
 	protected void init() {
 		// Search box {{{
-		this.searchBox = new TextFieldWidget(this.textRenderer, (this.width - Searchable.SEARCH_BOX_WIDTH) / 2, 22, Searchable.SEARCH_BOX_WIDTH, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
+		this.searchBox = new TextFieldWidget(this.textRenderer, (this.width - Searchable.SEARCH_BOX_WIDTH) / 2, Searchable.SEARCH_BOX_Y, Searchable.SEARCH_BOX_WIDTH, 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		this.searchBox.setChangedListener(query -> {
 			PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);
@@ -80,11 +80,12 @@ public class SearchableConfigScreen extends Screen {
 		this.setInitialFocus(this.searchBox);
 		// }}}
 
-		// Entry list widget
+		// Entry list widget {{{
 		this.entryListWidget = new SearchableConfigEntryListWidget(48, this.height - 32, 28, this.entryListWidget);
 		this.addSelectableChild(this.entryListWidget);
+		// }}}
 
-		// Buttons
+		// Buttons {{{
 		GridWidget.AdditionHelper additionHelper = this.grid.createAdditionHelper(2);
 
 		this.doneButton = additionHelper.add(ButtonWidget.builder(CommonTexts.DONE, button -> {
@@ -93,6 +94,7 @@ public class SearchableConfigScreen extends Screen {
 			this.getClient().setScreen(this.parent);
 		}).build());
 		additionHelper.add(ButtonWidget.builder(CommonTexts.CANCEL, button -> this.closeScreen()).build());
+		// }}}
 
 		this.repositionElements();
 		this.grid.visitWidgets(this::addDrawableChild);

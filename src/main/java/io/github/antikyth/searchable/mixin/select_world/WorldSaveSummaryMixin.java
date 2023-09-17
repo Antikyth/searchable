@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.mixin.selectworld;
+package io.github.antikyth.searchable.mixin.select_world;
 
 import io.github.antikyth.searchable.accessor.GetMatchManagerAccessor;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;

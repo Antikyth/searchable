@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.mixin.selectserver;
+package io.github.antikyth.searchable.mixin.select_server;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import io.github.antikyth.searchable.accessor.MatchesAccessor;
@@ -27,23 +27,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
-
 @Mixin(MultiplayerServerListWidget.class)
 public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedEntryListWidget.Entry<E>> extends AlwaysSelectedEntryListWidget<E> implements MultiplayerServerListWidgetAccessor {
 	@Final
 	@Shadow
 	private MultiplayerScreen screen;
-
-	@Final
-	@Shadow
-	private List<ServerEntry> servers;
-	@Final
-	@Shadow
-	private List<LanServerEntry> lanServers;
-	@Final
-	@Shadow
-	private MultiplayerServerListWidget.Entry scanningEntry;
 
 	@Shadow
 	protected abstract void updateEntries();
@@ -58,12 +46,6 @@ public abstract class MultiplayerServerListWidgetMixin<E extends AlwaysSelectedE
 
 	@Unique
 	private String query = "";
-
-	@Unique
-	@Override
-	public String searchable$getQuery() {
-		return this.query;
-	}
 
 	@Unique
 	@Override

@@ -34,8 +34,10 @@ public class SearchableConfig extends ReflectiveConfig {
 	public final SelectWorldScreenOptions select_world_screen = new SelectWorldScreenOptions();
 	@Comment(EnglishUs.Config.EditGameRulesScreen.DESCRIPTION)
 	public final EditGameRulesScreenOptions edit_gamerules_screen = new EditGameRulesScreenOptions();
+	@Comment(EnglishUs.Config.SelectPacksScreen.DESCRIPTION)
+	public final SelectPackScreenOptions select_packs_screen = new SelectPackScreenOptions();
 
-	public static class SearchableConfigScreenOptions extends Section {
+	public static final class SearchableConfigScreenOptions extends Section {
 		@Comment(EnglishUs.Config.SearchableConfigScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION)
 		public final TrackedValue<Boolean> show_technical_names = value(false);
 
@@ -47,7 +49,7 @@ public class SearchableConfig extends ReflectiveConfig {
 		public final TrackedValue<Boolean> match_technical_names = value(false);
 	}
 
-	public static class KeyBindScreenOptions extends Section {
+	public static final class KeyBindScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
 
 		@Comment(EnglishUs.Config.KeyBindsScreen.MATCH_CATEGORIES_DESCRIPTION)
@@ -56,23 +58,23 @@ public class SearchableConfig extends ReflectiveConfig {
 		public final TrackedValue<Boolean> match_bound_keys = value(true);
 	}
 
-	public static class LanguageScreenOptions extends Section {
+	public static final class LanguageScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
 	}
 
-	public static class SelectServerScreenOptions extends Section {
+	public static final class SelectServerScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
 
 		@Comment(EnglishUs.Config.SelectServerScreen.MATCH_MOTDS_DESCRIPTION)
 		public final TrackedValue<Boolean> match_motds = value(true);
 	}
 
-	public static class SelectWorldScreenOptions extends Section {
+	public static final class SelectWorldScreenOptions extends Section {
 		@Comment(EnglishUs.Config.SelectWorldScreen.MATCH_WORLD_DETAILS_DESCRIPTION)
 		public final TrackedValue<Boolean> match_world_details = value(false);
 	}
 
-	public static class EditGameRulesScreenOptions extends Section {
+	public static final class EditGameRulesScreenOptions extends Section {
 		public final TrackedValue<Boolean> add_search = value(true);
 
 		@Comment(EnglishUs.Config.EditGameRulesScreen.SHOW_TECHNICAL_NAMES_DESCRIPTION)
@@ -84,5 +86,12 @@ public class SearchableConfig extends ReflectiveConfig {
 		public final TrackedValue<Boolean> match_descriptions = value(false);
 		@Comment(EnglishUs.Config.EditGameRulesScreen.MATCH_TECHNICAL_NAMES_DESCRIPTION)
 		public final TrackedValue<Boolean> match_technical_names = value(true);
+	}
+
+	public static final class SelectPackScreenOptions extends Section {
+		public final TrackedValue<Boolean> add_search = value(true);
+
+		@Comment(EnglishUs.Config.SelectPacksScreen.MATCH_DESCRIPTIONS_DESCRIPTION)
+		public final TrackedValue<Boolean> match_descriptions = value(true);
 	}
 }

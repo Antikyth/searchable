@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package io.github.antikyth.searchable.mixin.selectserver;
+package io.github.antikyth.searchable.mixin.select_server;
 
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
@@ -37,9 +37,6 @@ public class MultiplayerScreenMixin extends Screen {
 	private static final Text SEARCH_BOX_HINT = Util.hint(Text.translatable("selectServer.search.hint"));
 
 	@Unique
-	private static final String ALT_TITLE_TRANSLATION_KEY = "selectServer.title";
-
-	@Unique
 	public TextFieldWidget searchBox;
 
 	@Shadow
@@ -57,7 +54,7 @@ public class MultiplayerScreenMixin extends Screen {
 		Searchable.LOGGER.debug("adding search box to multiplayer servers screen...");
 
 		// Search box {{{
-		this.searchBox = new TextFieldWidget(this.textRenderer, (this.width - Searchable.SEARCH_BOX_WIDTH) / 2, 22, Searchable.searchBoxWidth(), 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
+		this.searchBox = new TextFieldWidget(this.textRenderer, (this.width - Searchable.SEARCH_BOX_WIDTH) / 2, Searchable.SEARCH_BOX_Y, Searchable.searchBoxWidth(), 20, this.searchBox, SEARCH_BOX_NARRATION_MESSAGE);
 		this.searchBox.setHint(SEARCH_BOX_HINT);
 		this.searchBox.setChangedListener(query -> {
 			PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);

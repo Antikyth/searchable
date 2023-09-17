@@ -22,6 +22,7 @@ public class EnglishUs extends FabricLanguageProvider {
 	@Translation("option.language.search.hint")
 	@Translation("selectServer.search.hint")
 	@Translation("selectWorld.search.hint")
+	@Translation("pack.search.hint")
 	@Translation("config.%s.search.hint")
 	public static final String SEARCH_HINT = "Search...";
 	public static final String ADD_SEARCH = "Add Search Box";
@@ -43,6 +44,8 @@ public class EnglishUs extends FabricLanguageProvider {
 	public static final String SELECT_SERVER_SEARCH_NARRATION = "search for multiplayer servers";
 	@Translation("editGamerule.search")
 	public static final String EDIT_GAME_RULE_SEARCH_NARRATION = "search for game rules";
+	@Translation("pack.search")
+	public static final String SELECT_PACKS_SEARCH_NARRATION = "search for packs";
 
 	public static class Config {
 		@Translation("config.%s.title")
@@ -206,6 +209,23 @@ public class EnglishUs extends FabricLanguageProvider {
 			@Translation.ConfigOption.Description("match_technical_names")
 			public static final String MATCH_TECHNICAL_NAMES_DESCRIPTION = """
 				Whether game rule technical names should be searched for matching text during a search.""";
+		}
+
+		@Translation.ConfigCategory("select_packs_screen")
+		public static final class SelectPacksScreen {
+			@Translation.ConfigCategory.Name
+			public static final String NAME = "Select Packs Screens";
+			@Translation.ConfigCategory.Description
+			public static final String DESCRIPTION = "The select resource packs and select data packs screens.";
+
+			@Translation.ConfigOption.Name("add_search")
+			public static final String ADD_SEARCH = EnglishUs.ADD_SEARCH;
+
+			@Translation.ConfigOption.Name("match_descriptions")
+			public static final String MATCH_DESCRIPTIONS = "Match Descriptions";
+			@Translation.ConfigOption.Description("match_descriptions")
+			public static final String MATCH_DESCRIPTIONS_DESCRIPTION = """
+				Whether resource pack and data pack descriptions should be searched for matching text during a search.""";
 		}
 	}
 

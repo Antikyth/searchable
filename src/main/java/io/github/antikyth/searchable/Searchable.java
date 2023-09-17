@@ -25,6 +25,8 @@ public class Searchable implements PreLaunchEntrypoint, ClientModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
 
 	public static final int SEARCH_BOX_WIDTH = 200;
+	public static final int SEARCH_BOX_Y = 22;
+
 	public static final int CONFIG_BUTTON_OFFSET = 3;
 
 	@Override

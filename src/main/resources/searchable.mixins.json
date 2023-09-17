@@ -5,7 +5,8 @@
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
 		"gamerule.GameRules$CategoryMixin",
-		"selectworld.WorldSaveSummaryMixin"
+		"pack.PackListWidgetMixin",
+		"select_world.WorldSaveSummaryMixin"
 	],
 	"client": [
 		"ClickableWidgetMixin",
@@ -25,13 +26,15 @@
 		"language.LanguageEntryMixin",
 		"language.LanguageOptionsScreenMixin",
 		"language.LanguageSelectionListWidgetMixin",
-		"selectserver.LanServerEntryMixin",
-		"selectserver.MultiplayerScreenMixin",
-		"selectserver.MultiplayerServerListWidgetMixin",
-		"selectserver.ServerEntryMixin",
-		"selectworld.SelectWorldScreenMixin",
-		"selectworld.WorldListWidget$EntryMixin",
-		"selectworld.WorldListWidgetMixin"
+		"pack.PackScreenMixin",
+		"pack.ResourcePackEntryMixin",
+		"select_server.LanServerEntryMixin",
+		"select_server.MultiplayerScreenMixin",
+		"select_server.MultiplayerServerListWidgetMixin",
+		"select_server.ServerEntryMixin",
+		"select_world.SelectWorldScreenMixin",
+		"select_world.WorldListWidget$EntryMixin",
+		"select_world.WorldListWidgetMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

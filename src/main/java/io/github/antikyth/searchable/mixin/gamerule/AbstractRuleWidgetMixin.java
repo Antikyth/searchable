@@ -8,14 +8,32 @@ package io.github.antikyth.searchable.mixin.gamerule;
 
 import io.github.antikyth.searchable.accessor.singleplayer.gamerule.AbstractRuleWidgetAccessor;
 import io.github.antikyth.searchable.config.SearchableConfig;
+import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
+import net.minecraft.text.OrderedText;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Mixin(EditGameRulesScreen.AbstractRuleWidget.class)
 public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
+	/**
+	 * This is the tooltip, not the description. It is named incorrectly. 1.20.2 mappings will have this fixed (by
+	 * Antikyth, writer of this javadoc).
+	 */
+	@Shadow
+	@Final
+	List<OrderedText> description;
+
+	@Unique
+	protected List<OrderedText> highlightedTooltip = this.description;
+
 	@Unique
 	protected String query = "";
 
@@ -28,7 +46,17 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 	}
 
 	@Unique
-	protected void updateHighlight(String query) {
+	protected boolean updateHighlight(String query) {
+		if (!enabled() || !SearchableConfig.INSTANCE.highlight_matches.value()) return false;
+
+		// TODO: What if you only want to highlight part of the tooltip (e.g. just the name)?
+		this.highlightedTooltip = this.description.stream().map(orderedText -> {
+			String string = Util.orderedTextToString(orderedText);
+
+			return this.tooltipMatchManager.getHighlightedText(orderedText, string, query);
+		}).collect(Collectors.toList());
+
+		return true;
 	}
 
 	@Unique
@@ -41,6 +69,8 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 	protected final MatchManager descriptionStringMatchManager = new MatchManager();
 	@Unique
 	protected final MatchManager technicalNameMatchManager = new MatchManager();
+	@Unique
+	protected final MatchManager tooltipMatchManager = new MatchManager();
 
 	@Unique
 	@Override

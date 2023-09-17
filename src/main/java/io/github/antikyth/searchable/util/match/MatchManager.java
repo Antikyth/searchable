@@ -18,6 +18,7 @@ import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MatchManager {
 	/**
@@ -149,6 +150,14 @@ public class MatchManager {
 		return orderedTextMatchesHighlightCache.apply(target, matches, Util::highlightOrderedText);
 	}
 
+	public List<OrderedText> getHighlightedOrderedTexts(List<OrderedText> texts, String query) {
+		return orderedTextsHighlightCache.apply(texts, query, (orderedTexts, _query) -> orderedTexts.stream().map(orderedText -> {
+			String string = Util.orderedTextToString(orderedText);
+
+			return this.getHighlightedText(orderedText, string, _query);
+		}).collect(Collectors.toList()));
+	}
+
 	// Matching caches {{{
 	private final MatcherTriFunctionTempCache<String, String, List<Match>> getMatchesCache = MatcherTriFunctionTempCache.create();
 	private final MatcherTriFunctionTempCache<StringVisitable, String, List<Match>> visitableGetMatchesCache = MatcherTriFunctionTempCache.create();
@@ -167,6 +176,8 @@ public class MatchManager {
 	private final TriFunctionTempCache<OrderedText, StringVisitable, String, OrderedText> orderedTextHighlightCache = TriFunctionTempCache.create();
 	private final TriFunctionTempCache<OrderedText, String, String, OrderedText> orderedTextStringHighlightCache = TriFunctionTempCache.create();
 	private final BiFunctionTempCache<OrderedText, List<Match>, OrderedText> orderedTextMatchesHighlightCache = BiFunctionTempCache.create();
+
+	private final BiFunctionTempCache<List<OrderedText>, String, List<OrderedText>> orderedTextsHighlightCache = BiFunctionTempCache.create();
 	// }}}
 
 	/**

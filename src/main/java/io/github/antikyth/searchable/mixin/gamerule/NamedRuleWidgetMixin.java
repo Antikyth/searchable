@@ -67,11 +67,13 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 	}
 
 	@Override
-	protected void updateHighlight(String query) {
-		if (!enabled() || !SearchableConfig.INSTANCE.highlight_matches.value()) return;
+	protected boolean updateHighlight(String query) {
+		if (!super.updateHighlight(query)) return false;
 
 		var nameWithHighlight = this.nameMatchManager.getHighlightedText(this.nameText, query);
 		this.name = this.instance.getTextRenderer().wrapLines(nameWithHighlight, 175);
+
+		return true;
 	}
 
 	@ModifyArg(method = "drawName", at = @At(

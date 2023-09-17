@@ -100,6 +100,17 @@ public class Util {
 		};
 	}
 
+	public static String orderedTextToString(OrderedText text) {
+		StringBuilder builder = new StringBuilder();
+
+		text.accept((index, style, codepoint) -> {
+			builder.appendCodePoint(codepoint);
+			return true;
+		});
+
+		return builder.toString();
+	}
+
 	public static StringVisitable highlightMatches(StringVisitable target, List<Match> matches) {
 		if (target == null || matches == null || matches.isEmpty()) return target;
 

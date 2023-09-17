@@ -6,6 +6,8 @@
 
 package io.github.antikyth.searchable.util.function;
 
+import org.apache.commons.lang3.function.TriFunction;
+
 import java.util.function.BiConsumer;
 
 public class Recursive<F> {
@@ -17,5 +19,10 @@ public class Recursive<F> {
 	public static <T, U> BiConsumer<T, U> biConsumer(RecursiveBiConsumer<T, U> function) {
 		final Recursive<BiConsumer<T, U>> recursive = new Recursive<>();
 		return recursive.function = (t, u) -> function.accept(t, u, recursive.function);
+	}
+
+	public static <T, U, V, R> TriFunction<T, U, V, R> triConsumer(RecursiveTriFunction<T, U, V, R> function) {
+		final Recursive<TriFunction<T, U, V, R>> recursive = new Recursive<>();
+		return recursive.function = (t, u, v) -> function.accept(t, u, v, recursive.function);
 	}
 }

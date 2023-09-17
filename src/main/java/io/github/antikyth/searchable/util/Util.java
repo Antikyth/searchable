@@ -8,12 +8,10 @@ package io.github.antikyth.searchable.util;
 
 import io.github.antikyth.searchable.util.function.Recursive;
 import io.github.antikyth.searchable.util.match.Match;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.text.component.TextComponent;
 import net.minecraft.util.Formatting;
+import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +39,69 @@ public class Util {
 		return style.withFormatting(Formatting.UNDERLINE, Formatting.WHITE);
 	}
 
+	public static OrderedText highlightOrderedText(OrderedText target, List<Match> matches) {
+		if (target == null || matches == null || matches.isEmpty()) return target;
+
+		return visitor -> {
+			var counter = new Object() {
+				int currentMatch = 0;
+				boolean endOfMatches = false;
+			};
+
+			TriFunction<Integer, Style, Integer, Boolean> highlightVisitor = Recursive.triConsumer((index, style, codepoint, self) -> {
+				// If the end of the matches hasn't been found yet...
+				if (!counter.endOfMatches) {
+					if (counter.currentMatch < matches.size()) {
+						// If the current match is within `matches`, do highlighting logic...
+
+						Match match = matches.get(counter.currentMatch);
+
+						// If this is after the start of the match...
+						if (index >= match.startIndex()) {
+							if (index < match.endIndex()) {
+								//
+								// Highlight
+								//
+
+								// If this is before the end of the match, then it's within the match, and we highlight it.
+
+								return visitor.accept(index, highlight(style), codepoint);
+							} else {
+								//
+								// Next match
+								//
+
+								// Otherwise, if this is after the match, then we increment the current match and
+								// recurse.
+
+								counter.currentMatch += 1;
+
+								return self.apply(index, style, codepoint);
+							}
+						}
+					} else {
+						//
+						// End of `matches`
+						//
+
+						// If the end of `matches` has been found, set `endOfMatches` to `true`.
+						counter.endOfMatches = true;
+					}
+				}
+
+				//
+				// Fall back to leaving the style untouched
+				//
+
+				return visitor.accept(index, style, codepoint);
+			});
+
+			return target.accept((CharacterVisitor) highlightVisitor);
+		};
+	}
+
 	public static StringVisitable highlightMatches(StringVisitable target, List<Match> matches) {
-		if (target == null || matches.isEmpty()) return target;
+		if (target == null || matches == null || matches.isEmpty()) return target;
 
 		List<Text> texts = new ArrayList<>();
 		// Non-final variables are not allowed within the lambda below, so a wrapper must be made around the index, as

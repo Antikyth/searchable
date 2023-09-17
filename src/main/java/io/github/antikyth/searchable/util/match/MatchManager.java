@@ -10,6 +10,8 @@ import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.function.BiFunctionTempCache;
 import io.github.antikyth.searchable.util.function.MatcherTriFunctionTempCache;
+import io.github.antikyth.searchable.util.function.TriFunctionTempCache;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -135,6 +137,18 @@ public class MatchManager {
 		return matchesHighlightCache.apply(text, matches, Util::highlightMatches);
 	}
 
+	public OrderedText getHighlightedText(OrderedText target, StringVisitable text, String query) {
+		return orderedTextHighlightCache.apply(target, text, query, (_target, _text, _query) -> this.getHighlightedText(_target, this.getMatches(_text, _query)));
+	}
+
+	public OrderedText getHighlightedText(OrderedText target, String text, String query) {
+		return orderedTextStringHighlightCache.apply(target, text, query, (_target, _text, _query) -> this.getHighlightedText(_target, this.getMatches(_text, _query)));
+	}
+
+	public OrderedText getHighlightedText(OrderedText target, List<Match> matches) {
+		return orderedTextMatchesHighlightCache.apply(target, matches, Util::highlightOrderedText);
+	}
+
 	// Matching caches {{{
 	private final MatcherTriFunctionTempCache<String, String, List<Match>> getMatchesCache = MatcherTriFunctionTempCache.create();
 	private final MatcherTriFunctionTempCache<StringVisitable, String, List<Match>> visitableGetMatchesCache = MatcherTriFunctionTempCache.create();
@@ -149,6 +163,10 @@ public class MatchManager {
 
 	private final BiFunctionTempCache<String, String, StringVisitable> stringHighlightCache = BiFunctionTempCache.create();
 	private final BiFunctionTempCache<String, List<Match>, StringVisitable> stringMatchesHighlightCache = BiFunctionTempCache.create();
+
+	private final TriFunctionTempCache<OrderedText, StringVisitable, String, OrderedText> orderedTextHighlightCache = TriFunctionTempCache.create();
+	private final TriFunctionTempCache<OrderedText, String, String, OrderedText> orderedTextStringHighlightCache = TriFunctionTempCache.create();
+	private final BiFunctionTempCache<OrderedText, List<Match>, OrderedText> orderedTextMatchesHighlightCache = BiFunctionTempCache.create();
 	// }}}
 
 	/**

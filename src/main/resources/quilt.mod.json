@@ -6,7 +6,7 @@
 		"version": "${version}",
 		"metadata": {
 			"name": "Searchable",
-			"description": "Improves the search functionality of the singleplayer world selection screen and brings it to the multiplayer server selection screen, languages screen, key binds screen, and game rules editing screen.",
+			"description": "Improves the search functionality of the singleplayer world selection screen and brings it to the multiplayer server selection screen, languages screen, key binds screen, game rules editing screen, resource pack selection screen, and data pack selection screen.",
 			"license": "MPL-2.0",
 			"contributors": {
 				"Antikyth": "Owner"

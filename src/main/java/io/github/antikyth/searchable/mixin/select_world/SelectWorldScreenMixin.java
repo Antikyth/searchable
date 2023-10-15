@@ -6,6 +6,7 @@
 
 package io.github.antikyth.searchable.mixin.select_world;
 
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import io.github.antikyth.searchable.Searchable;
 import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
 import io.github.antikyth.searchable.config.SearchableConfig;
@@ -14,8 +15,10 @@ import io.github.antikyth.searchable.util.Util;
 import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -33,6 +36,15 @@ public abstract class SelectWorldScreenMixin extends Screen {
 
 	@Shadow
 	protected TextFieldWidget searchBox;
+
+	@Shadow
+	private ButtonWidget selectButton;
+	@Shadow
+	private ButtonWidget editButton;
+	@Shadow
+	private ButtonWidget recreateButton;
+	@Shadow
+	private ButtonWidget deleteButton;
 
 	protected SelectWorldScreenMixin(Text title) {
 		super(title);
@@ -91,5 +103,17 @@ public abstract class SelectWorldScreenMixin extends Screen {
 		PatternSyntaxException validityError = MatchManager.matcher().validateQueryError(query);
 
 		((TextFieldWidgetValidityAccessor) this.searchBox).searchable$setValidity(validityError);
+	}
+
+	/**
+	 * Only update buttons' {@link ButtonWidget#active active} field if the button is not null.
+	 */
+	@WrapWithCondition(method = "worldSelected", at = @At(
+		value = "FIELD",
+		target = "net/minecraft/client/gui/widget/ButtonWidget.active : Z",
+		opcode = Opcodes.PUTFIELD
+	))
+	public boolean onWorldSelectedButtonActiveSet(ButtonWidget button, boolean buttonActive, boolean active, boolean deleteButtonActive) {
+		return button != null;
 	}
 }

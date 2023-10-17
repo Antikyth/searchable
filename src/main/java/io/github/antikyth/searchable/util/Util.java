@@ -96,7 +96,7 @@ public class Util {
 				return visitor.accept(index, style, codepoint);
 			});
 
-			return target.accept((CharacterVisitor) highlightVisitor);
+			return target.accept(highlightVisitor::apply);
 		};
 	}
 

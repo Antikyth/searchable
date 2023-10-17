@@ -45,16 +45,23 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 		}
 	}
 
+	/**
+	 * Updates the highlighting for the rule widget.
+	 *
+	 * @return Whether highlighting was able to be applied.
+	 */
 	@Unique
 	protected boolean updateHighlight(String query) {
 		if (!enabled() || !SearchableConfig.INSTANCE.highlight_matches.value()) return false;
 
 		// TODO: What if you only want to highlight part of the tooltip (e.g. just the name)?
-		this.highlightedTooltip = this.description.stream().map(orderedText -> {
-			String string = Util.orderedTextToString(orderedText);
+		if (this.description != null) {
+			this.highlightedTooltip = this.description.stream().map(orderedText -> {
+				String string = Util.orderedTextToString(orderedText);
 
-			return this.tooltipMatchManager.getHighlightedText(orderedText, string, query);
-		}).collect(Collectors.toList());
+				return this.tooltipMatchManager.getHighlightedText(orderedText, string, query);
+			}).collect(Collectors.toList());
+		}
 
 		return true;
 	}

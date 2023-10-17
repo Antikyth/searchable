@@ -12,10 +12,12 @@ import io.github.antikyth.searchable.accessor.MatchesAccessor;
 import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.singleplayer.gamerule.AbstractRuleWidgetAccessor;
 import io.github.antikyth.searchable.config.SearchableConfig;
+import io.github.antikyth.searchable.util.match.MatchManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.text.OrderedText;
 import net.minecraft.world.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.List;
 import java.util.Map;
 
 @Mixin(EditGameRulesScreen.RuleListWidget.class)
@@ -51,6 +54,9 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 
 	@Unique
 	private boolean currentCategoryMatches = false;
+
+	@Unique
+	private final MatchManager tooltipMatchManager = new MatchManager();
 
 	// Mixin will ignore this - required because of extending `ElementListWidget`
 	public RuleListWidgetMixin(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
@@ -145,6 +151,17 @@ public abstract class RuleListWidgetMixin extends ElementListWidget<EditGameRule
 		}
 
 		return false;
+	}
+
+	@ModifyArg(method = "render", at = @At(
+		value = "INVOKE",
+		target = "net/minecraft/client/gui/screen/world/EditGameRulesScreen.setDeferredTooltip (Ljava/util/List;)V",
+		ordinal = 0
+	), index = 0)
+	private List<OrderedText> switchTooltip(List<OrderedText> tooltip) {
+		if (!enabled() || !SearchableConfig.INSTANCE.highlight_matches.value() || tooltip == null) return tooltip;
+
+		return this.tooltipMatchManager.getHighlightedOrderedTexts(tooltip, this.query);
 	}
 
 	@Unique

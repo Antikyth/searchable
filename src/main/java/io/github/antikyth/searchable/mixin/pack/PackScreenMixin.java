@@ -7,6 +7,7 @@
 package io.github.antikyth.searchable.mixin.pack;
 
 import io.github.antikyth.searchable.Searchable;
+import io.github.antikyth.searchable.accessor.SetQueryAccessor;
 import io.github.antikyth.searchable.accessor.TextFieldWidgetValidityAccessor;
 import io.github.antikyth.searchable.config.SearchableConfig;
 import io.github.antikyth.searchable.gui.widget.SearchableConfigButton;
@@ -90,6 +91,16 @@ public abstract class PackScreenMixin extends Screen {
 			));
 		}
 		// }}}
+	}
+
+	@ModifyArg(method = "method_29672", at = @At(
+		value = "INVOKE",
+		target = "Ljava/util/List;add(Ljava/lang/Object;)Z"
+	), index = 0)
+	private Object setPackEntryQuery(Object object) {
+		if (object instanceof SetQueryAccessor entry) entry.searchable$setQuery(this.query);
+
+		return object;
 	}
 
 	@ModifyArg(method = "render", at = @At(

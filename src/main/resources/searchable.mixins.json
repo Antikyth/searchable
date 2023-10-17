@@ -4,17 +4,17 @@
 	"package": "io.github.antikyth.searchable.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"gamerule.GameRules$CategoryMixin",
-		"pack.PackListWidgetMixin",
-		"select_world.WorldSaveSummaryMixin"
 	],
 	"client": [
 		"ClickableWidgetMixin",
 		"EntryListWidgetMixin",
+		"MultilineText$LineAccessor",
+		"MultilineTextLinesMixin",
 		"TextFieldWidgetMixin",
 		"gamerule.AbstractRuleWidgetMixin",
 		"gamerule.BooleanRuleWidgetMixin",
 		"gamerule.EditGameRulesScreenMixin",
+		"gamerule.GameRules$CategoryMixin",
 		"gamerule.IntRuleWidgetMixin",
 		"gamerule.NamedRuleWidgetMixin",
 		"gamerule.RuleCategoryWidgetMixin",
@@ -26,6 +26,7 @@
 		"language.LanguageEntryMixin",
 		"language.LanguageOptionsScreenMixin",
 		"language.LanguageSelectionListWidgetMixin",
+		"pack.PackListWidgetMixin",
 		"pack.PackScreenMixin",
 		"pack.ResourcePackEntryMixin",
 		"select_server.LanServerEntryMixin",
@@ -34,7 +35,8 @@
 		"select_server.ServerEntryMixin",
 		"select_world.SelectWorldScreenMixin",
 		"select_world.WorldListWidget$EntryMixin",
-		"select_world.WorldListWidgetMixin"
+		"select_world.WorldListWidgetMixin",
+		"select_world.WorldSaveSummaryMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

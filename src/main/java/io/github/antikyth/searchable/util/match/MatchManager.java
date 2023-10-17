@@ -139,11 +139,19 @@ public class MatchManager {
 	}
 
 	public OrderedText getHighlightedText(OrderedText target, StringVisitable text, String query) {
-		return orderedTextHighlightCache.apply(target, text, query, (_target, _text, _query) -> this.getHighlightedText(_target, this.getMatches(_text, _query)));
+		return orderedTextStringVisitableHighlightCache.apply(target, text, query, (_target, _text, _query) -> this.getHighlightedText(_target, this.getMatches(_text, _query)));
 	}
 
 	public OrderedText getHighlightedText(OrderedText target, String text, String query) {
 		return orderedTextStringHighlightCache.apply(target, text, query, (_target, _text, _query) -> this.getHighlightedText(_target, this.getMatches(_text, _query)));
+	}
+
+	public OrderedText getHighlightedText(OrderedText target, String query) {
+		return this.orderedTextHighlightCache.apply(target, query, (_target, _query) -> {
+			String text = Util.orderedTextToString(_target);
+
+			return this.getHighlightedText(_target, text, _query);
+		});
 	}
 
 	public OrderedText getHighlightedText(OrderedText target, List<Match> matches) {
@@ -173,9 +181,10 @@ public class MatchManager {
 	private final BiFunctionTempCache<String, String, StringVisitable> stringHighlightCache = BiFunctionTempCache.create();
 	private final BiFunctionTempCache<String, List<Match>, StringVisitable> stringMatchesHighlightCache = BiFunctionTempCache.create();
 
-	private final TriFunctionTempCache<OrderedText, StringVisitable, String, OrderedText> orderedTextHighlightCache = TriFunctionTempCache.create();
+	private final TriFunctionTempCache<OrderedText, StringVisitable, String, OrderedText> orderedTextStringVisitableHighlightCache = TriFunctionTempCache.create();
 	private final TriFunctionTempCache<OrderedText, String, String, OrderedText> orderedTextStringHighlightCache = TriFunctionTempCache.create();
 	private final BiFunctionTempCache<OrderedText, List<Match>, OrderedText> orderedTextMatchesHighlightCache = BiFunctionTempCache.create();
+	private final BiFunctionTempCache<OrderedText, String, OrderedText> orderedTextHighlightCache = BiFunctionTempCache.create();
 
 	private final BiFunctionTempCache<List<OrderedText>, String, List<OrderedText>> orderedTextsHighlightCache = BiFunctionTempCache.create();
 	// }}}

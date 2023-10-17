@@ -40,8 +40,8 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 	@Override
 	public void searchable$setQuery(String query) {
 		if (enabled() && query != null && !query.equals(this.query)) {
-			this.updateHighlight(query);
 			this.query = query;
+			this.updateHighlight();
 		}
 	}
 
@@ -51,7 +51,7 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 	 * @return Whether highlighting was able to be applied.
 	 */
 	@Unique
-	protected boolean updateHighlight(String query) {
+	protected boolean updateHighlight() {
 		if (!enabled() || !SearchableConfig.INSTANCE.highlight_matches.value()) return false;
 
 		// TODO: What if you only want to highlight part of the tooltip (e.g. just the name)?
@@ -59,7 +59,7 @@ public class AbstractRuleWidgetMixin implements AbstractRuleWidgetAccessor {
 			this.highlightedTooltip = this.description.stream().map(orderedText -> {
 				String string = Util.orderedTextToString(orderedText);
 
-				return this.tooltipMatchManager.getHighlightedText(orderedText, string, query);
+				return this.tooltipMatchManager.getHighlightedText(orderedText, string, this.query);
 			}).collect(Collectors.toList());
 		}
 

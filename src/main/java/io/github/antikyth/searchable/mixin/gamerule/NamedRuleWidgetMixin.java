@@ -48,7 +48,7 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 			this.technicalName = technicalName;
 
 			this.technicalNameText = Util.technicalName(Text.literal(this.technicalName));
-			this.updateHighlight(this.query);
+			this.updateHighlight();
 		}
 	}
 
@@ -63,14 +63,14 @@ public abstract class NamedRuleWidgetMixin extends AbstractRuleWidgetMixin {
 		this.instance = instance;
 
 		this.nameText = name;
-		this.updateHighlight(this.query);
+		this.updateHighlight();
 	}
 
 	@Override
-	protected boolean updateHighlight(String query) {
-		if (!super.updateHighlight(query)) return false;
+	protected boolean updateHighlight() {
+		if (!super.updateHighlight()) return false;
 
-		var nameWithHighlight = this.nameMatchManager.getHighlightedText(this.nameText, query);
+		var nameWithHighlight = this.nameMatchManager.getHighlightedText(this.nameText, this.query);
 		this.name = this.instance.getTextRenderer().wrapLines(nameWithHighlight, 175);
 
 		return true;

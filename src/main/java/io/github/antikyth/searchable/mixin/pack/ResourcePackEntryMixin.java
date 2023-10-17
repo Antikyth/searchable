@@ -60,7 +60,7 @@ public abstract class ResourcePackEntryMixin extends AlwaysSelectedEntryListWidg
 		target = "Lnet/minecraft/client/gui/screen/pack/PackListWidget$ResourcePackEntry;displayName:Lnet/minecraft/text/OrderedText;"
 	))
 	private OrderedText highlightDisplayName(OrderedText displayName) {
-		if (displayName == null) return null;
+		if (!enabled() || displayName == null) return displayName;
 
 		return this.displayNameMatchManager.getHighlightedText(displayName, this.query);
 	}
@@ -71,7 +71,7 @@ public abstract class ResourcePackEntryMixin extends AlwaysSelectedEntryListWidg
 		target = "Lnet/minecraft/client/gui/screen/pack/PackListWidget$ResourcePackEntry;description:Lnet/minecraft/client/font/MultilineText;"
 	))
 	private MultilineText highlightDescription(MultilineText description) {
-		if (description == null) return null;
+		if (!highlightDescriptions() || description == null) return description;
 
 		// If we can't get the lines of text then we can't highlight the text.
 		if (!(description instanceof MultilineTextLinesAccessor multilineText)) return description;
@@ -105,5 +105,10 @@ public abstract class ResourcePackEntryMixin extends AlwaysSelectedEntryListWidg
 	private static boolean enabled() {
 		return SearchableConfig.INSTANCE.select_packs_screen.add_search.value()
 			&& SearchableConfig.INSTANCE.highlight_matches.value();
+	}
+
+	@Unique
+	private static boolean highlightDescriptions() {
+		return enabled() && SearchableConfig.INSTANCE.select_packs_screen.match_descriptions.value();
 	}
 }
